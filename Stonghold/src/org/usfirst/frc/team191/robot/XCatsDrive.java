@@ -3,10 +3,9 @@ package org.usfirst.frc.team191.robot;
 import edu.wpi.first.wpilibj.Joystick;
 
 public class XCatsDrive {
-	//we need to keep an array of the motors required for the drive
+	//we need to keep an array of the motors required for the drive. This will work for a 2 or 4 drive system
 	private XCatsSpeedContoller  _motors[];
 	
-	public final int _frontLeft = 0, _rearLeft = 1, _frontRight = 2, _rearRight = 3;
 	
 	//the reduction factor allows us to scale the speed of the drive
 	private double _reductionFactor = Enums.SPEED_REDUCTION_FACTOR;
@@ -14,32 +13,36 @@ public class XCatsDrive {
 	//we can control whether we can support mechanum movement with this
 	private boolean _useMechanumWheels = Enums.HAS_MECHANUM_WHEELS;
 	
-	public XCatsDrive (int channels[], boolean useCAN)
+	public XCatsDrive (boolean useCAN, boolean isTalon)
 	{
-		this._motors = new XCatsSpeedContoller[4];
+		//We will assume that if the Enums.DRIVE_MOTOR_NUMBERS array has length 4 then there are 4 motors, otherwise there are 2 (front left and front right)
+		this._motors = new XCatsSpeedContoller[Enums.DRIVE_MOTOR_NUMBERS.length];
+
+		this._motors[Enums.FRONT_LEFT] = new XCatsSpeedContoller("motor"+Enums.FRONT_LEFT, Enums.DRIVE_MOTOR_NUMBERS[Enums.FRONT_LEFT], useCAN, isTalon,null,null);
+		this._motors[Enums.FRONT_RIGHT] = new XCatsSpeedContoller("motor"+Enums.FRONT_RIGHT,Enums.DRIVE_MOTOR_NUMBERS[Enums.FRONT_RIGHT], useCAN, isTalon,null,null);
+		_motors[Enums.FRONT_LEFT].setInverted(true);
 		
-		for (int i = 0; i < 4; i++)
-		{
-			this._motors[i] = new XCatsSpeedContoller(channels[i], useCAN, Enums.IS_FINAL_ROBOT,null,null);
-			this._motors[i].setDashboardIO(Enums.DASHBOARD_INPUT, Enums.DASHBOARD_OUTPUT, "motor" + i);
-		}
-		
-		_motors[_frontLeft].setInverted(true);
-		_motors[_rearLeft].setInverted(true);
+		if (Enums.DRIVE_MOTOR_NUMBERS.length > 2){
+			this._motors[Enums.REAR_LEFT] = new XCatsSpeedContoller("motor"+Enums.REAR_LEFT,Enums.DRIVE_MOTOR_NUMBERS[Enums.REAR_LEFT], useCAN, isTalon,null,null);
+			this._motors[Enums.REAR_RIGHT] = new XCatsSpeedContoller("motor"+Enums.REAR_RIGHT,Enums.DRIVE_MOTOR_NUMBERS[Enums.REAR_RIGHT], useCAN, isTalon,null,null);			
+			_motors[Enums.REAR_LEFT].setInverted(true);
+		}		
 	}
 	
-	public XCatsDrive (int channels[], boolean speedMode, int codesPerRev, double p, double i, double d)
+
+	public XCatsDrive (int channels[], boolean speedMode, boolean isTalon, int codesPerRev, double p, double i, double d)
 	{
-		this._motors = new XCatsSpeedContoller[4];
+		this._motors = new XCatsSpeedContoller[Enums.DRIVE_MOTOR_NUMBERS.length];
 		
-		for (int j = 0; j < 4; j++)
-		{
-			this._motors[j] = new XCatsSpeedContoller(channels[j], speedMode, Enums.IS_FINAL_ROBOT, codesPerRev, p, i, d,null,null);
-			this._motors[j].setDashboardIO(true, true, "motor");
+		this._motors[Enums.FRONT_LEFT] = new XCatsSpeedContoller("motor",  channels[Enums.FRONT_LEFT], speedMode, isTalon, codesPerRev, p, i, d,null,null);
+		this._motors[Enums.FRONT_RIGHT] = new XCatsSpeedContoller("motor", channels[Enums.FRONT_RIGHT], speedMode, isTalon, codesPerRev, p, i, d,null,null);
+		_motors[Enums.FRONT_LEFT].setInverted(true);
+
+		if (Enums.DRIVE_MOTOR_NUMBERS.length > 2){
+			this._motors[Enums.REAR_LEFT] = new XCatsSpeedContoller("motor", channels[Enums.REAR_LEFT], speedMode, isTalon, codesPerRev, p, i, d,null,null);
+			this._motors[Enums.REAR_RIGHT] = new XCatsSpeedContoller("motor", channels[Enums.REAR_RIGHT], speedMode, isTalon, codesPerRev, p, i, d,null,null);
+			_motors[Enums.REAR_LEFT].setInverted(true);
 		}
-		
-		_motors[_frontLeft].setInverted(true);
-		_motors[_rearLeft].setInverted(true);
 	}
 	
 	public void set (Joystick drive_js)
@@ -49,12 +52,12 @@ public class XCatsDrive {
 		set(_reductionFactor*drive_js.getRawAxis(0), _reductionFactor*drive_js.getRawAxis(1), _reductionFactor*drive_js.getRawAxis(4), _reductionFactor*drive_js.getRawAxis(5));
 	}
 	
-	public void set_reductionFactor (double _reductionFactor)
+	public void setReductionFactor (double reductionFactor)
 	{
-		this._reductionFactor = _reductionFactor;
+		this._reductionFactor = reductionFactor;
 	}
 	
-	public double get_reductionFactor ()
+	public double getReductionFactor ()
 	{
 		return _reductionFactor;
 	}
@@ -67,25 +70,33 @@ public class XCatsDrive {
 	public void set (double left_x, double left_y, double right_x, double right_y)
 	{
 		if (_useMechanumWheels){
-			_motors[_frontLeft].set(left_y - left_x);
-			_motors[_rearLeft].set(left_y + left_x);
-			_motors[_frontRight].set(right_y + right_x);
-			_motors[_rearRight].set(right_y - right_x);			
+			_motors[Enums.FRONT_LEFT].set(left_y - left_x);
+			_motors[Enums.FRONT_RIGHT].set(right_y + right_x);
+			if (_motors.length > 2) {
+				_motors[Enums.REAR_LEFT].set(left_y + left_x);
+				_motors[Enums.REAR_RIGHT].set(right_y - right_x);							
+			}
 		}
 		else{
-			_motors[_frontLeft].set(left_y);
-			_motors[_rearLeft].set(left_x);
-			_motors[_frontRight].set(right_y );
-			_motors[_rearRight].set(right_x);						
+			_motors[Enums.FRONT_LEFT].set(left_y);
+			_motors[Enums.FRONT_RIGHT].set(right_y );
+
+			if (_motors.length > 2) {
+				_motors[Enums.REAR_LEFT].set(left_x);
+				_motors[Enums.REAR_RIGHT].set(right_x);			
+			}
 		}
 	}
 
 	public void set (double leftSpeed, double rightSpeed)
 	{
-		_motors[_frontLeft].set(leftSpeed);
-		_motors[_rearLeft].set(leftSpeed);
-		_motors[_frontRight].set(rightSpeed);
-		_motors[_rearRight].set(rightSpeed);
+		_motors[Enums.FRONT_LEFT].set(leftSpeed);
+		_motors[Enums.FRONT_RIGHT].set(rightSpeed);
+
+		if (_motors.length > 2){
+			_motors[Enums.REAR_LEFT].set(leftSpeed);
+			_motors[Enums.REAR_RIGHT].set(rightSpeed);
+		}
 	}
 
 	public void set (int motor, double speed)
@@ -100,7 +111,12 @@ public class XCatsDrive {
 	
 	public void updateStatus ()
 	{
-		for (int i = 0; i < 4; i++)
-			_motors[i].updateStatus();
+		_motors[Enums.FRONT_LEFT].updateStatus();
+		_motors[Enums.FRONT_RIGHT].updateStatus();
+		if (_motors.length > 2) {
+			_motors[Enums.REAR_LEFT].updateStatus();
+			_motors[Enums.REAR_RIGHT].updateStatus();			
+		}
+		
 	}
 }

@@ -17,125 +17,36 @@ public class XCatsSpeedContoller
 {
 	private SpeedController motor;
 	/*
-	 * The scale and the units depend on the mode the Jaguar is in.<br>
+	 * The _scale and the units depend on the mode the Jaguar is in.<br>
 	 * In percentVbus mode, the outputValue is from -1.0 to 1.0 (same as PWM Jaguar).<br>
 	 * In voltage mode, the outputValue is in volts. <br>
 	 * In current mode, the outputValue is in amps. <br>
 	 * In speed mode, the outputValue is in rotations/minute.<br>
 	 * In position mode, the outputValue is in rotations.
 	 */
-	private double scale;
-	private int invert = 1;
-	private boolean useRawInput = false;
-	private double setPoint = 0;
-	private double cutOffSetPointP = 0, cutOffSetPointN = 0; //what the motor should be set to when it hits a limit or something. the first is for positive speeds, the second negative.
-	private double p, i, d;
-	private int codesPerRev;
-	private String name;
-	private boolean dashboardInput = false;
-	private boolean dashboardOutput = false;
-	private double cutOffCurrent = -1;
-	private int cutOffDirection = 0;
-	private boolean stopping = false;
-	private Timer stopTimer;
+	private double _scale;
+	private int _invert = 1;
+	private boolean _useRawInput = false;
+	private double _setPoint = 0;
+	private double _cutOffSetPointP = 0, _cutOffSetPointN = 0; //what the motor should be set to when it hits a limit or something. the first is for positive speeds, the second negative.
+	private double _p, _i, _d;
+	private int _codesPerRev;
+	private String _name;
+	private boolean _dashboardInput = false;
+	private boolean _dashboardOutput = false;
+	private int _cutOffDirection = 0;
+	private boolean _stopping = false;
+	private Timer _stopTimer;
 	private DigitalInput _upperLimit;
 	private DigitalInput _lowerLimit;
 
-	//	private motorType type;
-	//	public enum motorType
-	//	{
-	//		pwmJaguar(0), percentJaguar(1), speedJaguar(2), positionJaguar(3), pwmTalon(4), percentTalon(5), speedTalon(6), positionTalon(7);
-	//		
-	//		int value;
-	//		
-	//		motorType (int value)
-	//		{
-	//			this.value = value;
-	//		}
-	//	};
-	//	
-	//	public XCatsSpeedContoller (int channel, motorType type)
-	//	{
-	//		if (type.value % motorType.pwmTalon.value != 0) //if using CAN bus
-	//		{
-	//			if (type.value > motorType.pwmTalon.value) //if is Talon
-	//			{
-	//				this.motor = new CANTalon(channel);
-	//				((CANTalon) motor).changeControlMode(ControlMode.PercentVbus);
-	//				((CANTalon) motor).enableControl();
-	//			}
-	//			else
-	//			{
-	//				this.motor = new CANJaguar(channel);
-	//				((CANJaguar) motor).setPercentMode();
-	//				((CANJaguar) motor).enableControl();
-	//			}
-	//		}
-	//		else
-	//			if (type.value == motorType.pwmTalon.value)
-	//				this.motor = new Talon(channel);
-	//			else
-	//				this.motor = new Jaguar(channel);
-	//
-	//		this.type = type;
-	//		scale = 1;	
-	//		stopTimer = new Timer();
-	//	}
-	//	
-	//	public XCatsSpeedContoller (int channel, motorType type, int codesPerRev, double p, double i, double d)
-	//	{
-	//		if (type.value % motorType.pwmTalon.value == 0)
-	//			System.out.println("PID constructor called with non PID type. Calling non PID constructor!");
-	//		
-	//		if (type.value >= motorType.pwmTalon.value)
-	//		{
-	//			motor = new CANTalon(channel);
-	//			
-	//			if (type == motorType.speedTalon)
-	//			{
-	//				((CANTalon) motor).changeControlMode(ControlMode.Speed);
-	//				scale = 500;
-	//			}
-	//			else
-	//			{
-	//				((CANTalon) motor).changeControlMode(ControlMode.Position);
-	//				scale = Enums.ELEVATOR_ROTATIONS_PER_LEVEL;
-	//			}
-	//			
-	//			((CANTalon) motor).setPID(p, i, d);
-	//			((CANTalon) motor).enableControl();
-	//		}
-	//		else
-	//		{
-	//			motor = new CANJaguar(channel);
-	//			if (type == motorType.speedJaguar)
-	//			{
-	//				((CANJaguar) motor).setSpeedMode(CANJaguar.kQuadEncoder, codesPerRev, p, i, d);
-	//				scale = 500;
-	//				((CANJaguar) motor).enableControl();
-	//			}
-	//			else
-	//			{
-	//				((CANJaguar) motor).setPositionMode(CANJaguar.kQuadEncoder, codesPerRev, p, i, d);
-	//				((CANJaguar) motor).enableControl();
-	//			}
-	//		}
-	//
-	//		this.codesPerRev = codesPerRev;
-	//		this.p = p;
-	//		this.i = i;
-	//		this.d = d;
-	//		this.type = type;
-	//		stopTimer = new Timer();
-	//	}
-
-
-
-	public XCatsSpeedContoller (int channel, boolean useCan, boolean isTalon, DigitalInput lowerLimit, DigitalInput upperLimit)
+	//this constructor is used with a controller that has a digital input that acts as a switch
+	public XCatsSpeedContoller (String name, int channel, boolean useCan, boolean isTalon, DigitalInput lowerLimit, DigitalInput upperLimit)
 	{
 		_upperLimit = upperLimit;
 		_lowerLimit = lowerLimit;
-		scale = 1;
+		_name = name;
+		_scale = 1;
 		if (useCan)
 		{
 			if (isTalon)
@@ -154,16 +65,20 @@ public class XCatsSpeedContoller
 		else
 			this.motor = new Jaguar(channel);
 
-		stopTimer = new Timer();
+		_stopTimer = new Timer();
+		
+		this.setDashboardIO(Enums.DASHBOARD_INPUT, Enums.DASHBOARD_OUTPUT, _name);
 	}
 
-	public XCatsSpeedContoller (int channel, boolean speedMode, boolean isTalon, int codesPerRev, double p, double i, double d,DigitalInput lowerLimit,DigitalInput upperLimit)
+	//this constructor is only used when we want to try using PID control
+	public XCatsSpeedContoller (String name, int channel, boolean speedMode, boolean isTalon, int codesPerRev, double p, double i, double d,DigitalInput lowerLimit,DigitalInput upperLimit)
 	{
-		this.codesPerRev = codesPerRev;
-		this.p = p;
-		this.i = i;
-		this.d = d;
-		scale = 1;
+		this._codesPerRev = codesPerRev;
+		this._p = p;
+		this._i = i;
+		this._d = d;
+		_name = name;
+		_scale = 1;
 
 		if (isTalon)
 		{
@@ -172,7 +87,7 @@ public class XCatsSpeedContoller
 			if (speedMode)
 			{
 				((CANTalon) motor).changeControlMode(CANTalon.TalonControlMode.Speed);
-				scale = 500;
+				_scale = 500;
 			}
 			else
 			{
@@ -188,7 +103,7 @@ public class XCatsSpeedContoller
 			if (speedMode)
 			{
 				((CANJaguar) motor).setSpeedMode(CANJaguar.kQuadEncoder, codesPerRev, p, i, d);
-				scale = 5000;
+				_scale = 5000;
 			}
 			else
 			{
@@ -197,7 +112,7 @@ public class XCatsSpeedContoller
 			((CANJaguar) motor).enableControl();
 		}
 
-		stopTimer = new Timer();
+		_stopTimer = new Timer();
 	}
 
 	public void set (double setPoint)
@@ -212,31 +127,31 @@ public class XCatsSpeedContoller
 
 			//if the lower limit is not null, then check to see if it is reached and the caller is trying to drive it lower
 			if (_lowerLimit != null)			
-				if (_lowerLimit.get() &&  cutOffDirection * setPoint < 0 )
+				if (_lowerLimit.get() &&  _cutOffDirection * setPoint < 0 )
 					return;
 
 			//if the upper limit is not null, then check to see if it is reached and the caller is trying to drive it higher
 			if (_upperLimit != null)
-				if (_upperLimit.get() && cutOffDirection * setPoint > 0 )
+				if (_upperLimit.get() && _cutOffDirection * setPoint > 0 )
 					return;
 		 */
 
-		if (cutOffDirection * setPoint <= 0)
+		if (_cutOffDirection * setPoint <= 0)
 		{
-			this.setPoint = setPoint;
-			cutOffDirection = 0;
+			this._setPoint = setPoint;
+			_cutOffDirection = 0;
 		}
 		else
-			this.setPoint = cutOffDirection > 0 ? cutOffSetPointP : cutOffSetPointN;
+			this._setPoint = _cutOffDirection > 0 ? _cutOffSetPointP : _cutOffSetPointN;
 
 
-			if (useRawInput)
-				motor.set(this.setPoint);
+			if (_useRawInput)
+				motor.set(this._setPoint);
 			else
-				motor.set(this.setPoint * invert * scale);
+				motor.set(this._setPoint * _invert * _scale);
 
-			if (dashboardOutput)
-				SmartDashboard.putNumber(name + "_set_point", this.setPoint);					
+			if (_dashboardOutput)
+				SmartDashboard.putNumber(_name + "_set_point", this._setPoint);					
 
 			//		}
 			//		catch (Exception e) {
@@ -249,22 +164,22 @@ public class XCatsSpeedContoller
 
 	public void stop ()
 	{
-		set(-setPoint);
-		this.stopping = true;
-		stopTimer.start();
+		set(-_setPoint);
+		this._stopping = true;
+		_stopTimer.start();
 	}
 
 	public void setPID (double p, double i, double d)
 	{
-		this.p = p;
-		this.i = i;
-		this.d = d;
+		this._p = p;
+		this._i = i;
+		this._d = d;
 
-		if (dashboardOutput)
+		if (_dashboardOutput)
 		{
-			SmartDashboard.putNumber(name + "_p", p);
-			SmartDashboard.putNumber(name + "_i", i);
-			SmartDashboard.putNumber(name + "_d", d);
+			SmartDashboard.putNumber(_name + "_p", p);
+			SmartDashboard.putNumber(_name + "_i", i);
+			SmartDashboard.putNumber(_name + "_d", d);
 		}
 
 		if (motor instanceof CANJaguar)
@@ -275,52 +190,52 @@ public class XCatsSpeedContoller
 
 	public void setCutOffDirection (int cutOffDirection)
 	{
-		this.cutOffDirection = cutOffDirection;
+		this._cutOffDirection = cutOffDirection;
 	}
 
 	public void setCutOffSetPointP (double setPoint)
 	{
-		cutOffSetPointP = setPoint;
+		_cutOffSetPointP = setPoint;
 	}
 
 	public void setCutOffSetPointN (double setPoint)
 	{
-		cutOffSetPointN = setPoint;
+		_cutOffSetPointN = setPoint;
 	}
 
 	public void setUseRawInput (boolean useRawInput)
 	{
-		this.useRawInput = useRawInput;
+		this._useRawInput = useRawInput;
 
-		if (dashboardOutput)
-			SmartDashboard.putBoolean(name + "_raw_input", useRawInput);
+		if (_dashboardOutput)
+			SmartDashboard.putBoolean(_name + "_raw_input", _useRawInput);
 	}
 
 	public void setInverted(boolean invert)
 	{
 		if (invert)
-			this.invert = -1;
+			this._invert = -1;
 		else
-			this.invert = 1;
+			this._invert = 1;
 	}
 
 	public void setDashboardIO (boolean input, boolean output, String name)
 	{
-		this.dashboardInput = input;
-		this.dashboardOutput = output;
-		this.name = name;
+		this._dashboardInput = input;
+		this._dashboardOutput = output;
+		this._name = name;
 
-		if (dashboardOutput)
+		if (_dashboardOutput)
 		{
-			SmartDashboard.putNumber(name + "_set_point", setPoint);
-			SmartDashboard.putBoolean(name + "_raw_input", useRawInput);
+			SmartDashboard.putNumber(_name + "_set_point", _setPoint);
+			SmartDashboard.putBoolean(_name + "_raw_input", _useRawInput);
 
 			if ((motor instanceof CANJaguar && ((CANJaguar) motor).getControlMode() != CANJaguar.JaguarControlMode.PercentVbus)
 					|| (motor instanceof CANTalon && ((CANTalon) motor).getControlMode() != CANTalon.TalonControlMode.PercentVbus) )
 			{
-				SmartDashboard.putNumber(name + "_p", p);
-				SmartDashboard.putNumber(name + "_i", i);
-				SmartDashboard.putNumber(name + "_d", d);
+				SmartDashboard.putNumber(_name + "_p", _p);
+				SmartDashboard.putNumber(_name + "_i", _i);
+				SmartDashboard.putNumber(_name + "_d", _d);
 			}
 		}
 	}
@@ -375,7 +290,7 @@ public class XCatsSpeedContoller
 
 	public double getSetPoint ()
 	{
-		return setPoint;
+		return _setPoint;
 	}
 
 	public double getCurrent ()
@@ -390,12 +305,12 @@ public class XCatsSpeedContoller
 
 	public double getSpeed ()
 	{
-		return motor instanceof CANJaguar ? ((CANJaguar) motor).getSpeed() / invert / scale : ((CANTalon) motor).getSpeed() / invert / scale;
+		return motor instanceof CANJaguar ? ((CANJaguar) motor).getSpeed() / _invert / _scale : ((CANTalon) motor).getSpeed() / _invert / _scale;
 	}
 
 	public double getPosition ()
 	{
-		return motor instanceof CANJaguar ? ((CANJaguar) motor).getPosition() / invert / scale : ((CANTalon) motor).getPosition() / invert / scale;
+		return motor instanceof CANJaguar ? ((CANJaguar) motor).getPosition() / _invert / _scale : ((CANTalon) motor).getPosition() / _invert / _scale;
 	}
 
 	public double getEncPosition ()
@@ -415,59 +330,59 @@ public class XCatsSpeedContoller
 
 	public void updateStatus()
 	{
-		if (stopping && stopTimer.get() > Enums.MOTOR_STOP_TIME)
+		if (_stopping && _stopTimer.get() > Enums.MOTOR_STOP_TIME)
 		{
 			set(0);
-			stopping = false;
-			stopTimer.stop();
-			stopTimer.reset();
+			_stopping = false;
+			_stopTimer.stop();
+			_stopTimer.reset();
 		}
 
 		if (motor instanceof CANJaguar)
 		{			
-			if (dashboardInput && ((CANJaguar) motor).getControlMode() != CANJaguar.JaguarControlMode.PercentVbus)
+			if (_dashboardInput && ((CANJaguar) motor).getControlMode() != CANJaguar.JaguarControlMode.PercentVbus)
 			{
-				p = SmartDashboard.getNumber(name + "_p");
-				i = SmartDashboard.getNumber(name + "_i");
-				d = SmartDashboard.getNumber(name + "_d");
+				_p = SmartDashboard.getNumber(_name + "_p");
+				_i = SmartDashboard.getNumber(_name + "_i");
+				_d = SmartDashboard.getNumber(_name + "_d");
 
-				((CANJaguar) motor).setPID(p, i, d);
+				((CANJaguar) motor).setPID(_p, _i, _d);
 			}
 
-			if (dashboardOutput)
+			if (_dashboardOutput)
 			{
-				SmartDashboard.putNumber(name + "_current", ((CANJaguar) motor).getOutputCurrent());
-				SmartDashboard.putNumber(name + "_speed", ((CANJaguar) motor).getSpeed());
-				SmartDashboard.putNumber(name + "_position", ((CANJaguar) motor).getPosition());
-				//				SmartDashboard.putNumber(name + "_encoder", ((CANJaguar) motor).);
+				SmartDashboard.putNumber(_name + "_current", ((CANJaguar) motor).getOutputCurrent());
+				SmartDashboard.putNumber(_name + "_speed", ((CANJaguar) motor).getSpeed());
+				SmartDashboard.putNumber(_name + "_position", ((CANJaguar) motor).getPosition());
+				//				SmartDashboard.putNumber(_name + "_encoder", ((CANJaguar) motor).);
 			}
 		}
 
 		if (motor instanceof CANTalon)
 		{			
-			if (dashboardInput && ((CANTalon) motor).getControlMode() != CANTalon.TalonControlMode.PercentVbus)
+			if (_dashboardInput && ((CANTalon) motor).getControlMode() != CANTalon.TalonControlMode.PercentVbus)
 			{
-				p = SmartDashboard.getNumber(name + "_p");
-				i = SmartDashboard.getNumber(name + "_i");
-				d = SmartDashboard.getNumber(name + "_d");
+				_p = SmartDashboard.getNumber(_name + "_p");
+				_i = SmartDashboard.getNumber(_name + "_i");
+				_d = SmartDashboard.getNumber(_name + "_d");
 
-				((CANTalon) motor).setPID(p, i, d);
+				((CANTalon) motor).setPID(_p, _i, _d);
 			}
 
-			if (dashboardOutput)
+			if (_dashboardOutput)
 			{
-				SmartDashboard.putNumber(name + "_current", ((CANTalon) motor).getOutputCurrent());
-				SmartDashboard.putNumber(name + "_speed", ((CANTalon) motor).getSpeed());
-				SmartDashboard.putNumber(name + "_position", ((CANTalon) motor).getPosition() / invert / scale);
+				SmartDashboard.putNumber(_name + "_current", ((CANTalon) motor).getOutputCurrent());
+				SmartDashboard.putNumber(_name + "_speed", ((CANTalon) motor).getSpeed());
+				SmartDashboard.putNumber(_name + "_position", ((CANTalon) motor).getPosition() / _invert / _scale);
 			}
 		}
 
-		if (dashboardInput)
+		if (_dashboardInput)
 		{
-			useRawInput = SmartDashboard.getBoolean(name + "_raw_input");
-			setPoint = SmartDashboard.getNumber(name + "_set_point");
+			_useRawInput = SmartDashboard.getBoolean(_name + "_raw_input");
+			_setPoint = SmartDashboard.getNumber(_name + "_set_point");
 		}
 
-		set(setPoint);
+		set(_setPoint);
 	}
 }

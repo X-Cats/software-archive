@@ -15,8 +15,14 @@ public class Enums {
 	
 	 //front left, rear left, front right, rear right
 	public static final double SPEED_REDUCTION_FACTOR = 0.5;
-	public static final int DRIVE_MOTOR_NUMBERS[] = {0, 1, 2, 3};
-	public static final int CAN_DRIVE_MOTOR_NUMBERS[] = {2, 3, 4, 5};
+
+	//these values keep track specifically of the specific motor controllers
+	//if we only need 2 motors in the drive, use FRONT_LEFT and FRONT_RIGHT. Make sure that the arrays below have a length of 2
+	public static final int FRONT_LEFT = 0, REAR_LEFT = 1, FRONT_RIGHT = 2, REAR_RIGHT = 3;
+	public static final int DRIVE_MOTOR_NUMBERS[] = {FRONT_LEFT, REAR_LEFT, FRONT_RIGHT, REAR_RIGHT}; //if we do not use CAN bus, the motors are created in this sequence
+	public static final int CAN_DRIVE_MOTOR_NUMBERS[] = {2, 3, 4, 5}; //these are the CAN bus ids of the motors
+	
+	
 	public static final int AUTO_SWITCH_NUMBERS[] = {9, 8, 7};
 	
 	public static final int ARM_MOTOR_1 = 9, ARM_MOTOR_2 = 10;
@@ -42,5 +48,6 @@ public class Enums {
 	
 	public static final int AUTONOMOUS_TIME = 15;
 	
+			
 
 }
