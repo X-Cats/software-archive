@@ -1,24 +1,63 @@
 package org.usfirst.frc.team191.robot;
 
 import java.util.ArrayList;
-import org.usfirst.frc.team191.robot.Autonomous.stepTypes;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Autonomous {
 	public enum stepTypes {DRIVE_FORWARD, DRIVE_A_LITTLE_BIT_FORWARD, DRIVE_BACKWARD,
 		DRIVE_A_LITTLE_BIT_BACKWARD, DRIVE_RIGHT, TURN_LEFT, TURN_RIGHT, TURN_LEFT_SHORT,
 		TURN_RIGHT_SHORT, GRAB,	UNGRAB, LIFT, LIFT_A_LITTLE_BIT, LOWER, WAIT, STOP};
-		private RobotControls controls;
-		private ArrayList<stepTypes> steps;
-		private int currentStep;
-		private Timer stepTimer, autoTimer;
-		private DigitalInput switches[];
+
+		private RobotControls _controls;
+		private ArrayList<stepTypes> _steps;
+		private int _currentStep;
+		private Timer _stepTimer, _autoTimer;
+		//private DigitalInput switches[];
 		int autoType;
+
+		final String _defaultAuto = "Do Nothing";
+		final String _autoForwardOnly = "Go forward only and stop";
+		final String _auto1 = "Defense 1";
+		final String _auto2 = "Defense 2";
+		final String _auto3 = "Defense 3";
+		final String _auto4 = "Defense 4";
+		final String _auto5 = "Defense 5";
+		String _autoSelected;
+		SendableChooser _chooser;
 
 		public Autonomous (RobotControls controls)
 		{
+			
+			_controls = controls;      	//passes the controls object reference
+			_autoTimer = new Timer(); 	//create the overall autonmous timer
+			_stepTimer = new Timer();	//Create the stepTimer
+
+			
+			/**
+			 * This autonomous (along with the chooser code above) shows how to select between different autonomous modes
+			 * using the dashboard. The sendable chooser code works with the Java SmartDashboard. If you prefer the LabVIEW
+			 * Dashboard, remove all of the chooser code and uncomment the getString line to get the auto name from the text box
+			 * below the Gyro
+			 *
+			 * You can add additional auto modes by adding additional comparisons to the switch structure below with additional strings.
+			 * If using the SendableChooser make sure to add them to the chooser code above as well.
+			 */
+			
+			_chooser = new SendableChooser();
+			_chooser.addDefault("Default Auto", _defaultAuto);
+			_chooser.addObject(_autoForwardOnly, _autoForwardOnly);
+			_chooser.addObject(_auto1, _auto1);
+			_chooser.addObject(_auto2, _auto2);
+			_chooser.addObject(_auto3, _auto3);
+			_chooser.addObject(_auto4, _auto4);
+			_chooser.addObject(_auto5, _auto5);
+			SmartDashboard.putData("Auto choices", _chooser);	
+			
+			//put any properties here on the smart dashboard that you want to adjust from there.
+/*			
 			SmartDashboard.putNumber("forward time", 2.8); //1.4 old
 			SmartDashboard.putNumber("forward speed", -.5); //-.8 old 
 			SmartDashboard.putNumber("short forward time", 1.8);
@@ -39,46 +78,88 @@ public class Autonomous {
 			SmartDashboard.putNumber("lift speed", -1.4); //-1 proto
 			SmartDashboard.putNumber("lift time", 1.4);
 			SmartDashboard.putNumber("short lift speed", -.3); //-.4 proto
-			SmartDashboard.putNumber("short lift time", .4
-
-
-					);
+			SmartDashboard.putNumber("short lift time", .4);
 			SmartDashboard.putNumber("lower speed", 0); //.8 proto
 			SmartDashboard.putNumber("lower time", 1.4); //1.2 proto
 			SmartDashboard.putNumber("wait time", .4);
 			SmartDashboard.putNumber("auto type", 0);
 
-			this.controls = controls;
+*/
 
-			autoTimer = new Timer();
-			stepTimer = new Timer();
-
+			/*
 			switches = new DigitalInput[3];
 
 			for (int i = 0; i < switches.length; i++)
 				switches[i] = new DigitalInput(Enums.AUTO_SWITCH_NUMBERS[i]);
 
 			autoType = readSwitches();
-			setAuto();
+			*/
+			//setAuto();  
 		}
 
 		public void init ()
 		{
-			autoType = (int) SmartDashboard.getNumber("auto type");
-			setAuto();
+//			autoType = (int) SmartDashboard.getNumber("auto type");
 
-			currentStep = 0;
-			autoTimer.start();
-			stepTimer.start();
+		 	_autoSelected = (String) _chooser.getSelected();
+//			autoSelected = SmartDashboard.getString("Auto Selector", defaultAuto);
+			System.out.println("Auto selected: " + _autoSelected);			
+			setAuto();  //build the steps for the selected autonomous
+			
+			_currentStep = 0;
+			_autoTimer.start();
+			_stepTimer.start();
 		}
 
+		private void setAuto ()
+		{	
+			//we are going to construct the steps needed for our autonomous mode
+			_steps = new ArrayList<stepTypes>();
+			switch (_autoSelected)
+			{
+			case _autoForwardOnly:
+				_steps.add(stepTypes.DRIVE_A_LITTLE_BIT_FORWARD);
+				break;
+			case _auto1:
+				_steps.add(stepTypes.TURN_RIGHT);
+				break;
+			case _auto2:
+				_steps.add(stepTypes.GRAB);
+				break;
+			case _auto3:
+				_steps.add(stepTypes.GRAB);
+				_steps.add(stepTypes.TURN_RIGHT);
+				_steps.add(stepTypes.DRIVE_FORWARD);
+				_steps.add(stepTypes.TURN_LEFT_SHORT);
+				_steps.add(stepTypes.STOP);
+				break;
+			case _auto4:
+				_steps.add(stepTypes.GRAB);
+				_steps.add(stepTypes.TURN_LEFT);
+				_steps.add(stepTypes.DRIVE_FORWARD);
+				_steps.add(stepTypes.TURN_RIGHT_SHORT);
+				_steps.add(stepTypes.STOP);
+				break;
+			case _auto5:
+				_steps.add(stepTypes.GRAB);
+				_steps.add(stepTypes.DRIVE_RIGHT);
+				_steps.add(stepTypes.STOP);
+				break;
+				
+			default:
+				_steps.add(stepTypes.STOP);
+
+			}
+		}
+		
+		
 		public void execute ()
 		{
-			if (autoTimer.get() > Enums.AUTONOMOUS_TIME || currentStep >= steps.size())
-				controls.getDrive().set(0, 0, 0, 0);
+			if (_autoTimer.get() > Enums.AUTONOMOUS_TIME || _currentStep >= _steps.size())
+				_controls.getDrive().set(0, 0, 0, 0);
 			else
 			{
-				switch (steps.get(currentStep))
+				switch (_steps.get(_currentStep))
 				{
 				case DRIVE_FORWARD:
 					drive(SmartDashboard.getNumber("forward time"),
@@ -153,167 +234,78 @@ public class Autonomous {
 				}
 			}
 
-			controls.updateStatus();
-		}
-
-		private int readSwitches ()
-		{
-			int value = 0;
-			for (int i = 0; i < switches.length; i++)
-			{
-				if (switches[i].get())
-					value += Math.pow(2, i);
-			}
-			return value;
-		}
-
-		//private interface AutoMode
-		//{
-		//public abstract void execute (int currentStep);
-		//}
-
-		private void setAuto ()
-		{	
-			steps = new ArrayList<stepTypes>();
-			switch (autoType)
-			{
-			case 1:
-				steps.add(stepTypes.DRIVE_A_LITTLE_BIT_FORWARD);
-				break;
-			case 2:
-				steps.add(stepTypes.TURN_RIGHT);
-				break;
-			case 3:
-				steps.add(stepTypes.GRAB);
-				break;
-			case 4:
-				steps.add(stepTypes.GRAB);
-				steps.add(stepTypes.TURN_RIGHT);
-				steps.add(stepTypes.DRIVE_FORWARD);
-				steps.add(stepTypes.TURN_LEFT_SHORT);
-				steps.add(stepTypes.STOP);
-				break;
-			case 5:
-				steps.add(stepTypes.GRAB);
-				steps.add(stepTypes.TURN_LEFT);
-				steps.add(stepTypes.DRIVE_FORWARD);
-				steps.add(stepTypes.TURN_RIGHT_SHORT);
-				steps.add(stepTypes.STOP);
-				break;
-			case 6:
-				steps.add(stepTypes.GRAB);
-				steps.add(stepTypes.DRIVE_RIGHT);
-				steps.add(stepTypes.STOP);
-				break;
-			case 7:
-				steps.add(stepTypes.GRAB);
-				steps.add(stepTypes.LIFT_A_LITTLE_BIT);
-				steps.add(stepTypes.DRIVE_BACKWARD);
-				steps.add(stepTypes.STOP);
-				break;
-			case 8: //don't use this one
-				steps.add(stepTypes.GRAB);
-				steps.add(stepTypes.LIFT);
-				steps.add(stepTypes.DRIVE_A_LITTLE_BIT_FORWARD);
-				steps.add(stepTypes.WAIT);
-				steps.add(stepTypes.UNGRAB);
-				steps.add(stepTypes.DRIVE_A_LITTLE_BIT_BACKWARD);
-				steps.add(stepTypes.LOWER);
-				steps.add(stepTypes.GRAB);
-				steps.add(stepTypes.LIFT_A_LITTLE_BIT);
-				steps.add(stepTypes.TURN_LEFT);
-				steps.add(stepTypes.DRIVE_FORWARD);
-				steps.add(stepTypes.WAIT);
-				steps.add(stepTypes.TURN_LEFT);
-				steps.add(stepTypes.STOP);
-				break;
-
-				//ArrayList<AutoMode> list = new ArrayList<AutoMode>();
-				//
-				//list.add(new AutoMode () {
-				//public void execute (int currentStep)
-				//{
-				//	switch (currentStep)
-				//	{
-				//		case 0:
-				//			drive(2.3, .5, .5);
-				//	}
-				//}
-				//});
-
-			}
-			SmartDashboard.putNumber("auto type", autoType);
+			_controls.updateStatus();
 		}
 
 		public void drive (double time, double left, double right)
 		{
-			if (stepTimer.get() > time)
+			if (_stepTimer.get() > time)
 			{
-				controls.getDrive().set(0, 0, 0, 0);
+				_controls.getDrive().set(0, 0, 0, 0);
 				startNextStep();
 			}
 			else
 			{
-				controls.getDrive().set(0, left, 0, right);
+				_controls.getDrive().set(0, left, 0, right);
 			}
 		}
 
 		public void drive (double time, double leftX, double leftY, double rightX, double rightY)
 		{
-			if (stepTimer.get() > time)
+			if (_stepTimer.get() > time)
 			{
-				controls.getDrive().set(0, 0, 0, 0);
+				_controls.getDrive().set(0, 0, 0, 0);
 				startNextStep();
 			}
 			else
 			{
-				controls.getDrive().set(leftX, leftY, rightX, rightY);
+				_controls.getDrive().set(leftX, leftY, rightX, rightY);
 			}
 		}
 
 		public void grab (int grabSetpoint)
 		{
-//			controls.getElevator().setGrabMotor(grabSetpoint);
+//			_controls.getElevator().setGrabMotor(grabSetpoint);
 			startNextStep();
 		}
 
 		public void lift (double time, double setPoint)
 		{
-			if (stepTimer.get() > time)
+			if (_stepTimer.get() > time)
 			{
 				startNextStep();
-				//controls.getElevator().setLiftSpeed(0);
+				//_controls.getElevator().setLiftSpeed(0);
 			}
 			else
 			{
-//				controls.getElevator().setLiftPosition(setPoint);
-				//controls.getElevator().setLiftSpeed(setPoint);
+//				_controls.getElevator().setLiftPosition(setPoint);
+				//_controls.getElevator().setLiftSpeed(setPoint);
 			}
 		}
 
 		public void wait (double time)
 		{
-			if (stepTimer.get() > time)
+			if (_stepTimer.get() > time)
 				startNextStep();
 		}
 
 		public void stop ()
 		{
-			if (stepTimer.get() > SmartDashboard.getNumber("stop time"))
+			if (_stepTimer.get() > SmartDashboard.getNumber("stop time"))
 			{
-				controls.getDrive().set(0, 0, 0, 0);
+				_controls.getDrive().set(0, 0, 0, 0);
 				startNextStep();
 			}
 			else
 				for (int i = 0; i < 4; i++)
-					controls.getDrive().set(i, -controls.getDrive().get(i));
+					_controls.getDrive().set(i, -_controls.getDrive().get(i));
 
 		}
 
 		public void startNextStep ()
 		{
-			currentStep++;
-			stepTimer.reset();
+			_currentStep++;
+			_stepTimer.reset();
 		}	
 
 }

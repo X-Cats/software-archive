@@ -20,7 +20,7 @@ public class Enums {
 	//if we only need 2 motors in the drive, use FRONT_LEFT and FRONT_RIGHT. Make sure that the arrays below have a length of 2
 	public static final int FRONT_LEFT = 0, REAR_LEFT = 1, FRONT_RIGHT = 2, REAR_RIGHT = 3;
 	public static final int DRIVE_MOTOR_NUMBERS[] = {FRONT_LEFT, REAR_LEFT, FRONT_RIGHT, REAR_RIGHT}; //if we do not use CAN bus, the motors are created in this sequence
-	public static final int CAN_DRIVE_MOTOR_NUMBERS[] = {2, 3, 4, 5}; //these are the CAN bus ids of the motors
+	public static final int CAN_DRIVE_MOTOR_NUMBERS[] = {1, 2, 3, 4}; //these are the CAN bus ids of the motors
 	
 	
 	public static final int AUTO_SWITCH_NUMBERS[] = {9, 8, 7};
@@ -38,9 +38,9 @@ public class Enums {
 	
 	public static final int LEFT_DRIVE_JS = 0, RIGHT_DRIVE_JS = 1, DRIVE_JS = 0, OPERATOR_JS = 2;
 	public static final boolean TWO_JOYSTICKS = false;
-	public static final boolean DASHBOARD_INPUT = false, DASHBOARD_OUTPUT = false;
+	public static final boolean DASHBOARD_INPUT = true, DASHBOARD_OUTPUT = true;
 	
-	public static final boolean IS_FINAL_ROBOT = true;
+	public static final boolean IS_FINAL_ROBOT = false;
 	public static final boolean HAS_MECHANUM_WHEELS = false;
 	public static final boolean USE_CAN = true, USE_PID = false;
 	public static final int ENCODER_CODES_PER_REVOLUTION = 360;
