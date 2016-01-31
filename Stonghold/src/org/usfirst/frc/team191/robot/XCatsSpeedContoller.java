@@ -219,11 +219,11 @@ public class XCatsSpeedContoller
 			this._invert = 1;
 	}
 
-	public void setDashboardIO (boolean input, boolean output, String name)
+	private void setDashboardIO (boolean input, boolean output)
 	{
 		this._dashboardInput = input;
 		this._dashboardOutput = output;
-		this._name = name;
+		
 
 		if (_dashboardOutput)
 		{
