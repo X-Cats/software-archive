@@ -67,7 +67,7 @@ public class XCatsSpeedContoller
 
 		_stopTimer = new Timer();
 		
-		this.setDashboardIO(Enums.DASHBOARD_INPUT, Enums.DASHBOARD_OUTPUT, _name);
+		this.setDashboardIO(Enums.DASHBOARD_INPUT, Enums.DASHBOARD_OUTPUT);
 	}
 
 	//this constructor is only used when we want to try using PID control
