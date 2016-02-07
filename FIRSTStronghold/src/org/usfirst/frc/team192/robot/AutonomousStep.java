@@ -1,7 +1,7 @@
 package org.usfirst.frc.team192.robot;
 
 public class AutonomousStep {
-	public enum stepTypes {DRIVE, GRAB,	UNGRAB, LIFT, LOWER, WAIT, STOP};
+	public enum stepTypes {DRIVE, GRAB,	UNGRAB, LIFT, LOWER, WAIT, STOP, RELEASE};
 				
 		public String name= "";
 		public double stepTime=0;
@@ -9,6 +9,9 @@ public class AutonomousStep {
 		public double rightSpeed=0;
 		public stepTypes stepType;
 
+		public AutonomousStep(){
+			//blank empty constructor
+		}
 		
 		public AutonomousStep(AutonomousStep.stepTypes stepType, String name,double time, double leftSpeed,double rightSpeed){
 			this.name = name;

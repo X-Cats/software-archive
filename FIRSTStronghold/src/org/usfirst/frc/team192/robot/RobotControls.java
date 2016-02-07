@@ -10,6 +10,7 @@ public class RobotControls {
 	private XCatsDrive _drive;
 	private CameraServer _camera;
 	private boolean _reductionToggle = false, slowMode = true;
+	private Acquisition _acq;
 	
 
 	public RobotControls ()
@@ -45,6 +46,7 @@ public class RobotControls {
 
 		if (Enums.DASHBOARD_INPUT)
 			SmartDashboard.putBoolean("Use Joysticks", false);
+		_acq = new Acquisition();
 
 //		try
 //		{
@@ -93,5 +95,8 @@ public class RobotControls {
 	public XCatsDrive getDrive()
 	{
 		return _drive;
+	}
+	public Acquisition acquisition(){
+		return _acq;
 	}
 }
