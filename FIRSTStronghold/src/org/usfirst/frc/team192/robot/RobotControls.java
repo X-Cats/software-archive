@@ -11,7 +11,7 @@ public class RobotControls {
 	private CameraServer _camera;
 	private boolean _reductionToggle = false, slowMode = true;
 	private Acquisition _acq;
-	
+
 
 	public RobotControls ()
 	{
@@ -29,8 +29,8 @@ public class RobotControls {
 			else			
 				_drive = new XCatsDrive (Enums.CAN_DRIVE_MOTOR_NUMBERS, true, false, 128, .5, 0, 0);			
 		}
-		
-	
+
+
 		//drive motors are currently up to 5000 rpm, 128 codes per rev.
 
 
@@ -42,28 +42,29 @@ public class RobotControls {
 		else
 			_driveJS = new Joystick(Enums.DRIVE_JS);
 
-//		_operatorJS = new Joystick(Enums.OPERATOR_JS);
+		//		_operatorJS = new Joystick(Enums.OPERATOR_JS);
 
 		if (Enums.DASHBOARD_INPUT)
 			SmartDashboard.putBoolean("Use Joysticks", false);
 		_acq = new Acquisition();
 
-//		try
-//		{
-//			_camera = CameraServer.getInstance();
-//			_camera.setQuality(25);
-//			_camera.startAutomaticCapture("cam0");
-//		}
-//		catch (Exception e)
-//		{
-//			System.out.println(e);
-//			e.printStackTrace();
-//		}
+		//		try
+		//		{
+		//			_camera = CameraServer.getInstance();
+		//			_camera.setQuality(25);
+		//			_camera.startAutomaticCapture("cam0");
+		//		}
+		//		catch (Exception e)
+		//		{
+		//			System.out.println(e);
+		//			e.printStackTrace();
+		//		}
 	}
 
 	public void drive ()
 	{
-	    
+
+
 		if (Enums.TWO_JOYSTICKS)
 			_drive.set(_leftJS, _rightJS);
 		else
@@ -77,21 +78,23 @@ public class RobotControls {
 
 			_drive.setReductionFactor(slowMode ? 1.0 : Enums.SPEED_REDUCTION_FACTOR )	;
 		}
+
+
 	}
 
 	public void operate ()
 	{
-//		if (!Enums.DASHBOARD_INPUT || SmartDashboard.getBoolean("Use Joysticks"));
-//		{
-//		}
+		//		if (!Enums.DASHBOARD_INPUT || SmartDashboard.getBoolean("Use Joysticks"));
+		//		{
+		//		}
 	}
 
 	public void updateStatus ()
 	{
-//		_drive.updateStatus();
+		//		_drive.updateStatus();
 	}
 
-	
+
 	public XCatsDrive getDrive()
 	{
 		return _drive;

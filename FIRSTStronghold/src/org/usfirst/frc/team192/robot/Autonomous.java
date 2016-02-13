@@ -114,20 +114,21 @@ public class Autonomous {
 		switch (_autoSelected)
 		{
 		case _autoForwardOnly:
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Forward to Defense", 2.5, 0.5, 0.425));									
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Forward to Defense", 2.5, 0.5, 0.425, 0));									
 			break;
 
 		case _auto1:
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Forward to end", 5.9, 0.8, 0.725));
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Turn Right", 0.6, 0.5, -0.5));
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Forward to goal", 2.5, 0.8, 0.725));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Forward to end", 5.9, 0.8, 0.725, 0));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Turn Right", 0.6, 0.5, -0.5, 0));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Forward to goal", 2.5, 0.8, 0.725, 0));
 			break;
 
 		case _auto2:
-
+		//	_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Forward to end", 3, 1.0, 1.0 -0.075, 0));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Forward to end", 3.53, .65, .65 -0.075, 0));
 			break;
 		case _auto3:
-
+            _steps.add(new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE, "Forward for 10", 0,.65,.65-0.075,10));
 			break;
 		case _auto4:
 			break;
@@ -139,7 +140,7 @@ public class Autonomous {
 			break;
 
 		default:
-			_steps.add(new AutonomousStep(AutonomousStep.stepTypes.STOP,"stop",0,0,0));
+			_steps.add(new AutonomousStep(AutonomousStep.stepTypes.STOP,"stop",0,0,0,0));
 
 		}
 	}
@@ -158,6 +159,9 @@ public class Autonomous {
 			{
 			case DRIVE:
 				drive(_currentAutoStep.stepTime,_currentAutoStep.leftSpeed,_currentAutoStep.rightSpeed);
+				break;
+			case DRIVE_DISTANCE:
+				drive(_currentAutoStep.distance/(6.275*_currentAutoStep.leftSpeed-1.2456),_currentAutoStep.leftSpeed,_currentAutoStep.rightSpeed);
 			case GRAB:
 				break;
 			case UNGRAB:
@@ -286,6 +290,7 @@ public class Autonomous {
 					newStep.stepTime = Double.parseDouble(temp[2]);
 					newStep.leftSpeed = Double.parseDouble(temp[3]);
 					newStep.rightSpeed = Double.parseDouble(temp[4]);
+					newStep.distance = Double.parseDouble(temp[5]);
 					_steps.add(newStep);
 
 					System.out.println("Autosteps now has "+_steps.size());
