@@ -16,9 +16,14 @@ public class Autonomous {
 	private ArrayList<AutonomousStep> _steps;
 
 	private int _currentStep;
+	private double _totalAutoTime = Enums.AUTONOMOUS_TIME;
 	private AutonomousStep _currentAutoStep;
-	private Timer _stepTimer, _autoTimer;
+	private Timer _stepTimer = new Timer();
+	private Timer _autoTimer = new Timer();
 
+	private boolean _isExecuting = false;
+	private boolean _cancelExecution = false;
+	
 
 	final String _defaultAuto = "Do Nothing";
 	final String _autoForwardOnly = "Go forward only and stop";
@@ -36,8 +41,6 @@ public class Autonomous {
 	{
 
 		_controls = controls;      	//passes the controls object reference
-		_autoTimer = new Timer(); 	//create the overall autonmous timer
-		_stepTimer = new Timer();	//Create the stepTimer
 
 
 		/**
@@ -93,6 +96,19 @@ public class Autonomous {
 
 	}
 
+	public Autonomous (RobotControls controls, ArrayList<AutonomousStep> mysteps, double totalTime){
+		// this "autonomous" instantiation can be called from teleop to do a set of steps
+		_controls = controls;
+		_steps = mysteps;
+		_totalAutoTime = totalTime;
+		init();	
+	}
+	
+	public void setSteps(ArrayList<AutonomousStep> mysteps){
+		_steps = mysteps;
+		init();
+		
+	}
 	public void init ()
 	{
 
@@ -104,6 +120,8 @@ public class Autonomous {
 		_currentAutoStep = null;
 		_autoTimer.start();
 		_stepTimer.start();
+		_isExecuting = false;
+		_cancelExecution = false;
 		this.updateStatus();
 	}
 
@@ -114,21 +132,21 @@ public class Autonomous {
 		switch (_autoSelected)
 		{
 		case _autoForwardOnly:
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Forward to Defense", 2.5, 0.5, 0.425, 0));									
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Forward to Defense", 2.5, 0.5, 0.5, 0));									
 			break;
 
 		case _auto1:
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Forward to end", 5.9, 0.8, 0.725, 0));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Forward to end", 5.9, 0.8, 0.8, 0));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Turn Right", 0.6, 0.5, -0.5, 0));
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Forward to goal", 2.5, 0.8, 0.725, 0));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Forward to goal", 2.5, 0.8, 0.8, 0));
 			break;
 
 		case _auto2:
-		//	_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Forward to end", 3, 1.0, 1.0 -0.075, 0));
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Forward to end", 3.53, .65, .65 -0.075, 0));
+		//	_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Forward to end", 3, 1.0, 1.0 1.0, 0));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Forward to end", 3.53, .65, .65, 0));
 			break;
 		case _auto3:
-            _steps.add(new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE, "Forward for 10", 0,.65,.65-0.075,10));
+            _steps.add(new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE, "Forward for 10", 0,.65,.65,10));
 			break;
 		case _auto4:
 			break;
@@ -145,15 +163,24 @@ public class Autonomous {
 		}
 	}
 
+	public boolean isExecuting(){
+		return _isExecuting;
+	}
+	public void cancelExecution(){
+		_cancelExecution = true;
+	}
 
 	public void execute ()
 	{
 		_currentAutoStep = _steps.get(_currentStep);
 
-		if (_autoTimer.get() > Enums.AUTONOMOUS_TIME || _currentStep >= _steps.size())
+		if (_autoTimer.get() > _totalAutoTime || _currentStep >= _steps.size() || _cancelExecution){
 			_controls.getDrive().set(0, 0, 0, 0);
+			_isExecuting = false;			
+		}
 		else
 		{
+			_isExecuting = true;
 			//switch (_steps.get(_currentStep))
 			switch (_currentAutoStep.stepType)
 			{
@@ -161,7 +188,15 @@ public class Autonomous {
 				drive(_currentAutoStep.stepTime,_currentAutoStep.leftSpeed,_currentAutoStep.rightSpeed);
 				break;
 			case DRIVE_DISTANCE:
-				drive(_currentAutoStep.distance/(6.275*_currentAutoStep.leftSpeed-1.2456),_currentAutoStep.leftSpeed,_currentAutoStep.rightSpeed);
+				double cTime=0;
+
+				if (Enums.IS_FINAL_ROBOT)					
+					cTime = _currentAutoStep.distance/(6.275*_currentAutoStep.leftSpeed-1.2456);
+				else
+					cTime = _currentAutoStep.distance/(6.275*_currentAutoStep.leftSpeed-1.2456);
+				
+				drive(cTime,_currentAutoStep.leftSpeed,_currentAutoStep.rightSpeed);
+
 			case GRAB:
 				break;
 			case UNGRAB:
@@ -196,6 +231,13 @@ public class Autonomous {
 	}
 	public void drive (double time, double left, double right)
 	{
+		//if (left == right){
+			if (Enums.IS_FINAL_ROBOT)
+				right = right - 0.075;
+			else
+				right = right - 0.075;
+		//}
+		
 		if (_stepTimer.get() > time)
 		{
 			_controls.getDrive().set(0, 0, 0, 0);

@@ -11,6 +11,7 @@ public class RobotControls {
 	private CameraServer _camera;
 	private boolean _reductionToggle = false, slowMode = true;
 	private Acquisition _acq;
+	private XCatsJSButton _speedToggleButton;
 
 
 	public RobotControls ()
@@ -39,11 +40,13 @@ public class RobotControls {
 			_leftJS = new Joystick(Enums.LEFT_DRIVE_JS);
 			_rightJS = new Joystick(Enums.RIGHT_DRIVE_JS);
 		}
-		else
+		else{
 			_driveJS = new Joystick(Enums.DRIVE_JS);
+			_speedToggleButton = new XCatsJSButton(_driveJS,6);
+		}
 
-		//		_operatorJS = new Joystick(Enums.OPERATOR_JS);
-
+				_operatorJS = new Joystick(Enums.OPERATOR_JS);
+		
 		if (Enums.DASHBOARD_INPUT)
 			SmartDashboard.putBoolean("Use Joysticks", false);
 		_acq = new Acquisition();
@@ -76,6 +79,8 @@ public class RobotControls {
 
 			_reductionToggle = _driveJS.getRawButton(6);
 
+//			slowMode = _speedToggleButton.isPressed();
+			
 			_drive.setReductionFactor(slowMode ? 1.0 : Enums.SPEED_REDUCTION_FACTOR )	;
 		}
 
@@ -84,6 +89,30 @@ public class RobotControls {
 
 	public void operate ()
 	{
+		
+		_acq.setShooterSpeed(_operatorJS.getRawAxis(5));
+		
+		
+		//in and out is using left/right of the left joystick button
+		if (_operatorJS.getRawAxis(2)> 0.2)
+			_acq.release();
+		else if (_operatorJS.getRawAxis(2)< -0.2)
+			_acq.acquire();
+		else	
+			_acq.stop();
+		
+		//up and down is using the up/down of the left joystick button
+		if (_operatorJS.getRawAxis(1)> 0.2)
+			_acq.lower();
+		else if (_operatorJS.getRawAxis(1)<-0.2)
+			_acq.raise();
+		else	
+			_acq.stop();
+		
+		if (_operatorJS.getRawButton(1)){
+			
+		}
+		
 		//		if (!Enums.DASHBOARD_INPUT || SmartDashboard.getBoolean("Use Joysticks"));
 		//		{
 		//		}
@@ -92,6 +121,7 @@ public class RobotControls {
 	public void updateStatus ()
 	{
 		//		_drive.updateStatus();
+		_acq.updateStatus();
 	}
 
 
