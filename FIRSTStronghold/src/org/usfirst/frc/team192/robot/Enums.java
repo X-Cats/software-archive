@@ -42,13 +42,15 @@ public class Enums {
 		
 	//this assembly rotates up and down and in and out
 	public static final int ACQ_LIFT_MOTOR = 7;
-	public static final double ACQ_LIFT_SPEED = 0.05;
-	public static final int ACQ_MOTOR_1 = 5;	//this motor controls the green acquisition into the robot 
-	public static final int ACQ_MOTOR_2 = 6;    //this motor controls the dispense of the ball into the shooter
-	public static final double ACQ_SPEED = 0.05;
+	public static final double ACQ_LIFT_SPEED = 0.40;
+	public static final int ACQ_MOTOR_GRAB = 6;	//this motor controls the green acquisition into the robot 
+	public static final int ACQ_MOTOR_SHOOT = 5;    //this motor controls the dispense of the ball into the shooter
+	public static final double ACQ_SPEED = 1;
 	
 	//This assembly controls the shooter wheels
 	public static final int SHOOTER_MOTOR_MASTER = 8, SHOOTER_MOTOR_FOLLOWER = 9;
+	public static final double SHOOT_TIME = 2.0;
+	public static final int SHOOTER_OPTICAL_DI = 1;
 	
 	//Joysticks
 	public static final int LEFT_DRIVE_JS = 1, RIGHT_DRIVE_JS = 2, DRIVE_JS = 1, OPERATOR_JS = 0;

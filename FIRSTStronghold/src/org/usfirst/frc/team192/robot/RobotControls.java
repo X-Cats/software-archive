@@ -12,6 +12,7 @@ public class RobotControls {
 	private boolean _reductionToggle = false, slowMode = true;
 	private Acquisition _acq;
 	private XCatsJSButton _speedToggleButton;
+	private XCatsJSButton _bumpSpeedButton;
 
 
 	public RobotControls ()
@@ -45,23 +46,24 @@ public class RobotControls {
 			_speedToggleButton = new XCatsJSButton(_driveJS,6);
 		}
 
-				_operatorJS = new Joystick(Enums.OPERATOR_JS);
+		_operatorJS = new Joystick(Enums.OPERATOR_JS);
+		_bumpSpeedButton = new XCatsJSButton(_operatorJS,2);
 		
 		if (Enums.DASHBOARD_INPUT)
 			SmartDashboard.putBoolean("Use Joysticks", false);
 		_acq = new Acquisition();
 
-		//		try
-		//		{
-		//			_camera = CameraServer.getInstance();
-		//			_camera.setQuality(25);
-		//			_camera.startAutomaticCapture("cam0");
-		//		}
-		//		catch (Exception e)
-		//		{
-		//			System.out.println(e);
-		//			e.printStackTrace();
-		//		}
+		try
+		{
+			_camera = CameraServer.getInstance();
+			_camera.setQuality(25);
+			_camera.startAutomaticCapture("cam0");
+		}
+		catch (Exception e)
+		{
+			System.out.println(e);
+			e.printStackTrace();
+		}
 	}
 
 	public void drive ()
@@ -94,25 +96,62 @@ public class RobotControls {
 		
 		
 		//in and out is using left/right of the left joystick button
-		if (_operatorJS.getRawAxis(2)> 0.2)
+		if (_operatorJS.getRawAxis(0)> 0.05)
 			_acq.release();
-		else if (_operatorJS.getRawAxis(2)< -0.2)
+		else if (_operatorJS.getRawAxis(0)< -0.05)
 			_acq.acquire();
 		else	
 			_acq.stop();
 		
 		//up and down is using the up/down of the left joystick button
-		if (_operatorJS.getRawAxis(1)> 0.2)
-			_acq.lower();
-		else if (_operatorJS.getRawAxis(1)<-0.2)
-			_acq.raise();
-		else	
-			_acq.stop();
-		
+//		if (_operatorJS.getRawAxis(1)> 0.2)
+//			_acq.lower();
+//		else if (_operatorJS.getRawAxis(1)<-0.2)
+//			_acq.raise();
+//		else	
+//			_acq.holdPosition();
+
+		//all the way down
 		if (_operatorJS.getRawButton(1)){
-			
+			_acq.setPosition(1.0);
 		}
 		
+		//all the way up/home
+		if (_operatorJS.getRawButton(2)){
+			_acq.setPosition(-1.0);
+		}
+
+		if (_operatorJS.getRawButton(4)){
+			_acq.setPosition(0);
+		}
+				
+			if (_operatorJS.getRawButton(3)){
+			_acq.zeroLifter();
+		}
+	
+
+		if (_operatorJS.getRawButton(7)){
+			_acq.bumpAcqSpeed(-0.10);
+		}
+
+		if (_operatorJS.getRawButton(7)){
+			_acq.bumpAcqSpeed(+0.10);
+		}
+
+
+		
+		
+		if (_operatorJS.getRawButton(6)){
+			_acq.shoot();
+		}
+		else
+			_acq.stopShoot();
+		
+
+		//If button 2 on the operator joystick is pressed bump up the speed of the acq rollers by 10%
+		if (_bumpSpeedButton.isPressed()){
+			_acq.bumpAcqSpeed(0.1);
+		}
 		//		if (!Enums.DASHBOARD_INPUT || SmartDashboard.getBoolean("Use Joysticks"));
 		//		{
 		//		}

@@ -110,6 +110,7 @@ public class XCatsSpeedController {
 			}
 
 			_CANmotor.setPID(p, i, d);
+//			((CANTalon) _CANmotor).SelectProfileSlot(0);
 			((CANTalon) _CANmotor).enableControl();
 		}
 		else
@@ -185,6 +186,20 @@ public class XCatsSpeedController {
 		_stopTimer.start();
 	}
 
+	public void setFeedbackDevice(CANTalon.FeedbackDevice device){
+		((CANTalon) _CANmotor).setFeedbackDevice(device);
+		
+	}
+	public void zeroSensorAndThrottle(CANTalon.FeedbackDevice feedbackdevice,double zero){
+		_setPoint = zero;
+		((CANTalon) _CANmotor).setPosition(zero); /* start our position at zero, this example uses relative positions */
+		setFeedbackDevice(feedbackdevice);
+		((CANTalon) _CANmotor).set(zero);
+//		 Thread.Sleep(100); 		
+	}
+//	public void setSensorDirection(boolean direction){
+//		((TalonSRX) _CANmotor).SetSensorDirection(direction);
+//	}
 	public void setPID (double p, double i, double d)
 	{
 		if (_CANmotor != null){
@@ -345,6 +360,13 @@ public class XCatsSpeedController {
 		//return motor instanceof CANJaguar ? ((CANJaguar) motor).getSpeed() / _invert / _scale : ((CANTalon) motor).getSpeed() / _invert / _scale;
 	}
 
+	public void setPosition(double position)
+	{
+		if (_CANmotor != null && _CANmotor instanceof CANTalon)
+			((CANTalon)_CANmotor).setPosition(position) ;
+				
+	}
+	
 	public double getPosition ()
 	{
 		if (_CANmotor == null){

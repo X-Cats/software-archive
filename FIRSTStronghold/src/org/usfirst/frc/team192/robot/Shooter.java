@@ -41,6 +41,7 @@ public class Shooter {
 	public void updateStatus(){
 		SmartDashboard.putNumber("Shooter Speed", this.getSpeed());
 		SmartDashboard.putNumber("Shooter Encoder", this.getPosition());
+//		SmartDashboard.putNumber("Shooter abs", _master.getPulseWidthPosition());
 	}
 	
 }

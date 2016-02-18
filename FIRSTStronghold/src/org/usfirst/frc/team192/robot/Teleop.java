@@ -11,9 +11,16 @@ public class Teleop {
 
 	public void execute ()
 	{
-		_controls.drive();
-		_controls.operate();
-		_controls.updateStatus();
+		try{
+			_controls.drive();
+			_controls.operate();
+			_controls.updateStatus();			
+		}
+		catch (Exception e){
+			System.out.println("* * * DANGER DANGER DANGER * * *");
+			e.printStackTrace();
+			
+		}
 	}
 
 }
