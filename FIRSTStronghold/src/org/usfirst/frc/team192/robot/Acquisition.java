@@ -1,8 +1,10 @@
 package org.usfirst.frc.team192.robot;
 
+
 import edu.wpi.first.wpilibj.CANJaguar;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -18,8 +20,8 @@ public class Acquisition {
 	private double _maxPosition=0;
 	
 	
-	public Acquisition(){
-		_shooter = new Shooter();
+	public Acquisition(Joystick oj){
+		_shooter = new Shooter(oj);
 		//_liftMotor = new CANTalon(Enums.ACQ_LIFT_MOTOR);
 		_liftMotor = new XCatsSpeedController("Arm", Enums.ACQ_LIFT_MOTOR, false,true, 4096, 0.125, 0, 0,null,null);
 		_liftMotor.setDashboardIO(false, true);
@@ -79,7 +81,7 @@ public class Acquisition {
 	}
 	
 	public void bumpPosition(double delta){
-		_liftMotor.set(_liftMotor.getSpeed()+delta);
+		setPosition(_liftMotor.getSetPoint()+delta);
 	}
 	public void stopShoot(){
 		_acqShoot.set(0);
