@@ -18,15 +18,17 @@ public class Acquisition {
 	private DigitalInput _optShooter;
 	private double _acqSpeed;
 	private double _maxPosition=0;
+	private boolean _shotComplete=false;
 	
 	
 	public Acquisition(Joystick oj){
-		_shooter = new Shooter(oj);
 		//_liftMotor = new CANTalon(Enums.ACQ_LIFT_MOTOR);
-		_liftMotor = new XCatsSpeedController("Arm", Enums.ACQ_LIFT_MOTOR, false,true, 4096, 0.125, 0, 0,null,null);
+		_liftMotor = new XCatsSpeedController("Arm", Enums.ACQ_LIFT_MOTOR, false,true, 4096, 1, 0.125, 0, 0,null,null,CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
 		_liftMotor.setDashboardIO(false, true);
+
+		_shooter = new Shooter(oj);
 		
-		//I dont know why we have to call this twice but we do....
+		//I don't know why, probably something in here is in the wrong order,  we have to call this twice but we do....
 		zeroLifter();
 		zeroLifter();
 		
@@ -52,24 +54,23 @@ public class Acquisition {
 		
 	}
 	
-	public void raise(){
-		_liftMotor.set(Enums.ACQ_LIFT_SPEED);		
+	//this is all the way up
+	public void goHome(){
+		_liftMotor.set(-1.0);		
 	}
-	public void lower(){
-		_liftMotor.set(-Enums.ACQ_LIFT_SPEED);
+	
+	//this is all the way down
+	public void gotoGround(){
+		_liftMotor.set(1.0);
 		
 	}
-//	public void holdPosition(){
-//		_liftMotor.set(0);
-//	}
+	
+	public void gotoLowGoal(){
+		_liftMotor.set(-0.30);		
+	}
+	
 	public void shoot(){
-//		_shootTimer.reset();
-//		_shootTimer.start();
 		_acqShoot.set(1.0);
-//		if (_isLow)			
-//		_shooter.shootLow();
-//		else
-//			_shooter.shootHigh();
 	}
 	
 	public void zeroLifter(){
@@ -95,8 +96,19 @@ public class Acquisition {
 	}
 	
 	public void setShooterSpeed(double speed){
-		_shooter.set(-speed);
+		_shooter.set(speed);
 	}
+	
+	public boolean setShooterAndShoot(){
+		if (_shootTimer.get() == 0) {
+			_shotComplete = false;
+			_shooter.set(1.0);
+			_shootTimer.reset();
+			_shootTimer.start();
+		} 
+		return _shotComplete;
+	}
+	
 	
 	public void bumpAcqSpeed(double delta){
 		_acqSpeed = _acqSpeed+delta;
@@ -111,14 +123,19 @@ public class Acquisition {
 	}
 	public void updateStatus(){
 		//print out stuff, timer stuff
+		
+		if (_shootTimer.get() > 0){
+			if (_shooter.readyToShoot()){
+				shoot();
+				_shotComplete = true;
+				_shootTimer.stop();
+				_shootTimer.reset();
+			}				
+		}
+		
 		_maxPosition = Math.max(_maxPosition, _liftMotor.getPosition());
 		SmartDashboard.putNumber("Acq Speed", _acqSpeed);
-//		SmartDashboard.putBoolean("Shooter Optical", _optShooter.get());
 		SmartDashboard.putNumber("Arm Position", this.getPosition());
-//		SmartDashboard.putNumber("Arm Postion abs", _liftMotor.getPulseWidthPosition());
 		_shooter.updateStatus();
-//		if (_shootTimer.get() > Enums.SHOOT_TIME){
-//			_shootTimer.stop();
-//		}
 	}
 }

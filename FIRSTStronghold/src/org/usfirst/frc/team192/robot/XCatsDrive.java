@@ -44,13 +44,13 @@ public class XCatsDrive {
 	{
 		this._motors = new XCatsSpeedController[Enums.DRIVE_MOTOR_NUMBERS.length];
 		
-		this._motors[Enums.FRONT_LEFT] = new XCatsSpeedController("motor",  channels[Enums.FRONT_LEFT], speedMode, isTalon, codesPerRev, p, i, d,null,null);
-		this._motors[Enums.FRONT_RIGHT] = new XCatsSpeedController("motor", channels[Enums.FRONT_RIGHT], speedMode, isTalon, codesPerRev, p, i, d,null,null);
+		this._motors[Enums.FRONT_LEFT] = new XCatsSpeedController("motor",  channels[Enums.FRONT_LEFT], speedMode, isTalon, codesPerRev,1, p, i, d,null,null,null);
+		this._motors[Enums.FRONT_RIGHT] = new XCatsSpeedController("motor", channels[Enums.FRONT_RIGHT], speedMode, isTalon, codesPerRev,1, p, i, d,null,null,null);
 		_motors[Enums.FRONT_LEFT].setInverted(true);
 
 		if (Enums.DRIVE_MOTOR_NUMBERS.length > 2){
-			this._motors[Enums.REAR_LEFT] = new XCatsSpeedController("motor", channels[Enums.REAR_LEFT], speedMode, isTalon, codesPerRev, p, i, d,null,null);
-			this._motors[Enums.REAR_RIGHT] = new XCatsSpeedController("motor", channels[Enums.REAR_RIGHT], speedMode, isTalon, codesPerRev, p, i, d,null,null);
+			this._motors[Enums.REAR_LEFT] = new XCatsSpeedController("motor", channels[Enums.REAR_LEFT], speedMode, isTalon, codesPerRev,1, p, i, d,null,null,null);
+			this._motors[Enums.REAR_RIGHT] = new XCatsSpeedController("motor", channels[Enums.REAR_RIGHT], speedMode, isTalon, codesPerRev,1,  p, i, d,null,null,null);
 			_motors[Enums.REAR_LEFT].setInverted(true);
 		}
 	}

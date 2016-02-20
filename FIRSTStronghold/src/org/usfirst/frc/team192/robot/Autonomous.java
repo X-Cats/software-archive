@@ -33,9 +33,22 @@ public class Autonomous {
 	final String _auto4 = "Defense 4";
 	final String _auto5 = "Defense 5";
 	final String _autoReadFile = "TextFile read";
+	
+	final String _defLowBar = "Low Bar";
+	final String _defMoat = "Moat";
+	final String _defRamparts = "Ramparts";
+	final String _defPortCullis = "Portcullis";
+	final String _defChevaldeFrise = "Cheval de Frise";
+	final String _defSallyPort = "Sally Port";
+	final String _defRockwall = "Rock Wall";
+	final String _defRoughTerrain = "Rough Terrain";
+	final String _defDrawbridge = "Drawbridge";
+	
 
 	String _autoSelected;
+	String _defenseSelected;
 	SendableChooser _chooser;
+	SendableChooser _defenseType;
 
 	public Autonomous (RobotControls controls)
 	{
@@ -63,6 +76,18 @@ public class Autonomous {
 		_chooser.addObject(_auto5, _auto5);
 		_chooser.addObject(_autoReadFile,_autoReadFile);
 		SmartDashboard.putData("Auto choices", _chooser);	
+		
+		_defenseType = new SendableChooser();
+		_defenseType.addDefault(_defLowBar, _defLowBar);
+		_defenseType.addObject(_defPortCullis, _defPortCullis);
+		_defenseType.addObject(_defChevaldeFrise, _defChevaldeFrise);
+		_defenseType.addObject(_defMoat, _defMoat);
+		_defenseType.addObject(_defRamparts, _defRamparts);
+		_defenseType.addObject(_defDrawbridge, _defDrawbridge);
+		_defenseType.addObject(_defSallyPort, _defSallyPort);
+		_defenseType.addObject(_defRockwall, _defRockwall);
+		_defenseType.addObject(_defRoughTerrain, _defRoughTerrain);
+		SmartDashboard.putData("Defense Types", _defenseType);
 
 		//put any properties here on the smart dashboard that you want to adjust from there.
 		/*			
@@ -113,7 +138,9 @@ public class Autonomous {
 	{
 
 		_autoSelected = (String) _chooser.getSelected();
-		System.out.println("Auto selected: " + _autoSelected);			
+		System.out.println("Auto selected: " + _autoSelected);		
+		_defenseSelected = (String) _defenseType.getSelected();
+		System.out.println("Defense selected: " + _defenseSelected);				
 		setAuto();  //build the steps for the selected autonomous
 
 		_currentStep = 0;
@@ -132,18 +159,26 @@ public class Autonomous {
 		switch (_autoSelected)
 		{
 		case _autoForwardOnly:
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Forward to Defense", 2.5, 0.5, 0.5, 0));									
+			if (_defenseSelected == _defLowBar)
+				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to Defense", 0, 0.7, 0.7, 35/12.0));									
+			else 
+				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to Defense", 0, 0.7, 0.7, 45/12.0));									
 			break;
 
 		case _auto1:
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Forward to end", 5.9, 0.8, 0.8, 0));
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Turn Right", 0.6, 0.5, -0.5, 0));
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Forward to goal", 2.5, 0.8, 0.8, 0));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to Defense", 0, 0.7, 0.7, 35/12.0));									
+//			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LOWER,"Move shifter to ground", 1.5, 0, 0, 0));			
+//			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Navigate Defense", 0, 0.5, 0.5, 45/12.0));
+//			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LIFT,"Move shifter home", 1.5, 0, 0, 0));			
+//			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to Turn", 0, 0.7, 0.7, 94/12.0));									
+//			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn Right",60, 0, 0, 0));
+//			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to goal", 0, 0.7, 0.7, 78/12.0));
+//			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.SHOOT,"Shoot",0,0,0,0));
 			break;
 
 		case _auto2:
-		//	_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Forward to end", 3, 1.0, 1.0 1.0, 0));
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Forward to end", 3.53, .65, .65, 0));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Forward to end", 3, 1.0,-1.0, 0));
+			//_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Forward to end", 3.53, .65, .65, 0));
 			break;
 		case _auto3:
             _steps.add(new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE, "Forward for 10", 0,.65,.65,10));
@@ -172,6 +207,9 @@ public class Autonomous {
 
 	public void execute ()
 	{
+		double cTime=0;
+		int direction=1;
+
 		_currentAutoStep = _steps.get(_currentStep);
 
 		if (_autoTimer.get() > _totalAutoTime || _currentStep >= _steps.size() || _cancelExecution){
@@ -187,31 +225,59 @@ public class Autonomous {
 			case DRIVE:
 				drive(_currentAutoStep.stepTime,_currentAutoStep.leftSpeed,_currentAutoStep.rightSpeed);
 				break;
+				
 			case DRIVE_DISTANCE:
-				double cTime=0;
 
 				if (Enums.IS_FINAL_ROBOT)					
-					cTime = _currentAutoStep.distance/(6.275*_currentAutoStep.leftSpeed-1.2456);
+					cTime = _currentAutoStep.distance/(6.892*_currentAutoStep.leftSpeed-1.038);
 				else
-					cTime = _currentAutoStep.distance/(6.275*_currentAutoStep.leftSpeed-1.2456);
+					cTime = _currentAutoStep.distance/(6.892*_currentAutoStep.leftSpeed-1.038);
 				
 				drive(cTime,_currentAutoStep.leftSpeed,_currentAutoStep.rightSpeed);
+				break;
+				
+			case ROTATE:
+				// assume 102 degrees per second
+				direction = (_currentAutoStep.distance > 0 ? 1 : -1);
 
+				if (Enums.IS_FINAL_ROBOT)					
+					cTime = Math.abs( _currentAutoStep.distance/102.0);
+				else
+					cTime = Math.abs( _currentAutoStep.distance/102.0);
+				
+				drive(cTime, direction * 0.5, direction * -0.5);
+				break;
+				
 			case GRAB:
 				break;
+				
 			case UNGRAB:
 				break;
+			
 			case LIFT:
 				lift();
 				break;	
+				
 			case LOWER:
+				lower();
 				break;
+				
+			case LIFT_TO_LOW:
+				liftToLow();
+				break;
+				
+			case SHOOT:
+				shoot();
+				break;
+				
 			case WAIT:
 				wait(_currentAutoStep.stepTime);
 				break;
+				
 			case STOP:
 				stop();
 				break;
+				
 			case RELEASE:
 				release();
 				break;
@@ -233,9 +299,9 @@ public class Autonomous {
 	{
 		//if (left == right){
 			if (Enums.IS_FINAL_ROBOT)
-				right = right - 0.075;
+				right = right - 0.035;
 			else
-				right = right - 0.075;
+				right = right - 0.035;
 		//}
 		
 		if (_stepTimer.get() > time)
@@ -272,18 +338,37 @@ public class Autonomous {
 		startNextStep();
 	}
 	
+	public void lower ()
+	{
+		
+		if (_stepTimer.get() > _currentAutoStep.stepTime)
+		{
+			startNextStep();
+		}
+		else
+			_controls.acquisition().gotoGround();
+	}
+	
 	public void lift ()
 	{
 		
 		if (_stepTimer.get() > _currentAutoStep.stepTime)
 		{
 			startNextStep();
-			//_controls.getElevator().setLiftSpeed(0);
 		}
 		else
+			_controls.acquisition().goHome();
+	}
+
+	public void liftToLow ()
+	{
+		
+		if (_stepTimer.get() > _currentAutoStep.stepTime)
 		{
-			_controls.acquisition().raise();
+			startNextStep();
 		}
+		else
+			_controls.acquisition().gotoLowGoal();
 	}
 
 	public void wait (double time)
@@ -292,6 +377,13 @@ public class Autonomous {
 			startNextStep();
 	}
 
+	public void shoot (){
+		
+		if (_controls.acquisition().setShooterAndShoot()){
+			startNextStep();
+		}
+
+	}
 	public void stop ()
 	{
 		_controls.getDrive().set(0, 0, 0, 0);

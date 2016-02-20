@@ -15,11 +15,11 @@ public class XCatsSpeedController {
 	private SpeedController motor;
 	private CANSpeedController _CANmotor;
 	/*
-	 * The _scale and the units depend on the mode the Jaguar is in.<br>
-	 * In percentVbus mode, the outputValue is from -1.0 to 1.0 (same as PWM Jaguar).<br>
-	 * In voltage mode, the outputValue is in volts. <br>
-	 * In current mode, the outputValue is in amps. <br>
-	 * In speed mode, the outputValue is in rotations/minute.<br>
+	 * The _scale and the units depend on the mode the Jaguar is in.
+	 * In percentVbus mode, the outputValue is from -1.0 to 1.0 (same as PWM Jaguar).
+	 * In voltage mode, the outputValue is in volts. 
+	 * In current mode, the outputValue is in amps. 
+	 * In speed mode, the outputValue is in rotations/minute.
 	 * In position mode, the outputValue is in rotations.
 	 */
 	private double _scale;
@@ -27,12 +27,12 @@ public class XCatsSpeedController {
 	private boolean _useRawInput = false;
 	private double _setPoint = 0;
 	private double _cutOffSetPointP = 0, _cutOffSetPointN = 0; //what the motor should be set to when it hits a limit or something. the first is for positive speeds, the second negative.
+	private int _cutOffDirection = 0;
 	private double _p, _i, _d;
 	private int _codesPerRev;
 	private String _name;
 	private boolean _dashboardInput = false;
 	private boolean _dashboardOutput = false;
-	private int _cutOffDirection = 0;
 	private boolean _stopping = false;
 	private Timer _stopTimer;
 	private DigitalInput _upperLimit;
@@ -52,6 +52,9 @@ public class XCatsSpeedController {
 				{
 					this._CANmotor = new CANTalon(channel);
 					this.motor = _CANmotor;			// all CANSpeedControllers are SpeedControllers
+					//this makes sure the talon operates between 0 and 12 volts, voltage > 12 is unpredictable
+					((CANTalon) _CANmotor).configNominalOutputVoltage(0f, -0f);
+					((CANTalon) _CANmotor).configPeakOutputVoltage(12.0f, -12.0f);
 					((CANTalon) _CANmotor).changeControlMode(CANTalon.TalonControlMode.PercentVbus);
 					((CANTalon) _CANmotor).enableControl();
 				}
@@ -84,25 +87,31 @@ public class XCatsSpeedController {
 	}
 
 	//this constructor is only used when we want to try using PID control
-	public XCatsSpeedController (String name, int channel, boolean speedMode, boolean isTalon, int codesPerRev, double p, double i, double d,DigitalInput lowerLimit,DigitalInput upperLimit)
+	public XCatsSpeedController (String name, int channel, boolean speedMode, boolean isTalon, int codesPerRev, int scale, double p, double i, double d,DigitalInput lowerLimit,DigitalInput upperLimit, CANTalon.FeedbackDevice feedback)
 	{
 		this._codesPerRev = codesPerRev;
 		this._p = p;
 		this._i = i;
 		this._d = d;
 		_name = name;
-		_scale = 1;
+		_scale = scale ;
 
 		if (isTalon)
 		{
 			
 			_CANmotor = new CANTalon(channel);
 			motor = _CANmotor;
+			
+			this.setFeedbackDevice(feedback);
+			
+			//this makes sure the talon operates between 0 and 12 volts, voltage > 12 is unpredictable
+			((CANTalon) _CANmotor).configNominalOutputVoltage(0f, -0f);
+			((CANTalon) _CANmotor).configPeakOutputVoltage(12.0f, -12.0f);
 
 			if (speedMode)
 			{
 				((CANTalon) _CANmotor).changeControlMode(CANTalon.TalonControlMode.Speed);
-				_scale = 500;
+				//_scale = 500;
 			}
 			else
 			{
@@ -120,7 +129,7 @@ public class XCatsSpeedController {
 			if (speedMode)
 			{
 				((CANJaguar) _CANmotor).setSpeedMode(CANJaguar.kQuadEncoder, codesPerRev, p, i, d);
-				_scale = 5000;
+				//_scale = 5000;
 			}
 			else
 			{
@@ -162,13 +171,13 @@ public class XCatsSpeedController {
 			this._setPoint = _cutOffDirection > 0 ? _cutOffSetPointP : _cutOffSetPointN;
 
 
-			if (_useRawInput)
-				motor.set(this._setPoint);
-			else
-				motor.set(this._setPoint * _invert * _scale);
+		if (_useRawInput)
+			motor.set(this._setPoint);
+		else
+			motor.set(this._setPoint * _invert * _scale);
 
-			if (_dashboardOutput)
-				SmartDashboard.putNumber(_name + "_set_point", this._setPoint);					
+		if (_dashboardOutput)
+			SmartDashboard.putNumber(_name + "_set_point", this._setPoint);					
 
 			//		}
 			//		catch (Exception e) {
@@ -177,6 +186,8 @@ public class XCatsSpeedController {
 			//		}
 
 
+			//			if (setPoint ==0)
+			//				this.stop();
 	}
 
 	public void stop ()
@@ -356,7 +367,8 @@ public class XCatsSpeedController {
 		if (_CANmotor == null){
 			return motor.get();
 		}else
-			return _CANmotor.getSpeed() / _invert / _scale;
+			return _CANmotor.getSpeed();
+//			return _CANmotor.getSpeed() / _invert / _scale;
 		//return motor instanceof CANJaguar ? ((CANJaguar) motor).getSpeed() / _invert / _scale : ((CANTalon) motor).getSpeed() / _invert / _scale;
 	}
 
@@ -388,6 +400,7 @@ public class XCatsSpeedController {
 
 	public void reverseSensor (boolean invert)
 	{
+		//note: you may need to use this if the RPMs are negative and you have an encoder
 		if (motor instanceof CANTalon)
 			((CANTalon) motor).reverseSensor(invert);
 	}
@@ -399,6 +412,16 @@ public class XCatsSpeedController {
 
 	public void updateStatus()
 	{
+			
+		if (_CANmotor != null){
+			//don't do anything with following motors
+			if (_CANmotor.getControlMode() == CANTalon.TalonControlMode.Follower)
+				return;			
+		}
+
+		
+		//SmartDashboard.putBoolean(_name+"_I/O output", _dashboardOutput);
+		
 		/*
 		if (motor instanceof CANTalon){
 			
@@ -429,8 +452,12 @@ public class XCatsSpeedController {
 
 			if (_dashboardOutput)
 			{
+				if (motor instanceof CANTalon)
+					SmartDashboard.putBoolean(_name + " is RPM Mode", ((CANTalon) motor).getControlMode() == CANTalon.TalonControlMode.Speed ? true : false);
+
 				SmartDashboard.putNumber(_name + "_current", _CANmotor.getOutputCurrent());
 				SmartDashboard.putNumber(_name + "_speed", _CANmotor.getSpeed());
+				
 				if (_CANmotor instanceof CANJaguar)
 					SmartDashboard.putNumber(_name + "_position", ((CANJaguar) _CANmotor).getPosition());
 				else

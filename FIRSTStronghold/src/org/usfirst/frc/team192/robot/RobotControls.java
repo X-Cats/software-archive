@@ -99,10 +99,10 @@ public class RobotControls {
 //		_acq.setShooterSpeed(_operatorJS.getRawAxis(5));
 		
 		
-		//in and out is using left/right of the left joystick button
-		if (_operatorJS.getRawAxis(1)> 0.05)
+		//in and out is using up/down of the left joystick button
+		if (_operatorJS.getRawAxis(1)> 0.15)
 			_acq.release();
-		else if (_operatorJS.getRawAxis(1)< -0.05)
+		else if (_operatorJS.getRawAxis(1)< -0.15)
 			_acq.acquire();
 		else	
 			_acq.stop();
@@ -117,16 +117,17 @@ public class RobotControls {
 
 		//all the way up/home
 		if (_operatorJS.getRawButton(1)){
-			_acq.setPosition(-1.0);
+			_acq.goHome();
 		}
 		
 		//all the way down
 		if (_operatorJS.getRawButton(4)){
-			_acq.setPosition(1.0);
+			_acq.gotoGround();
 		}
 		
+		//go to the low goal shooting position 
 		if (_operatorJS.getRawButton(2)){
-			_acq.setPosition(-0.35);
+			_acq.gotoLowGoal();
 		}		
 
 		//home
@@ -134,17 +135,19 @@ public class RobotControls {
 			_acq.zeroLifter();
 		}
 	
-
+		//this is the little black rotating keypad, not the joystick
+		//180 is all the way down
 		if (_operatorJS.getPOV() == 180){
 			_acq.bumpPosition(-0.05);
 		}
 
+		//0 is all the way up
 		if (_operatorJS.getPOV() == 0){
 			_acq.bumpPosition(+0.05);
 		}
 
 		_highSpeed = _highSpeedButton.isPressed();		
-		_acq.setShooterSpeed(!_highSpeed ? -1.0 : 0.0);
+		_acq.setShooterSpeed(!_highSpeed ? 1.0 : 0);
 		
 		
 		if (_operatorJS.getRawButton(6)){
@@ -169,8 +172,6 @@ public class RobotControls {
 		//		_drive.updateStatus();
 		_acq.updateStatus();
 
-		
-		SmartDashboard.putNumber("POV", _operatorJS.getPOV());
 	}
 
 
