@@ -2,14 +2,17 @@ package org.usfirst.frc.team192.robot;
 
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.CANTalon.TalonControlMode;
+import edu.wpi.first.wpilibj.Joystick.RumbleType;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Shooter {
 	
 	private CANTalon _master;
 	private CANTalon _follower;
+	private Joystick _oj;
 	
-	public Shooter(){
+	public Shooter(Joystick oj){
 		
 		_master = new CANTalon(Enums.SHOOTER_MOTOR_MASTER);
 		_follower = new CANTalon(Enums.SHOOTER_MOTOR_FOLLOWER);
@@ -18,6 +21,8 @@ public class Shooter {
 		
 		_master.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
 		_master.enableControl();	
+		
+		_oj = oj;
 		
 	}
 	
@@ -29,6 +34,9 @@ public class Shooter {
 	}
 	public void set(double speed){
 		_master.set(speed);
+		if (speed == 0){
+			_master.setPosition(0);
+		}
 	}
 	
 	public void shootLow(){
@@ -41,7 +49,15 @@ public class Shooter {
 	public void updateStatus(){
 		SmartDashboard.putNumber("Shooter Speed", this.getSpeed());
 		SmartDashboard.putNumber("Shooter Encoder", this.getPosition());
-//		SmartDashboard.putNumber("Shooter abs", _master.getPulseWidthPosition());
+		
+		if (this.getPosition() < -6000000){
+			_oj.setRumble(RumbleType.kRightRumble,1);
+		} else
+			_oj.setRumble(RumbleType.kRightRumble,0);
+			
+		
+
+		//		SmartDashboard.putNumber("Shooter abs", _master.getPulseWidthPosition());
 	}
 	
 }

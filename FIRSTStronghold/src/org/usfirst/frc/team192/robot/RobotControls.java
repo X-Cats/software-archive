@@ -2,6 +2,7 @@ package org.usfirst.frc.team192.robot;
 
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Joystick.RumbleType;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -13,6 +14,8 @@ public class RobotControls {
 	private Acquisition _acq;
 	private XCatsJSButton _speedToggleButton;
 	private XCatsJSButton _bumpSpeedButton;
+	private XCatsJSButton _highSpeedButton;
+	private boolean _highSpeed = false;;
 
 
 	public RobotControls ()
@@ -48,10 +51,11 @@ public class RobotControls {
 
 		_operatorJS = new Joystick(Enums.OPERATOR_JS);
 		_bumpSpeedButton = new XCatsJSButton(_operatorJS,2);
+		_highSpeedButton = new XCatsJSButton(_operatorJS,8);
 		
 		if (Enums.DASHBOARD_INPUT)
 			SmartDashboard.putBoolean("Use Joysticks", false);
-		_acq = new Acquisition();
+		_acq = new Acquisition(_operatorJS);
 
 		try
 		{
@@ -92,13 +96,13 @@ public class RobotControls {
 	public void operate ()
 	{
 		
-		_acq.setShooterSpeed(_operatorJS.getRawAxis(5));
+//		_acq.setShooterSpeed(_operatorJS.getRawAxis(5));
 		
 		
 		//in and out is using left/right of the left joystick button
-		if (_operatorJS.getRawAxis(0)> 0.05)
+		if (_operatorJS.getRawAxis(1)> 0.05)
 			_acq.release();
-		else if (_operatorJS.getRawAxis(0)< -0.05)
+		else if (_operatorJS.getRawAxis(1)< -0.05)
 			_acq.acquire();
 		else	
 			_acq.stop();
@@ -111,41 +115,44 @@ public class RobotControls {
 //		else	
 //			_acq.holdPosition();
 
-		//all the way down
+		//all the way up/home
 		if (_operatorJS.getRawButton(1)){
+			_acq.setPosition(-1.0);
+		}
+		
+		//all the way down
+		if (_operatorJS.getRawButton(4)){
 			_acq.setPosition(1.0);
 		}
 		
-		//all the way up/home
 		if (_operatorJS.getRawButton(2)){
-			_acq.setPosition(-1.0);
-		}
+			_acq.setPosition(-0.35);
+		}		
 
-		if (_operatorJS.getRawButton(4)){
-			_acq.setPosition(0);
-		}
-				
-			if (_operatorJS.getRawButton(3)){
+		//home
+		if (_operatorJS.getRawButton(3)){
 			_acq.zeroLifter();
 		}
 	
 
-		if (_operatorJS.getRawButton(7)){
-			_acq.bumpAcqSpeed(-0.10);
+		if (_operatorJS.getPOV() == 180){
+			_acq.bumpPosition(-0.05);
 		}
 
-		if (_operatorJS.getRawButton(7)){
-			_acq.bumpAcqSpeed(+0.10);
+		if (_operatorJS.getPOV() == 0){
+			_acq.bumpPosition(+0.05);
 		}
 
-
+		_highSpeed = _highSpeedButton.isPressed();		
+		_acq.setShooterSpeed(!_highSpeed ? -1.0 : 0.0);
 		
 		
 		if (_operatorJS.getRawButton(6)){
 			_acq.shoot();
 		}
-		else
+		else{
 			_acq.stopShoot();
+		}
 		
 
 		//If button 2 on the operator joystick is pressed bump up the speed of the acq rollers by 10%
@@ -161,6 +168,9 @@ public class RobotControls {
 	{
 		//		_drive.updateStatus();
 		_acq.updateStatus();
+
+		
+		SmartDashboard.putNumber("POV", _operatorJS.getPOV());
 	}
 
 
