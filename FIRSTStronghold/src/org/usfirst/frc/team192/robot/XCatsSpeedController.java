@@ -34,6 +34,7 @@ public class XCatsSpeedController {
 	private boolean _dashboardInput = false;
 	private boolean _dashboardOutput = false;
 	private boolean _stopping = false;
+	private boolean _speedMode = false;
 	private Timer _stopTimer;
 	private DigitalInput _upperLimit;
 	private DigitalInput _lowerLimit;
@@ -95,6 +96,7 @@ public class XCatsSpeedController {
 		this._d = d;
 		_name = name;
 		_scale = scale ;
+		_speedMode = speedMode;
 
 		if (isTalon)
 		{
@@ -108,37 +110,62 @@ public class XCatsSpeedController {
 			((CANTalon) _CANmotor).configNominalOutputVoltage(0f, -0f);
 			((CANTalon) _CANmotor).configPeakOutputVoltage(12.0f, -12.0f);
 
-			if (speedMode)
-			{
-				((CANTalon) _CANmotor).changeControlMode(CANTalon.TalonControlMode.Speed);
-				//_scale = 500;
-			}
-			else
-			{
-				((CANTalon) _CANmotor).changeControlMode(CANTalon.TalonControlMode.Position);
-			}
-
-			_CANmotor.setPID(p, i, d);
-//			((CANTalon) _CANmotor).SelectProfileSlot(0);
-			((CANTalon) _CANmotor).enableControl();
+			this.switchModeToPID();
 		}
 		else
 		{
 			_CANmotor = new CANJaguar(channel);
 			motor = _CANmotor;
-			if (speedMode)
-			{
-				((CANJaguar) _CANmotor).setSpeedMode(CANJaguar.kQuadEncoder, codesPerRev, p, i, d);
-				//_scale = 5000;
-			}
-			else
-			{
-				((CANJaguar) _CANmotor).setPositionMode(CANJaguar.kQuadEncoder, codesPerRev, p, i, d);
-			}
-			((CANJaguar) _CANmotor).enableControl();
+			this.switchModeToPID();
 		}
 
 		_stopTimer = new Timer();
+	}
+
+	public void switchModeToPID(){
+		if (_CANmotor != null){
+			
+			if (motor instanceof CANTalon){
+				if (_speedMode)
+				{
+					((CANTalon) _CANmotor).changeControlMode(CANTalon.TalonControlMode.Speed);
+				}
+				else
+				{
+					((CANTalon) _CANmotor).changeControlMode(CANTalon.TalonControlMode.Position);
+				}
+
+				((CANTalon) _CANmotor).enableControl();			
+			}
+			else
+			{
+				if (_speedMode)
+				{					
+					((CANJaguar) _CANmotor).setSpeedMode(CANJaguar.kQuadEncoder, _codesPerRev, _p, _i, _d);
+				}
+				else
+				{
+					((CANJaguar) _CANmotor).setSpeedMode(CANJaguar.kQuadEncoder, _codesPerRev, _p, _i, _d);
+				}
+				
+				((CANJaguar) _CANmotor).enableControl();				
+			}			
+		}
+	}
+	
+	public void switchModeToPercentVBus(){
+		if (_CANmotor != null){
+			if (motor instanceof CANTalon)
+			{
+				((CANTalon) _CANmotor).changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+				((CANTalon) _CANmotor).enableControl();
+			}
+			else
+			{
+				((CANJaguar) motor).setPercentMode();
+				((CANJaguar) motor).enableControl();
+			}			
+		}		
 	}
 
 	public void set (double setPoint)
