@@ -1,4 +1,5 @@
-package org.usfirst.frc.team192.robot;
+package org.usfirst.frc.xcats.robot;
+
 
 import edu.wpi.first.wpilibj.CANJaguar;
 import edu.wpi.first.wpilibj.CANSpeedController;
@@ -6,14 +7,18 @@ import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Jaguar;
 import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.CANTalon.TalonControlMode;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class XCatsSpeedController {
+public class XCatsSpeedController{
 
+	public enum SCType{TALON,JAGUAR,VICTOR_SP};
 	private SpeedController motor;
 	private CANSpeedController _CANmotor;
+	private SCType _sctype; 
 	/*
 	 * The _scale and the units depend on the mode the Jaguar is in.
 	 * In percentVbus mode, the outputValue is from -1.0 to 1.0 (same as PWM Jaguar).
@@ -40,17 +45,18 @@ public class XCatsSpeedController {
 	private DigitalInput _lowerLimit;
 
 	//this constructor is used with a controller that has a digital input that acts as a switch
-	public XCatsSpeedController (String name, int channel, boolean useCan, boolean isTalon, DigitalInput lowerLimit, DigitalInput upperLimit)
+	public XCatsSpeedController (String name, int channel, boolean useCan, SCType sctype,  DigitalInput lowerLimit, DigitalInput upperLimit)
 	{
 		try{
 			_upperLimit = upperLimit;
 			_lowerLimit = lowerLimit;
 			_name = name;
 			_scale = 1;
+			_sctype = sctype;
 			if (useCan)
 			{
-				if (isTalon)
-				{
+				switch ( sctype){
+				case TALON :
 					this._CANmotor = new CANTalon(channel);
 					this.motor = _CANmotor;			// all CANSpeedControllers are SpeedControllers
 					//this makes sure the talon operates between 0 and 12 volts, voltage > 12 is unpredictable
@@ -58,17 +64,34 @@ public class XCatsSpeedController {
 					((CANTalon) _CANmotor).configPeakOutputVoltage(12.0f, -12.0f);
 					((CANTalon) _CANmotor).changeControlMode(CANTalon.TalonControlMode.PercentVbus);
 					((CANTalon) _CANmotor).enableControl();
-				}
-				else
-				{
+					break;
+				case JAGUAR :
 					this._CANmotor = new CANJaguar(channel);
 					this.motor = _CANmotor;
 					//					((CANJaguar) motor).setPercentMode();
 					//					((CANJaguar) motor).enableControl();
-				}
+					break;
+				default:
+					System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
+				}				
 			}
 			else
-				this.motor = new Jaguar(channel);				
+			{
+				switch ( sctype){
+				case TALON:
+					this.motor = new Talon(channel);				
+					break;
+				case JAGUAR:
+					this.motor = new Jaguar(channel);				
+					break;
+				case VICTOR_SP:
+					this.motor = new VictorSP(channel);				
+					break;
+				default:
+					System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
+				}				
+				
+			}
 			
 
 			_stopTimer = new Timer();
@@ -87,8 +110,9 @@ public class XCatsSpeedController {
 
 	}
 
+	
 	//this constructor is only used when we want to try using PID control
-	public XCatsSpeedController (String name, int channel, boolean speedMode, boolean isTalon, int codesPerRev, int scale, double p, double i, double d,DigitalInput lowerLimit,DigitalInput upperLimit, CANTalon.FeedbackDevice feedback)
+	public XCatsSpeedController (String name, int channel, SCType sctype, boolean speedMode, int codesPerRev, int scale, double p, double i, double d,DigitalInput lowerLimit,DigitalInput upperLimit, CANTalon.FeedbackDevice feedback)
 	{
 		this._codesPerRev = codesPerRev;
 		this._p = p;
@@ -97,10 +121,10 @@ public class XCatsSpeedController {
 		_name = name;
 		_scale = scale ;
 		_speedMode = speedMode;
+		_sctype = sctype;
 
-		if (isTalon)
-		{
-			
+		switch ( sctype){
+		case TALON:
 			_CANmotor = new CANTalon(channel);
 			motor = _CANmotor;
 			
@@ -111,21 +135,25 @@ public class XCatsSpeedController {
 			((CANTalon) _CANmotor).configPeakOutputVoltage(12.0f, -12.0f);
 
 			this.switchModeToPID();
-		}
-		else
-		{
+			break;
+		case JAGUAR:
 			_CANmotor = new CANJaguar(channel);
 			motor = _CANmotor;
 			this.switchModeToPID();
-		}
-
+			break;
+		default:
+			System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
+		}				
+				
 		_stopTimer = new Timer();
 	}
+
 
 	public void switchModeToPID(){
 		if (_CANmotor != null){
 			
-			if (motor instanceof CANTalon){
+			switch ( _sctype){
+			case TALON:
 				if (_speedMode)
 				{
 					((CANTalon) _CANmotor).changeControlMode(CANTalon.TalonControlMode.Speed);
@@ -136,9 +164,9 @@ public class XCatsSpeedController {
 				}
 
 				((CANTalon) _CANmotor).enableControl();			
-			}
-			else
-			{
+
+				break;
+			case JAGUAR:
 				if (_speedMode)
 				{					
 					((CANJaguar) _CANmotor).setSpeedMode(CANJaguar.kQuadEncoder, _codesPerRev, _p, _i, _d);
@@ -149,22 +177,27 @@ public class XCatsSpeedController {
 				}
 				
 				((CANJaguar) _CANmotor).enableControl();				
+				break;
+			default:
+				System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
 			}			
 		}
 	}
 	
 	public void switchModeToPercentVBus(){
 		if (_CANmotor != null){
-			if (motor instanceof CANTalon)
-			{
+			switch ( _sctype){
+			case TALON:
 				((CANTalon) _CANmotor).changeControlMode(CANTalon.TalonControlMode.PercentVbus);
 				((CANTalon) _CANmotor).enableControl();
-			}
-			else
-			{
+				break;
+			case JAGUAR:
 				((CANJaguar) motor).setPercentMode();
 				((CANJaguar) motor).enableControl();
-			}			
+				break;
+			default:
+				System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
+			}								
 		}		
 	}
 
@@ -225,19 +258,28 @@ public class XCatsSpeedController {
 	}
 
 	public void setFeedbackDevice(CANTalon.FeedbackDevice device){
-		((CANTalon) _CANmotor).setFeedbackDevice(device);
+		switch ( _sctype){
+		case TALON:
+			((CANTalon) _CANmotor).setFeedbackDevice(device);
+			break;
+		default:
+			System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
+		}					
 		
 	}
 	public void zeroSensorAndThrottle(CANTalon.FeedbackDevice feedbackdevice,double zero){
-		_setPoint = zero;
-		((CANTalon) _CANmotor).setPosition(zero); /* start our position at zero, this example uses relative positions */
-		setFeedbackDevice(feedbackdevice);
-		((CANTalon) _CANmotor).set(zero);
-//		 Thread.Sleep(100); 		
+		switch ( _sctype){
+		case TALON:
+			_setPoint = zero;
+			((CANTalon) _CANmotor).setPosition(zero); /* start our position at zero, this example uses relative positions */
+			setFeedbackDevice(feedbackdevice);
+			((CANTalon) _CANmotor).set(zero);
+//			 Thread.Sleep(100); 		
+			break;
+		default:
+			System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
+		}							
 	}
-//	public void setSensorDirection(boolean direction){
-//		((TalonSRX) _CANmotor).SetSensorDirection(direction);
-//	}
 	public void setPID (double p, double i, double d)
 	{
 		if (_CANmotor != null){
@@ -252,8 +294,7 @@ public class XCatsSpeedController {
 				SmartDashboard.putNumber(_name + "_d", d);
 			}
 
-			_CANmotor.setPID(p, i, d);
-			
+			_CANmotor.setPID(p, i, d);			
 		}
 	}
 
@@ -347,26 +388,45 @@ public class XCatsSpeedController {
 
 	public CANSpeedController.ControlMode getTalonControlMode ()
 	{
-		if (_CANmotor != null){
-			return ((CANTalon) _CANmotor).getControlMode();			
+		if (_CANmotor == null){
+			return null;
 		}
-		return null;
+
+		switch (_sctype){
+		case TALON:
+			return ((CANTalon) _CANmotor).getControlMode();			
+		default:
+			System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
+			return null;
+		}
 	}
 
 	public void setFollower(int masterChannel){
-		if (motor instanceof CANTalon){
+		
+		switch (_sctype){
+		case TALON:
 			 ((CANTalon) _CANmotor).changeControlMode(TalonControlMode.Follower);
-			 ((CANTalon) _CANmotor).set(masterChannel);			
-		}
+			 ((CANTalon) _CANmotor).set(masterChannel);
+			 break;
+		default:
+			System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
+		}		
 	}
 	
-	public void zeroEncoder ()
+	public void zeroEncoder ()	
 	{
-		if (_CANmotor != null){
-			if (_CANmotor instanceof CANJaguar)
-				((CANJaguar) _CANmotor).enableControl(0);
-			else
+
+		if (_CANmotor != null){		
+			switch (_sctype){
+			case TALON:
 				((CANTalon) _CANmotor).setPosition(0);			
+				break;
+			case JAGUAR:
+				((CANJaguar) _CANmotor).enableControl(0);
+				break;
+			default:
+				System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
+			}
 		}
 	}
 
@@ -378,13 +438,19 @@ public class XCatsSpeedController {
 	public double getCurrent ()
 	{
 		return _CANmotor.getOutputCurrent();
-//		return motor instanceof CANJaguar ? ((CANJaguar) motor).getOutputCurrent() : ((CANTalon) motor).getOutputCurrent();
 	}
 
 	public CANSpeedController.ControlMode getJaguarControlMode ()
 	{
-		if (_CANmotor != null && _CANmotor instanceof CANJaguar)
-			return ((CANJaguar) motor).getControlMode();
+		if (_CANmotor != null){		
+			switch (_sctype){
+			case JAGUAR:
+				return ((CANJaguar) motor).getControlMode();
+			default:
+				System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
+				return null;
+			}		
+		}
 		else
 			return null;
 	}
@@ -395,14 +461,17 @@ public class XCatsSpeedController {
 			return motor.get();
 		}else
 			return _CANmotor.getSpeed();
-//			return _CANmotor.getSpeed() / _invert / _scale;
-		//return motor instanceof CANJaguar ? ((CANJaguar) motor).getSpeed() / _invert / _scale : ((CANTalon) motor).getSpeed() / _invert / _scale;
 	}
 
 	public void setPosition(double position)
 	{
-		if (_CANmotor != null && _CANmotor instanceof CANTalon)
+		switch (_sctype){
+		case TALON:
 			((CANTalon)_CANmotor).setPosition(position) ;
+			break;
+		default:
+			System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
+		}
 				
 	}
 	
@@ -413,23 +482,29 @@ public class XCatsSpeedController {
 		}
 		else
 			return _CANmotor.getPosition() / _invert / _scale;
-		//return motor instanceof CANJaguar ? ((CANJaguar) motor).getPosition() / _invert / _scale : ((CANTalon) motor).getPosition() / _invert / _scale;
 	}
 
 	public double getEncPosition ()
 	{
-		if (motor instanceof CANTalon){
+		switch (_sctype){
+		case TALON:
 			return ((CANTalon) motor).getEncPosition();			
-		}
-		else
+		default:
+			System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
 			return 0;
+		}		
 	}
 
 	public void reverseSensor (boolean invert)
 	{
 		//note: you may need to use this if the RPMs are negative and you have an encoder
-		if (motor instanceof CANTalon)
+		switch (_sctype){
+		case TALON:
 			((CANTalon) motor).reverseSensor(invert);
+			break;
+		default:
+			System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
+		}				
 	}
 
 	public void selfTest ()

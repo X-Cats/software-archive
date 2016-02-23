@@ -1,7 +1,11 @@
-package org.usfirst.frc.team192.robot;
+package org.usfirst.frc.xcats.robot;
+
+import org.usfirst.frc.xcats.robot.XCatsSpeedController.SCType;
+
+//package org.usfirst.frc.team191.robot;
 
 
-import edu.wpi.first.wpilibj.CANJaguar;
+
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
@@ -13,17 +17,27 @@ public class Acquisition {
 	private boolean _isLow=false;
 	//private CANTalon _liftMotor;
 	private XCatsSpeedController _liftMotor;
-	private CANJaguar _acqGrab,_acqShoot;
+	private XCatsSpeedController _acqGrab,_acqShoot;
 	private Timer _shootTimer = new Timer();
 	private DigitalInput _optShooter;
 	private double _acqSpeed;
 	private double _maxPosition=0;
 	private boolean _shotComplete=false;
+	private double _liftDirection = 1.0;
+
 	
 	
 	public Acquisition(Joystick oj){
-		//_liftMotor = new CANTalon(Enums.ACQ_LIFT_MOTOR);
-		_liftMotor = new XCatsSpeedController("Arm", Enums.ACQ_LIFT_MOTOR, false,true, 4096, 1, 0.125, 0, 0,null,null,CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
+
+		if (Enums.IS_FINAL_ROBOT){
+			// the motor on the final robot is reversed orientation from the prototype. We need to invert the drive, but not the encoder sensor
+			_liftMotor = new XCatsSpeedController("Arm", Enums.ACQ_LIFT_MOTOR, XCatsSpeedController.SCType.TALON,false, 4096, 1, 0.125, 0, 0,null,null,CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
+			_liftMotor.setInverted(true);
+			_liftMotor.setDashboardIO(false, true);
+		}
+		else
+			_liftMotor = new XCatsSpeedController("Arm", Enums.ACQ_LIFT_MOTOR,  XCatsSpeedController.SCType.TALON, false, 4096, 1, 0.125, 0, 0,null,null,CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
+
 		_liftMotor.setDashboardIO(false, true);
 
 		_shooter = new Shooter(oj);
@@ -32,11 +46,18 @@ public class Acquisition {
 		zeroLifter();
 		zeroLifter();
 		
-		_acqGrab = new CANJaguar(Enums.ACQ_MOTOR_GRAB);
-		_acqShoot = new CANJaguar(Enums.ACQ_MOTOR_SHOOT);
 		
-//		_liftMotor.changeControlMode(CANTalon.TalonControlMode.Position);
-		//_optShooter = new DigitalInput(Enums.SHOOTER_OPTICAL_DI);
+		if (Enums.IS_FINAL_ROBOT)
+			_acqGrab  = new XCatsSpeedController("AcqGrab",Enums.ACQ_MOTOR_GRAB , true, SCType.TALON, null, null );
+		else
+			_acqGrab = new XCatsSpeedController("AcqGrab",Enums.ACQ_MOTOR_GRAB , true, SCType.JAGUAR, null, null );
+			
+		
+		if (Enums.IS_FINAL_ROBOT)
+			_acqShoot = new XCatsSpeedController("AcqShoot",Enums.ACQ_MOTOR_SHOOT_PWM , false, SCType.VICTOR_SP, null, null );
+		else
+			_acqShoot = new XCatsSpeedController("AcqShoot",Enums.ACQ_MOTOR_SHOOT , true, SCType.JAGUAR, null, null );
+			
 		_acqSpeed = Enums.ACQ_SPEED;
 		
 	}
@@ -56,33 +77,41 @@ public class Acquisition {
 	
 	//this is all the way up
 	public void goHome(){
-		_liftMotor.set(-1.0);		
+		_liftMotor.set(_liftDirection * -1.0);		
 	}
 	
 	//this is all the way down
 	public void gotoGround(){
-		_liftMotor.set(1.0);
+		_liftMotor.set(_liftDirection * 0.9);
 		
 	}
 	
 	public void gotoLowGoal(){
-		_liftMotor.set(-0.30);		
+		_liftMotor.set(_liftDirection * -0.20);		
 	}
 	
 	public void shoot(){
 		_acqShoot.set(1.0);
 	}
 	
-	public void zeroLifter(){
-		_liftMotor.zeroSensorAndThrottle(CANTalon.FeedbackDevice.CtreMagEncoder_Relative, -1.00);
+	public void reverseShooter(){
+		_acqShoot.set(-1.0);
 	}
-	public void setPosition(double position){
+	
+	public void zeroLifter(){
+		if (Enums.IS_FINAL_ROBOT)
+			_liftMotor.zeroSensorAndThrottle(CANTalon.FeedbackDevice.CtreMagEncoder_Relative,  1.00);
+		else
+			_liftMotor.zeroSensorAndThrottle(CANTalon.FeedbackDevice.CtreMagEncoder_Relative,  -1.00);
 		
-		_liftMotor.set(position);
+	}
+	
+	private void setPosition(double position){	
+		_liftMotor.set(_liftDirection * position);
 	}
 	
 	public void bumpPosition(double delta){
-		setPosition(_liftMotor.getSetPoint()+delta);
+		setPosition(_liftDirection * _liftMotor.getSetPoint()+delta);
 	}
 	public void stopShoot(){
 		_acqShoot.set(0);
@@ -96,7 +125,15 @@ public class Acquisition {
 	}
 	
 	public void setShooterSpeed(double speed){
-		_shooter.set(speed);
+		//if the liftMotor is positioned in the low shooting position, only set the speed to 0.5 instead of full
+		if (speed > 0){
+			if (Math.abs(_liftMotor.getSetPoint()) > 0.5 &&  Math.abs(_liftMotor.getSetPoint()) < 0.9)
+				_shooter.set(0.5);
+			else
+				_shooter.set(speed);			
+		}
+		else
+			_shooter.set(speed);
 	}
 	
 	public boolean setShooterAndShoot(){

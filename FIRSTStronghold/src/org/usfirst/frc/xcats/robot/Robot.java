@@ -1,5 +1,7 @@
+package org.usfirst.frc.xcats.robot;
 
-package org.usfirst.frc.team192.robot;
+
+//package org.usfirst.frc.team191.robot;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -25,9 +27,16 @@ public class Robot extends IterativeRobot {
      */
     public void robotInit() {
         
-        _controls = new RobotControls();
-        _teleop = new Teleop(_controls);
-        _auto = new Autonomous(_controls);
+    	try{
+            _controls = new RobotControls();
+            _teleop = new Teleop(_controls);
+            _auto = new Autonomous(_controls);    		
+    	}
+    	catch (Exception e)
+    	{
+    		System.out.println("* * * * CANNOT INIT ROBOT * * * *");
+    		e.printStackTrace();
+    	}
     }
     
 	/**
@@ -61,7 +70,17 @@ public class Robot extends IterativeRobot {
     		e.printStackTrace();
     	}
     }
-
+    
+    public void disabledPeriodic(){
+    	
+    }
+    public void disabledInit(){
+    	
+    }
+    public void teleopInit(){
+    	
+    }
+    
     /**
      * This function is called periodically during operator control
      */

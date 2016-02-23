@@ -1,4 +1,5 @@
-package org.usfirst.frc.team192.robot;
+package org.usfirst.frc.xcats.robot;
+
 
 public class Enums {
 
@@ -28,10 +29,12 @@ public class Enums {
 	public static final String DRIVE_CONTROLLER_TYPE = "Jaguar"; // choices are "Jaguar" or "Talon"
 	public static final boolean HAS_MECHANUM_WHEELS = false;
 	public static final boolean USE_PID = false;    	// This is if the drive train is using PID control
-//	public static final int ENCODER_CODES_PER_REVOLUTION = 360;
 	public static final int MAX_CAN_SPEED = 6000;
 	public static final boolean USE_CAN = true;			// if the motors are wired with CAN bus use this
 	public static final double MOTOR_STOP_TIME = .1;	//when using coast mode this is how to stop gradually	
+	
+	public static final double ROBOT_LENGTH_COMPACT = 30.0; //length of robot with shooter in home position
+	public static final double ROBOT_LENGTH_EXTENDED = 40; // length of robot with shooter down
 
 	//these values keep track specifically of the specific motor controllers
 	//if we only need 2 motors in the drive, use FRONT_LEFT and FRONT_RIGHT. Make sure that the arrays below have a length of 2
@@ -45,6 +48,7 @@ public class Enums {
 	public static final double ACQ_LIFT_SPEED = 0.40;
 	public static final int ACQ_MOTOR_GRAB = 6;	//this motor controls the green acquisition into the robot 
 	public static final int ACQ_MOTOR_SHOOT = 5;    //this motor controls the dispense of the ball into the shooter
+	public static final int ACQ_MOTOR_SHOOT_PWM = 9;    //this motor controls the dispense of the ball into the shooter
 	public static final double ACQ_SPEED = 1;
 	
 	//This assembly controls the shooter wheels

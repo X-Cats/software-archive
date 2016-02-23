@@ -1,4 +1,5 @@
-package org.usfirst.frc.team192.robot;
+package org.usfirst.frc.xcats.robot;
+
 
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Joystick;
@@ -13,7 +14,6 @@ public class RobotControls {
 	private boolean _reductionToggle = false, slowMode = true;
 	private Acquisition _acq;
 	private XCatsJSButton _speedToggleButton;
-	private XCatsJSButton _bumpSpeedButton;
 	private XCatsJSButton _highSpeedButton;
 	private boolean _highSpeed = false;;
 
@@ -50,7 +50,6 @@ public class RobotControls {
 		}
 
 		_operatorJS = new Joystick(Enums.OPERATOR_JS);
-		_bumpSpeedButton = new XCatsJSButton(_operatorJS,2);
 		_highSpeedButton = new XCatsJSButton(_operatorJS,8);
 		
 		if (Enums.DASHBOARD_INPUT)
@@ -146,25 +145,24 @@ public class RobotControls {
 			_acq.bumpPosition(+0.05);
 		}
 
+		//check to see if the shooter speed button has been toggled on
 		_highSpeed = _highSpeedButton.isPressed();		
-		_acq.setShooterSpeed(!_highSpeed ? 1.0 : 0);
+		_acq.setShooterSpeed(!_highSpeed ? 0.9 : 0);
 		
 		
+		//the right bump button shoots the left bump button reverses to clear a jam
 		if (_operatorJS.getRawButton(6)){
 			_acq.shoot();
+		}
+		else if (_operatorJS.getRawButton(5)){
+			_acq.reverseShooter();
 		}
 		else{
 			_acq.stopShoot();
 		}
 		
 
-		//If button 2 on the operator joystick is pressed bump up the speed of the acq rollers by 10%
-		if (_bumpSpeedButton.isPressed()){
-			_acq.bumpAcqSpeed(0.1);
-		}
-		//		if (!Enums.DASHBOARD_INPUT || SmartDashboard.getBoolean("Use Joysticks"));
-		//		{
-		//		}
+	
 	}
 
 	public void updateStatus ()

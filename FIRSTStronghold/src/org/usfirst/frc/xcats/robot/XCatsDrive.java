@@ -1,4 +1,5 @@
-package org.usfirst.frc.team192.robot;
+package org.usfirst.frc.xcats.robot;
+
 
 import edu.wpi.first.wpilibj.Joystick;
 
@@ -16,6 +17,8 @@ public class XCatsDrive {
 	public XCatsDrive (boolean useCAN, boolean isTalon)
 	{
 		int channels[];
+		XCatsSpeedController.SCType sctype;
+		sctype = (isTalon ? XCatsSpeedController.SCType.TALON : XCatsSpeedController.SCType.JAGUAR );
 		
 		channels = new int[Enums.DRIVE_MOTOR_NUMBERS.length];
 		if (useCAN){
@@ -25,16 +28,18 @@ public class XCatsDrive {
 			channels =Enums.DRIVE_MOTOR_NUMBERS;		
 		}
 		
+		
 		//We will assume that if the Enums.DRIVE_MOTOR_NUMBERS array has length 4 then there are 4 motors, otherwise there are 2 (front left and front right)
+		
 		this._motors = new XCatsSpeedController[Enums.DRIVE_MOTOR_NUMBERS.length];
 
-		this._motors[Enums.FRONT_LEFT] = new XCatsSpeedController("motor"+Enums.FRONT_LEFT, channels[Enums.FRONT_LEFT], useCAN, isTalon,null,null);
-		this._motors[Enums.FRONT_RIGHT] = new XCatsSpeedController("motor"+Enums.FRONT_RIGHT,channels[Enums.FRONT_RIGHT], useCAN, isTalon,null,null);
+		this._motors[Enums.FRONT_LEFT] = new XCatsSpeedController("motor"+Enums.FRONT_LEFT, channels[Enums.FRONT_LEFT], useCAN, sctype, null,null);
+		this._motors[Enums.FRONT_RIGHT] = new XCatsSpeedController("motor"+Enums.FRONT_RIGHT,channels[Enums.FRONT_RIGHT], useCAN, sctype, null,null);
 		_motors[Enums.FRONT_LEFT].setInverted(true);
 		
 		if (Enums.DRIVE_MOTOR_NUMBERS.length > 2){
-			this._motors[Enums.REAR_LEFT] = new XCatsSpeedController("motor"+Enums.REAR_LEFT,channels[Enums.REAR_LEFT], useCAN, isTalon,null,null);
-			this._motors[Enums.REAR_RIGHT] = new XCatsSpeedController("motor"+Enums.REAR_RIGHT,channels[Enums.REAR_RIGHT], useCAN, isTalon,null,null);			
+			this._motors[Enums.REAR_LEFT] = new XCatsSpeedController("motor"+Enums.REAR_LEFT,channels[Enums.REAR_LEFT], useCAN, sctype, null,null);
+			this._motors[Enums.REAR_RIGHT] = new XCatsSpeedController("motor"+Enums.REAR_RIGHT,channels[Enums.REAR_RIGHT], useCAN, sctype, null,null);			
 			_motors[Enums.REAR_LEFT].setInverted(true);
 		}		
 	}
@@ -42,15 +47,18 @@ public class XCatsDrive {
 
 	public XCatsDrive (int channels[], boolean speedMode, boolean isTalon, int codesPerRev, double p, double i, double d)
 	{
+		XCatsSpeedController.SCType sctype;
+		sctype = (isTalon ? XCatsSpeedController.SCType.TALON : XCatsSpeedController.SCType.JAGUAR );
+		
 		this._motors = new XCatsSpeedController[Enums.DRIVE_MOTOR_NUMBERS.length];
 		
-		this._motors[Enums.FRONT_LEFT] = new XCatsSpeedController("motor",  channels[Enums.FRONT_LEFT], speedMode, isTalon, codesPerRev,1, p, i, d,null,null,null);
-		this._motors[Enums.FRONT_RIGHT] = new XCatsSpeedController("motor", channels[Enums.FRONT_RIGHT], speedMode, isTalon, codesPerRev,1, p, i, d,null,null,null);
+		this._motors[Enums.FRONT_LEFT] = new XCatsSpeedController("motor",  channels[Enums.FRONT_LEFT], sctype, speedMode, codesPerRev,1, p, i, d,null,null,null);
+		this._motors[Enums.FRONT_RIGHT] = new XCatsSpeedController("motor", channels[Enums.FRONT_RIGHT], sctype,  speedMode, codesPerRev,1, p, i, d,null,null,null);
 		_motors[Enums.FRONT_LEFT].setInverted(true);
 
 		if (Enums.DRIVE_MOTOR_NUMBERS.length > 2){
-			this._motors[Enums.REAR_LEFT] = new XCatsSpeedController("motor", channels[Enums.REAR_LEFT], speedMode, isTalon, codesPerRev,1, p, i, d,null,null,null);
-			this._motors[Enums.REAR_RIGHT] = new XCatsSpeedController("motor", channels[Enums.REAR_RIGHT], speedMode, isTalon, codesPerRev,1,  p, i, d,null,null,null);
+			this._motors[Enums.REAR_LEFT] = new XCatsSpeedController("motor", channels[Enums.REAR_LEFT], sctype, speedMode, codesPerRev,1, p, i, d,null,null,null);
+			this._motors[Enums.REAR_RIGHT] = new XCatsSpeedController("motor", channels[Enums.REAR_RIGHT], sctype, speedMode, codesPerRev,1,  p, i, d,null,null,null);
 			_motors[Enums.REAR_LEFT].setInverted(true);
 		}
 	}

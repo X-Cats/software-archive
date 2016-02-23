@@ -1,4 +1,5 @@
-package org.usfirst.frc.team192.robot;
+package org.usfirst.frc.xcats.robot;
+
 
 public class AutonomousStep {
 	public enum stepTypes {DRIVE, SHOOT, GRAB, UNGRAB, LIFT, LOWER, LIFT_TO_LOW, WAIT, STOP, RELEASE, DRIVE_DISTANCE,ROTATE};
