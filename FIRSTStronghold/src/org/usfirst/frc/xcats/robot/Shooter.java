@@ -18,14 +18,22 @@ public class Shooter {
 	private boolean _readyToShoot=false;
 	
 	public Shooter(Joystick oj){
+		if(Enums.IS_FINAL_ROBOT){
+			_master = new XCatsSpeedController("Shooter Master", Enums.SHOOTER_MOTOR_MASTER, XCatsSpeedController.SCType.TALON, true, 4096, 10000, 0.125, 0, 0,null,null,CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
+			_master.reverseSensor(false);
+//			_master.setDashboardIO(false, true);
 		
-		_master = new XCatsSpeedController("Shooter Master", Enums.SHOOTER_MOTOR_MASTER, XCatsSpeedController.SCType.TALON, true, 4096, 10000, 0.125, 0, 0,null,null,CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
-		_master.reverseSensor(true);
-		_master.setDashboardIO(false, true);
-		
-		_follower = new XCatsSpeedController("Shooter Follower", Enums.SHOOTER_MOTOR_FOLLOWER, true, SCType.TALON, null, null);
-		_follower.setFollower(Enums.SHOOTER_MOTOR_MASTER);
+			_follower = new XCatsSpeedController("Shooter Follower", Enums.SHOOTER_MOTOR_FOLLOWER, true, SCType.TALON, null, null);
+			_follower.setFollower(Enums.SHOOTER_MOTOR_MASTER);
+		}else{
+			_master = new XCatsSpeedController("Shooter Master", Enums.SHOOTER_MOTOR_MASTER, XCatsSpeedController.SCType.TALON, true, 4096, -8500, 0.125, 0, 0,null,null,CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
+			_master.reverseSensor(false);
+//			_master.setDashboardIO(false, true);
 			
+			_follower = new XCatsSpeedController("Shooter Follower", Enums.SHOOTER_MOTOR_FOLLOWER, true, SCType.TALON, null, null);
+			_follower.setFollower(Enums.SHOOTER_MOTOR_MASTER);
+		}
+				
 		_oj = oj;
 		
 	}
@@ -45,13 +53,17 @@ public class Shooter {
 		return _readyToShoot;
 	}
 	
+	public void stopShooter(){
+		_readyToShoot = false;
+		_master.set(0);
+	}
 	public void updateStatus(){
 		_master.updateStatus();
-		SmartDashboard.putNumber("Shooter Setpoint", _master.getSetPoint());
-		SmartDashboard.putNumber("Shooter Speed", this.getSpeed());
-		SmartDashboard.putNumber("Shooter Encoder", this.getPosition());
+//		SmartDashboard.putNumber("Shooter Setpoint", _master.getSetPoint());
+//		SmartDashboard.putNumber("Shooter Speed", this.getSpeed());
+//		SmartDashboard.putNumber("Shooter Encoder", this.getPosition());
 		
-		if (this.getSpeed() > 6300){
+		if ((this.getSpeed() < -6300) || (this.getSpeed() > 6300)) {
 			_oj.setRumble(RumbleType.kRightRumble,1);
 			_readyToShoot=true;
 		} else

@@ -33,16 +33,18 @@ public class Acquisition {
 			// the motor on the final robot is reversed orientation from the prototype. We need to invert the drive, but not the encoder sensor
 			_liftMotor = new XCatsSpeedController("Arm", Enums.ACQ_LIFT_MOTOR, XCatsSpeedController.SCType.TALON,false, 4096, 1, 0.125, 0, 0,null,null,CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
 			_liftMotor.setInverted(true);
+//			_liftMotor.setDashboardIO(false, true);
+		}
+		else{
+			_liftMotor = new XCatsSpeedController("Arm", Enums.ACQ_LIFT_MOTOR,  XCatsSpeedController.SCType.TALON, false, 4096, 1, 0.125, 0, 0,null,null,CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
+//			_liftMotor.setInverted(true);
 			_liftMotor.setDashboardIO(false, true);
 		}
-		else
-			_liftMotor = new XCatsSpeedController("Arm", Enums.ACQ_LIFT_MOTOR,  XCatsSpeedController.SCType.TALON, false, 4096, 1, 0.125, 0, 0,null,null,CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
-
-		_liftMotor.setDashboardIO(false, true);
 
 		_shooter = new Shooter(oj);
 		
 		//I don't know why, probably something in here is in the wrong order,  we have to call this twice but we do....
+		zeroLifter();
 		zeroLifter();
 		zeroLifter();
 		
@@ -77,12 +79,18 @@ public class Acquisition {
 	
 	//this is all the way up
 	public void goHome(){
-		_liftMotor.set(_liftDirection * -1.0);		
+		if (Enums.IS_FINAL_ROBOT)
+			_liftMotor.set(_liftDirection * -1.0);
+		else
+			_liftMotor.set(_liftDirection * -1.0);
 	}
 	
 	//this is all the way down
 	public void gotoGround(){
-		_liftMotor.set(_liftDirection * 0.9);
+		if (Enums.IS_FINAL_ROBOT)
+			_liftMotor.set(_liftDirection * 0.9);//.9
+		else
+			_liftMotor.set(_liftDirection * 1.1);//.9
 		
 	}
 	
@@ -115,6 +123,7 @@ public class Acquisition {
 	}
 	public void stopShoot(){
 		_acqShoot.set(0);
+		
 	}
 	public void positionForLowShot(){
 		_isLow = true;
@@ -147,6 +156,8 @@ public class Acquisition {
 	}
 	
 	
+	
+	
 	public void bumpAcqSpeed(double delta){
 		_acqSpeed = _acqSpeed+delta;
 		if (_acqSpeed > 1)
@@ -171,8 +182,10 @@ public class Acquisition {
 		}
 		
 		_maxPosition = Math.max(_maxPosition, _liftMotor.getPosition());
-		SmartDashboard.putNumber("Acq Speed", _acqSpeed);
+//		SmartDashboard.putNumber("Acq Speed", _acqSpeed);
 		SmartDashboard.putNumber("Arm Position", this.getPosition());
+		SmartDashboard.putNumber("Arm get", _liftMotor.get());
+//		SmartDashboard.putNumber("Arm Speed", _liftMotor.getSpeed());
 		_shooter.updateStatus();
 	}
 }

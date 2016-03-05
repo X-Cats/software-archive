@@ -462,6 +462,10 @@ public class XCatsSpeedController{
 		}else
 			return _CANmotor.getSpeed();
 	}
+	
+	public double get(){
+		return motor.get();
+	}
 
 	public void setPosition(double position)
 	{
