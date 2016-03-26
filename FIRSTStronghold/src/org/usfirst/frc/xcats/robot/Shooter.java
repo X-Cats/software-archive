@@ -19,7 +19,7 @@ public class Shooter {
 	
 	public Shooter(Joystick oj){
 		if(Enums.IS_FINAL_ROBOT){
-			_master = new XCatsSpeedController("Shooter Master", Enums.SHOOTER_MOTOR_MASTER, XCatsSpeedController.SCType.TALON, true, 4096, 10000, 0.125, 0, 0,null,null,CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
+			_master = new XCatsSpeedController("Shooter Master", Enums.SHOOTER_MOTOR_MASTER, XCatsSpeedController.SCType.TALON, true, 4096, -8000, 0.125, 0, 0,null,null,CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
 			_master.reverseSensor(false);
 //			_master.setDashboardIO(false, true);
 		

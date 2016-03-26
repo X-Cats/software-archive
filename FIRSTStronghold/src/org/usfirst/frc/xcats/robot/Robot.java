@@ -57,7 +57,19 @@ public class Robot extends IterativeRobot {
     		e.printStackTrace();
     	}
     }
+    
+    public void teleopInit() {
+    	try {
+        	_auto.disable();    		
+    	}
+    	catch (Exception e){
+    		//keep going!
+    		e.printStackTrace();
+    	}
+    }
 
+
+    
     /**
      * This function is called periodically during autonomous
      */
@@ -72,14 +84,19 @@ public class Robot extends IterativeRobot {
     }
     
     public void disabledPeriodic(){
+      	try {
+        	_auto.disable();    		
+    	}
+    	catch (Exception e)
+    	{
+    		// keep going! ignore the error
+    	}  
     	
     }
     public void disabledInit(){
     	
     }
-    public void teleopInit(){
-    	
-    }
+  
     
     /**
      * This function is called periodically during operator control

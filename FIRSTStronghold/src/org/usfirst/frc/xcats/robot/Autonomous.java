@@ -53,10 +53,17 @@ public class Autonomous {
 	final String _defRoughTerrain = "Rough Terrain";
 	final String _defDrawbridge = "Drawbridge";
 	
+	final String _shootYesHi = "ShootHi";
+	final String _shootYesLow = "ShootLow";
+	final String _shootNo = "Don't Shoot";
+	
+	
 	String _autoSelected;
 	String _defenseSelected;
-	SendableChooser _chooser;
+	String _shooterModeSelected;
+	SendableChooser _defensePosition;
 	SendableChooser _defenseType;
+	SendableChooser _shooterMode;
 
 	public Autonomous (RobotControls controls)
 	{
@@ -74,17 +81,17 @@ public class Autonomous {
 		 * If using the SendableChooser make sure to add them to the chooser code above as well.
 		 */
 
-		_chooser = new SendableChooser();
-		_chooser.addDefault("Default Auto", _defaultAuto);
-		_chooser.addObject(_autoForwardOnly, _autoForwardOnly);
-		_chooser.addObject(_auto1, _auto1);
-		_chooser.addObject(_auto2, _auto2);
-		_chooser.addObject(_auto3, _auto3);
-		_chooser.addObject(_auto4, _auto4);
-		_chooser.addObject(_auto5, _auto5);
-		_chooser.addObject(_autoReadFile,_autoReadFile);
-		_chooser.addObject(_autoTestSpeed, _autoTestSpeed);
-		SmartDashboard.putData("Auto choices", _chooser);	
+		_defensePosition = new SendableChooser();
+		_defensePosition.addDefault("Default Auto", _defaultAuto);
+		_defensePosition.addObject(_autoForwardOnly, _autoForwardOnly);
+		_defensePosition.addObject(_auto1, _auto1);
+		_defensePosition.addObject(_auto2, _auto2);
+		_defensePosition.addObject(_auto3, _auto3);
+		_defensePosition.addObject(_auto4, _auto4);
+		_defensePosition.addObject(_auto5, _auto5);
+		_defensePosition.addObject(_autoReadFile,_autoReadFile);
+		_defensePosition.addObject(_autoTestSpeed, _autoTestSpeed);
+		SmartDashboard.putData("Auto choices", _defensePosition);	
 		
 		_defenseType = new SendableChooser();
 		_defenseType.addDefault(_defLowBar, _defLowBar);
@@ -97,7 +104,13 @@ public class Autonomous {
 		_defenseType.addObject(_defRockwall, _defRockwall);
 		_defenseType.addObject(_defRoughTerrain, _defRoughTerrain);
 		SmartDashboard.putData("Defense Types", _defenseType);
-
+		
+		_shooterMode = new SendableChooser();
+		_shooterMode.addDefault(_shootNo,_shootNo);
+		_shooterMode.addObject(_shootYesHi,_shootYesHi);
+		_shooterMode.addObject(_shootYesLow,_shootYesLow);
+		SmartDashboard.putData("Shoot Options",_shooterMode);
+		
 
 		SmartDashboard.putNumber(_autoTestSpeed, 0.5); 			//this is the speed to run the auto calibration test
 		//put any properties here on the smart dashboard that you want to adjust from there.
@@ -148,10 +161,12 @@ public class Autonomous {
 	public void init ()
 	{
 
-		_autoSelected = (String) _chooser.getSelected();
+		_autoSelected = (String) _defensePosition.getSelected();
 		System.out.println("Auto selected: " + _autoSelected);		
 		_defenseSelected = (String) _defenseType.getSelected();
-		System.out.println("Defense selected: " + _defenseSelected);				
+		System.out.println("Defense selected: " + _defenseSelected);	
+		_shooterModeSelected = (String) _shooterMode.getSelected();
+		System.out.println("ShooterMode Selected:" + _shooterModeSelected);
 		setAuto();  //build the steps for the selected autonomous
 
 		_currentStep = 0;
@@ -163,11 +178,21 @@ public class Autonomous {
 		this.updateStatus();
 	}
 
+	public void disable(){
+		_steps = null;
+		_autoSelected = "";
+		_defenseSelected = "";
+		_shooterModeSelected = "";
+		stopShooter();
+		updateStatus();
+		
+	}
 	private void setAuto ()
 	{	
 		switch (_defenseSelected){
 		
 		case _defLowBar:
+		case _defPortCullis:
 		case _defMoat:
 		case _defChevaldeFrise:
 		case _defRamparts:
@@ -180,6 +205,8 @@ public class Autonomous {
 		}
 		
 		
+		
+		
 		//we are going to construct the steps needed for our autonomous mode
 		_steps =  new ArrayList<AutonomousStep>();
 		switch (_autoSelected)
@@ -188,9 +215,9 @@ public class Autonomous {
 			
 			break;
 		case _autoForwardOnly:
-			if (_defenseSelected == _defLowBar){
-				//when we are the low bar, we need to have the shooter assembly on the ground to fit under it. Use the extended length.
-				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LOWER,"Move shifter to ground", 1.5, 0, 0, 0));			
+			if (_defenseSelected == _defLowBar || _defenseSelected == _defPortCullis){
+				//when we are the low bar or portcullis, we need to have the shooter assembly on the ground to fit under it. Use the extended length.
+				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LOWER,"Move arm to ground", 1.5, 0, 0, 0));			
 				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to Defense", 0, 0.7, 0.7, (FIRST_LEG_DISTANCE - (Enums.ROBOT_LENGTH_EXTENDED - OVERHANG) + OVERHANG)/12.0));
 			}
 			else 
@@ -198,7 +225,7 @@ public class Autonomous {
 			break;
 
 		case _auto1:
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LOWER,"Move shifter to ground", 2.8, 0, 0, 0));			
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LOWER,"Move arm to ground", 2.8, 0, 0, 0));			
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to Defense", 0, 0.7, 0.7, (FIRST_LEG_DISTANCE - (Enums.ROBOT_LENGTH_EXTENDED - OVERHANG) + OVERHANG)/12.0));									
 
 			if (_canNavDefense){
@@ -206,75 +233,90 @@ public class Autonomous {
 				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LIFT,"Move shifter home", 0.5, 0, 0, 0));			
 				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to Turn", 0, 0.95, 0.95, (109 + 6 - 0.5*Enums.ROBOT_LENGTH_COMPACT)/12.0));									
 				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn Right",0, 0, 0, 60));
-				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to goal", 0, 0.95, 0.95, (98 - SHOOT_DISTANCE + 0.5*Enums.ROBOT_LENGTH_COMPACT)/12.0));
-				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.SHOOT,"Shoot",0,0,0,0));				
+				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to goal", 0, 0.95, 0.95, (98 - SHOOT_DISTANCE + 0.5*Enums.ROBOT_LENGTH_COMPACT - 21.0)/12.0));
+				if (_shooterModeSelected == _shootYesLow){
+					_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LIFT_TO_LOW,"Move shifter low", 0.5, 0, 0, 0));	
+					_steps.add( new AutonomousStep(AutonomousStep.stepTypes.SHOOT,"Shoot",0,0,0,0));
+				}
+				else if (_shooterModeSelected == _shootYesHi){
+					_steps.add( new AutonomousStep(AutonomousStep.stepTypes.SHOOT,"Shoot",0,0,0,0));
+				}
 			}
 			break;
 
 		case _auto2:
-
-			if (_defenseSelected == _defPortCullis)
-				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LOWER,"Move shifter to ground", 3.0, 0, 0, 0));			
-
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to Defense", 0, 0.7, 0.7, (FIRST_LEG_DISTANCE - (Enums.ROBOT_LENGTH_EXTENDED - OVERHANG) + OVERHANG)/12.0));									
+			
 			if (_canNavDefense){
-				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Navigate Defense", 0, 0.5, 0.5, (DEFENSE_DEPTH - OVERHANG + Enums.ROBOT_LENGTH_EXTENDED)/12.0));
-				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to Turn", 0, 0.7, 0.7, (139 - 0.5*Enums.ROBOT_LENGTH_COMPACT)/12.0));									
+				addDefenseSteps();
+
+				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to Turn", 0, 0.95, 0.95, (139 - 0.5*Enums.ROBOT_LENGTH_COMPACT)/12.0));									
 				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn Right",0, 0, 0, 60));
-				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Backup from goal", 0, -0.7, -0.7, Math.abs(37 - SHOOT_DISTANCE + 0.5*Enums.ROBOT_LENGTH_COMPACT)/12.0));
-				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.SHOOT,"Shoot",0,0,0,0));
+				if (_shooterModeSelected == _shootYesLow){
+					_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LIFT_TO_LOW,"Move arm to shoot", 3.0, 0, 0, 0));	
+					_steps.add( new AutonomousStep(AutonomousStep.stepTypes.SHOOT,"Shoot",0,0,0,0));				
+				}
+				else if (_shooterModeSelected == _shootYesHi){
+					_steps.add( new AutonomousStep(AutonomousStep.stepTypes.SHOOT,"Shoot",0,0,0,0));				
+				}
 			}
+			else
+				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to Defense", 0, 0.7, 0.7, (FIRST_LEG_DISTANCE - (Enums.ROBOT_LENGTH_COMPACT - OVERHANG) + OVERHANG)/12.0));
+				
 			break;
 			
 		case _auto3:
-
-			if (_defenseSelected == _defPortCullis)
-				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LOWER,"Move shifter to ground", 3.0, 0, 0, 0));			
-
 			
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to Defense", 0, 0.7, 0.7, (FIRST_LEG_DISTANCE - (Enums.ROBOT_LENGTH_EXTENDED - OVERHANG) + OVERHANG)/12.0));									
 			if (_canNavDefense){
-				if (_defenseSelected == _defPortCullis)
-					addPortcullisSteps();			
-				else				
-					_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Navigate Defense", 0, 0.5, 0.5, (DEFENSE_DEPTH - OVERHANG + Enums.ROBOT_LENGTH_EXTENDED)/12.0));
+				addDefenseSteps();
 				
 				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to Turn", 0, 0.7, 0.7, (70 - 0.5*Enums.ROBOT_LENGTH_COMPACT)/12.0));									
 				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn Right",0, 0, 0, 90));
-				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to goal", 0, 0.7, 0.7, Math.abs(38)/12.0));
+				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to Turn back", 0, 0.7, 0.7, 24.0/12.0));
 				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn Left",0, 0, 0, -90));
-				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.SHOOT,"Shoot",0,0,0,0));
+				if (_shooterModeSelected == _shootYesHi || _shooterModeSelected == _shootYesLow){
+					_steps.add( new AutonomousStep(AutonomousStep.stepTypes.SHOOT,"Shoot",0,0,0,0));				
+				}
 			}
-				break;
+			else
+				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to Defense", 0, 0.7, 0.7, (FIRST_LEG_DISTANCE - (Enums.ROBOT_LENGTH_COMPACT - OVERHANG) + OVERHANG)/12.0));
+
+			break;
 			
 		case _auto4:
-			if (_defenseSelected == _defPortCullis)
-				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LOWER,"Move shifter to ground", 3.0, 0, 0, 0));			
 
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to Defense", 0, 0.7, 0.7, (FIRST_LEG_DISTANCE - (Enums.ROBOT_LENGTH_EXTENDED - OVERHANG) + OVERHANG)/12.0));									
 			if (_canNavDefense){
-				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Navigate Defense", 0, 0.5, 0.5, (DEFENSE_DEPTH - OVERHANG + Enums.ROBOT_LENGTH_EXTENDED)/12.0));
+				addDefenseSteps();
+				
 				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to Turn", 0, 0.7, 0.7, (70 - 0.5*Enums.ROBOT_LENGTH_COMPACT)/12.0));									
 				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn Left",0, 0, 0, -90));
-				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to goal", 0, 0.7, 0.7, Math.abs(15)/12.0));
+				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to turn back", 0, 0.7, 0.7, Math.abs(15)/12.0));
 				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn Right",0, 0, 0, 90));
-				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.SHOOT,"Shoot",0,0,0,0));
+				if (_shooterModeSelected == _shootYesHi || _shooterModeSelected == _shootYesLow){
+					_steps.add( new AutonomousStep(AutonomousStep.stepTypes.SHOOT,"Shoot",0,0,0,0));				
+				}
 			}
+			else
+				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to Defense", 0, 0.7, 0.7, (FIRST_LEG_DISTANCE - (Enums.ROBOT_LENGTH_COMPACT - OVERHANG) + OVERHANG)/12.0));
+
 			break;
 			
 		case _auto5:
 			
-			if (_defenseSelected == _defPortCullis)
-				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LOWER,"Move shifter to ground", 3.0, 0, 0, 0));			
-
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to Defense", 0, 0.7, 0.7, (FIRST_LEG_DISTANCE - (Enums.ROBOT_LENGTH_EXTENDED - OVERHANG) + OVERHANG)/12.0));									
 			if (_canNavDefense){
-				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Navigate Defense", 0, 0.5, 0.5, (DEFENSE_DEPTH - OVERHANG + Enums.ROBOT_LENGTH_EXTENDED)/12.0));
+				addDefenseSteps();
+
 				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to Turn", 0, 0.7, 0.7, (151 - 0.5*Enums.ROBOT_LENGTH_COMPACT)/12.0));									
 				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn Left",0, 0, 0, -60));
-				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Backup from goal", 0, -0.7, -0.7, Math.abs(8 - SHOOT_DISTANCE + 0.5*Enums.ROBOT_LENGTH_COMPACT)/12.0));
-				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.SHOOT,"Shoot",0,0,0,0));
+				if (_shooterModeSelected == _shootYesLow){
+					_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LIFT_TO_LOW,"Move arm to shoot", 3.0, 0, 0, 0));	
+					_steps.add( new AutonomousStep(AutonomousStep.stepTypes.SHOOT,"Shoot",0,0,0,0));				
+				}
+				else if (_shooterModeSelected == _shootYesHi){
+					_steps.add( new AutonomousStep(AutonomousStep.stepTypes.SHOOT,"Shoot",0,0,0,0));				
+				}
 			}
+			else
+				_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to Defense", 0, 0.7, 0.7, (FIRST_LEG_DISTANCE - (Enums.ROBOT_LENGTH_COMPACT - OVERHANG) + OVERHANG)/12.0));
 			
 			break;
 
@@ -294,11 +336,36 @@ public class Autonomous {
 		}
 	}
 	
-	private void addPortcullisSteps(){
-		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Navigate Defense", 0, 0.5, 0.5, (DEFENSE_DEPTH - OVERHANG + Enums.ROBOT_LENGTH_EXTENDED)/12.0));
-		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LIFT,"Move shifter home", 0.5, 0, 0, 0));			
-	}
+//	private void addPortcullisSteps(){
+//		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to Defense", 0, 0.7, 0.7, (FIRST_LEG_DISTANCE - (Enums.ROBOT_LENGTH_EXTENDED - OVERHANG ) +35)/12.0));
+//		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LIFT,"Move shifter home", 0.5, 0, 0, 0));			
+//		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Navigate Defense", 0, 0.6, 0.6, (DEFENSE_DEPTH - OVERHANG + Enums.ROBOT_LENGTH_EXTENDED)/12.0));
+//	}
 
+	private void  addDefenseSteps() {
+		
+		switch (_defenseSelected){		
+		case _defLowBar:
+			break;
+		case _defPortCullis:
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LOWER,"Move arm to ground", 3.0, 0, 0, 0));			
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to Defense", 0, 0.7, 0.7, (FIRST_LEG_DISTANCE - (Enums.ROBOT_LENGTH_EXTENDED - OVERHANG ) +26)/12.0));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LIFT,"Move shifter home", 0.5, 0, 0, 0));			
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Navigate Defense", 0, 0.6, 0.6, (DEFENSE_DEPTH - OVERHANG + Enums.ROBOT_LENGTH_EXTENDED)/12.0));
+			break;
+		case _defChevaldeFrise:
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to Defense", 0, 0.7, 0.7, (FIRST_LEG_DISTANCE - (Enums.ROBOT_LENGTH_COMPACT - OVERHANG ) +11 + 0)/12.0));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LOWER,"Move arm to ground", 3.0, 0, 0, 0));			
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Navigate Defense", 0, 0.6, 0.6, (DEFENSE_DEPTH - OVERHANG + Enums.ROBOT_LENGTH_EXTENDED)/12.0));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LIFT,"Move shifter home", 0.5, 0, 0, 0));			
+			break;
+		default:
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to Defense", 0, 0.7, 0.7, (FIRST_LEG_DISTANCE - (Enums.ROBOT_LENGTH_COMPACT - OVERHANG) + OVERHANG)/12.0));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Navigate Defense", 0, 0.5, 0.5, (DEFENSE_DEPTH - OVERHANG + Enums.ROBOT_LENGTH_EXTENDED)/12.0));
+		}		
+	}
+	
+	
 	public boolean isExecuting(){
 		return _isExecuting;
 	}
@@ -308,6 +375,12 @@ public class Autonomous {
 
 	public void execute ()
 	{
+		if (_autoSelected != (String) _defensePosition.getSelected() ||
+			_defenseSelected != (String) _defenseType.getSelected() ||
+		    _shooterModeSelected != (String) _shooterMode.getSelected()	){
+			init();
+		}
+		
 		double cTime=0;
 		int direction=1;
 
@@ -315,7 +388,8 @@ public class Autonomous {
 
 		if (_autoTimer.get() > _totalAutoTime || _currentStep >= _steps.size() || _cancelExecution){
 			_controls.getDrive().set(0, 0, 0, 0);
-			_isExecuting = false;			
+			_isExecuting = false;	
+			disable();
 		}
 		else
 		{
@@ -330,9 +404,9 @@ public class Autonomous {
 			case DRIVE_DISTANCE:
 
 				if (Enums.IS_FINAL_ROBOT)					
-					cTime = _currentAutoStep.distance/(6.892*_currentAutoStep.leftSpeed-1.038);
+					cTime = _currentAutoStep.distance/(4.92*_currentAutoStep.leftSpeed + 0.01);
 				else
-					cTime = _currentAutoStep.distance/(6.892*_currentAutoStep.leftSpeed-1.038);
+					cTime = _currentAutoStep.distance/(6.892*_currentAutoStep.leftSpeed - 1.038);
 				
 				drive(cTime,_currentAutoStep.leftSpeed,_currentAutoStep.rightSpeed);
 				break;
@@ -342,7 +416,7 @@ public class Autonomous {
 				direction = (_currentAutoStep.distance > 0 ? 1 : -1);
 
 				if (Enums.IS_FINAL_ROBOT)					
-					cTime = Math.abs( _currentAutoStep.distance/102.0);
+					cTime = Math.abs( _currentAutoStep.distance/112.0);
 				else
 					cTime = Math.abs( _currentAutoStep.distance/115.0);
 				
@@ -392,6 +466,8 @@ public class Autonomous {
 	private void updateStatus(){
 
 		SmartDashboard.putString("Selected Auto mode", _autoSelected);
+		SmartDashboard.putString("Selected Shooter Mode", _shooterModeSelected);
+		SmartDashboard.putString("Selected Defense", _defenseSelected);
 		SmartDashboard.putNumber("Step Count", _steps.size());
 		SmartDashboard.putString("Current Command", this._currentStep + " " + _currentAutoStep.name  + "\n " + _currentAutoStep.stepTime);
 
@@ -483,6 +559,12 @@ public class Autonomous {
 		if (_controls.acquisition().setShooterAndShoot()){
 			startNextStep();
 		}
+
+	}
+	public void stopShooter (){
+		
+		_controls.acquisition().stopShoot();
+		startNextStep();
 
 	}
 	public void stop ()

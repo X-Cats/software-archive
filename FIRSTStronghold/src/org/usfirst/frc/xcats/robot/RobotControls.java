@@ -2,9 +2,12 @@ package org.usfirst.frc.xcats.robot;
 
 
 import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Joystick.RumbleType;
 import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class RobotControls {
@@ -15,7 +18,11 @@ public class RobotControls {
 	private Acquisition _acq;
 	private XCatsJSButton _speedToggleButton;
 	private XCatsJSButton _highSpeedButton;
-	private boolean _highSpeed = false;;
+	private boolean _highSpeed = false;
+	private DigitalOutput _doUltraPing;
+	private DigitalInput _diUltraEcho;
+	private Ultrasonic _ultra;
+
 
 
 	public RobotControls ()
@@ -56,6 +63,21 @@ public class RobotControls {
 			SmartDashboard.putBoolean("Use Joysticks", false);
 		_acq = new Acquisition(_operatorJS);
 
+		try
+		{
+			if (!Enums.IS_FINAL_ROBOT){
+				_ultra = new Ultrasonic(1,2,Ultrasonic.Unit.kInches);
+				_ultra.setAutomaticMode(false);
+				_ultra.setEnabled(true);				
+			}			
+		}
+		catch (Exception e){
+			System.out.println(e);
+			e.printStackTrace();
+			
+		}
+		
+		
 		try
 		{
 			_camera = CameraServer.getInstance();
@@ -169,6 +191,18 @@ public class RobotControls {
 	{
 		//		_drive.updateStatus();
 		_acq.updateStatus();
+		
+		try {
+			if (!Enums.IS_FINAL_ROBOT) {
+				_ultra.ping();
+				SmartDashboard.putNumber("Ultrasonic", _ultra.getRangeInches());							
+			}
+		}
+		catch (Exception e){
+			System.out.println(e);
+			e.printStackTrace();			
+		}
+		
 
 	}
 

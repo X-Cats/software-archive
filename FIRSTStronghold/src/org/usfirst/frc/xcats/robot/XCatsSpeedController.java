@@ -267,19 +267,21 @@ public class XCatsSpeedController{
 		}					
 		
 	}
-	public void zeroSensorAndThrottle(CANTalon.FeedbackDevice feedbackdevice,double zero){
+	public void zeroSensorAndThrottle(CANTalon.FeedbackDevice feedbackdevice,CANTalon.TalonControlMode cmode,double zero){
 		switch ( _sctype){
 		case TALON:
 			_setPoint = zero;
 			((CANTalon) _CANmotor).setPosition(zero); /* start our position at zero, this example uses relative positions */
-			setFeedbackDevice(feedbackdevice);
-			((CANTalon) _CANmotor).set(zero);
+//			((CANTalon) _CANmotor).changeControlMode(cmode);
+//			setFeedbackDevice(feedbackdevice);
+//			((CANTalon) _CANmotor).set(zero);
 //			 Thread.Sleep(100); 		
 			break;
 		default:
 			System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
 		}							
 	}
+	
 	public void setPID (double p, double i, double d)
 	{
 		if (_CANmotor != null){

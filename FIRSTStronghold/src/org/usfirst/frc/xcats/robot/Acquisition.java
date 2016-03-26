@@ -33,20 +33,23 @@ public class Acquisition {
 			// the motor on the final robot is reversed orientation from the prototype. We need to invert the drive, but not the encoder sensor
 			_liftMotor = new XCatsSpeedController("Arm", Enums.ACQ_LIFT_MOTOR, XCatsSpeedController.SCType.TALON,false, 4096, 1, 0.125, 0, 0,null,null,CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
 			_liftMotor.setInverted(true);
-//			_liftMotor.setDashboardIO(false, true);
+			_liftMotor.setDashboardIO(false, false);
 		}
 		else{
-			_liftMotor = new XCatsSpeedController("Arm", Enums.ACQ_LIFT_MOTOR,  XCatsSpeedController.SCType.TALON, false, 4096, 1, 0.125, 0, 0,null,null,CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
+			_liftMotor = new XCatsSpeedController("Arm", Enums.ACQ_LIFT_MOTOR,  XCatsSpeedController.SCType.TALON, false, 4096, 1, 0.2, 0, 0,null,null,CANTalon.FeedbackDevice.CtreMagEncoder_Relative);
 //			_liftMotor.setInverted(true);
-			_liftMotor.setDashboardIO(false, true);
+			_liftMotor.setDashboardIO(false, false);
 		}
 
 		_shooter = new Shooter(oj);
 		
 		//I don't know why, probably something in here is in the wrong order,  we have to call this twice but we do....
 		zeroLifter();
-		zeroLifter();
-		zeroLifter();
+//		zeroLifter();
+//		zeroLifter();
+//		this.goHome();
+		
+		this.goHome();
 		
 		
 		if (Enums.IS_FINAL_ROBOT)
@@ -60,8 +63,11 @@ public class Acquisition {
 		else
 			_acqShoot = new XCatsSpeedController("AcqShoot",Enums.ACQ_MOTOR_SHOOT , true, SCType.JAGUAR, null, null );
 			
-		_acqSpeed = Enums.ACQ_SPEED;
-		
+		if (Enums.IS_FINAL_ROBOT)			
+			_acqSpeed = -Enums.ACQ_SPEED;
+		else
+			_acqSpeed = Enums.ACQ_SPEED;
+			
 	}
 	public void acquire(){
 		_acqGrab.set(_acqSpeed);
@@ -95,7 +101,28 @@ public class Acquisition {
 	}
 	
 	public void gotoLowGoal(){
-		_liftMotor.set(_liftDirection * -0.20);		
+		if (Enums.IS_FINAL_ROBOT)
+			_liftMotor.set(_liftDirection * -0.20);
+		else
+			_liftMotor.set(_liftDirection * -0.10);					
+		
+		
+//		if (_liftMotor.getSetPoint()<0){
+//			if (Enums.IS_FINAL_ROBOT)
+//				_liftMotor.set(_liftDirection * -0.20);
+//			else
+//				_liftMotor.set(_liftDirection * -0.10);			
+//		}
+//		else{
+//			if (Enums.IS_FINAL_ROBOT)
+//				_liftMotor.set(_liftDirection * -0.20);
+//			else
+//				_liftMotor.set(_liftDirection * -0.9);
+//			
+//		}
+	
+//			_liftMotor.set(-0.1);
+		
 	}
 	
 	public void shoot(){
@@ -108,10 +135,11 @@ public class Acquisition {
 	
 	public void zeroLifter(){
 		if (Enums.IS_FINAL_ROBOT)
-			_liftMotor.zeroSensorAndThrottle(CANTalon.FeedbackDevice.CtreMagEncoder_Relative,  1.00);
+			_liftMotor.zeroSensorAndThrottle(CANTalon.FeedbackDevice.CtreMagEncoder_Relative,CANTalon.TalonControlMode.Position , 1.00);
 		else
-			_liftMotor.zeroSensorAndThrottle(CANTalon.FeedbackDevice.CtreMagEncoder_Relative,  -1.00);
-		
+			_liftMotor.zeroSensorAndThrottle(CANTalon.FeedbackDevice.CtreMagEncoder_Relative,CANTalon.TalonControlMode.Position , -1.00);
+//		_liftMotor.switchModeToPID();
+	
 	}
 	
 	private void setPosition(double position){	
@@ -123,6 +151,7 @@ public class Acquisition {
 	}
 	public void stopShoot(){
 		_acqShoot.set(0);
+		_shootTimer.reset();		
 		
 	}
 	public void positionForLowShot(){
@@ -184,8 +213,10 @@ public class Acquisition {
 		_maxPosition = Math.max(_maxPosition, _liftMotor.getPosition());
 //		SmartDashboard.putNumber("Acq Speed", _acqSpeed);
 		SmartDashboard.putNumber("Arm Position", this.getPosition());
+		SmartDashboard.putNumber("Arm SP", _liftMotor.getSetPoint());
 		SmartDashboard.putNumber("Arm get", _liftMotor.get());
 //		SmartDashboard.putNumber("Arm Speed", _liftMotor.getSpeed());
 		_shooter.updateStatus();
+		_liftMotor.updateStatus();
 	}
 }
