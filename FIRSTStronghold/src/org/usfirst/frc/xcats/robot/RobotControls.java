@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Joystick.RumbleType;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -81,8 +81,8 @@ public class RobotControls {
 		try
 		{
 			_camera = CameraServer.getInstance();
-			_camera.setQuality(25);
-			_camera.startAutomaticCapture("cam0");
+			//_camera.setQuality(25);
+			_camera.startAutomaticCapture(0);
 		}
 		catch (Exception e)
 		{
