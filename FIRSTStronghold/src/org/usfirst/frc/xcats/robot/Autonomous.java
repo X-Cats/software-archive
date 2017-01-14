@@ -325,7 +325,7 @@ public class Autonomous {
 			break;
 		
 		case _autoTestSpeed:
-			double speed=SmartDashboard.getNumber(_autoTestSpeed);
+			double speed=SmartDashboard.getNumber(_autoTestSpeed, 0);
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Test for 3 seconds", 3, speed, speed, 0));
 
 			break;
