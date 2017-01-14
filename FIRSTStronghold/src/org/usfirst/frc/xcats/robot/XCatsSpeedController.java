@@ -112,7 +112,7 @@ public class XCatsSpeedController{
 
 	
 	//this constructor is only used when we want to try using PID control
-	public XCatsSpeedController (String name, int channel, SCType sctype, boolean speedMode, int codesPerRev, int scale, double p, double i, double d,DigitalInput lowerLimit,DigitalInput upperLimit, CANTalon.FeedbackDevice feedback)
+	public XCatsSpeedController (String name, int channel, SCType sctype, boolean speedMode, int codesPerRev, int scale, double p, double i, double d,DigitalInput lowerLimit,DigitalInput upperLimit, com.ctre.CANTalon.FeedbackDevice feedback)
 	{
 		this._codesPerRev = codesPerRev;
 		this._p = p;
