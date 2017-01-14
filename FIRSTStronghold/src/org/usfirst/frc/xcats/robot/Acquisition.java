@@ -6,7 +6,7 @@ import org.usfirst.frc.xcats.robot.XCatsSpeedController.SCType;
 
 
 
-import edu.wpi.first.wpilibj.CANTalon;
+import com.ctre.CANTalon;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
