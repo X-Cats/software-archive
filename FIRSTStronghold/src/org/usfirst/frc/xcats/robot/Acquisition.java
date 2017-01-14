@@ -52,16 +52,13 @@ public class Acquisition {
 		this.goHome();
 		
 		
-		if (Enums.IS_FINAL_ROBOT)
-			_acqGrab  = new XCatsSpeedController("AcqGrab",Enums.ACQ_MOTOR_GRAB , true, SCType.TALON, null, null );
-		else
-			_acqGrab = new XCatsSpeedController("AcqGrab",Enums.ACQ_MOTOR_GRAB , true, SCType.JAGUAR, null, null );
+		
+		_acqGrab  = new XCatsSpeedController("AcqGrab",Enums.ACQ_MOTOR_GRAB , true, SCType.TALON, null, null );
+		
 			
 		
-		if (Enums.IS_FINAL_ROBOT)
-			_acqShoot = new XCatsSpeedController("AcqShoot",Enums.ACQ_MOTOR_SHOOT_PWM , false, SCType.VICTOR_SP, null, null );
-		else
-			_acqShoot = new XCatsSpeedController("AcqShoot",Enums.ACQ_MOTOR_SHOOT , true, SCType.JAGUAR, null, null );
+		_acqShoot = new XCatsSpeedController("AcqShoot",Enums.ACQ_MOTOR_SHOOT_PWM , false, SCType.VICTOR_SP, null, null );
+	
 			
 		if (Enums.IS_FINAL_ROBOT)			
 			_acqSpeed = -Enums.ACQ_SPEED;
