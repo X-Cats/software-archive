@@ -1,11 +1,9 @@
 package org.usfirst.frc.xcats.robot;
 
 
-import com.ctre.CANJaguar;
 import edu.wpi.first.wpilibj.CANSpeedController;
 import com.ctre.CANTalon;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Jaguar;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Timer;
@@ -15,7 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class XCatsSpeedController{
 
-	public enum SCType{TALON,JAGUAR,VICTOR_SP};
+	public enum SCType{TALON,VICTOR_SP};
 	private SpeedController motor;
 	private CANSpeedController _CANmotor;
 	private SCType _sctype; 
@@ -65,12 +63,6 @@ public class XCatsSpeedController{
 					((CANTalon) _CANmotor).changeControlMode(CANTalon.TalonControlMode.PercentVbus);
 					((CANTalon) _CANmotor).enableControl();
 					break;
-				case JAGUAR :
-					this._CANmotor = new CANJaguar(channel);
-					this.motor = _CANmotor;
-					//					((CANJaguar) motor).setPercentMode();
-					//					((CANJaguar) motor).enableControl();
-					break;
 				default:
 					System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
 				}				
@@ -80,9 +72,6 @@ public class XCatsSpeedController{
 				switch ( sctype){
 				case TALON:
 					this.motor = new Talon(channel);				
-					break;
-				case JAGUAR:
-					this.motor = new Jaguar(channel);				
 					break;
 				case VICTOR_SP:
 					this.motor = new VictorSP(channel);				
@@ -136,11 +125,6 @@ public class XCatsSpeedController{
 
 			this.switchModeToPID();
 			break;
-		case JAGUAR:
-			_CANmotor = new CANJaguar(channel);
-			motor = _CANmotor;
-			this.switchModeToPID();
-			break;
 		default:
 			System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
 		}				
@@ -166,18 +150,6 @@ public class XCatsSpeedController{
 				((CANTalon) _CANmotor).enableControl();			
 
 				break;
-			case JAGUAR:
-				if (_speedMode)
-				{					
-					((CANJaguar) _CANmotor).setSpeedMode(CANJaguar.kQuadEncoder, _codesPerRev, _p, _i, _d);
-				}
-				else
-				{
-					((CANJaguar) _CANmotor).setSpeedMode(CANJaguar.kQuadEncoder, _codesPerRev, _p, _i, _d);
-				}
-				
-				((CANJaguar) _CANmotor).enableControl();				
-				break;
 			default:
 				System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
 			}			
@@ -190,10 +162,6 @@ public class XCatsSpeedController{
 			case TALON:
 				((CANTalon) _CANmotor).changeControlMode(CANTalon.TalonControlMode.PercentVbus);
 				((CANTalon) _CANmotor).enableControl();
-				break;
-			case JAGUAR:
-				((CANJaguar) motor).setPercentMode();
-				((CANJaguar) motor).enableControl();
 				break;
 			default:
 				System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
@@ -343,8 +311,8 @@ public class XCatsSpeedController{
 			SmartDashboard.putBoolean(_name + "_raw_input", _useRawInput);
 
 			if (_CANmotor != null ){
-				if (_CANmotor.getControlMode() != CANJaguar.JaguarControlMode.PercentVbus && 
-						_CANmotor.getControlMode() != CANTalon.TalonControlMode.PercentVbus){
+				if (_CANmotor.getControlMode() != CANTalon.TalonControlMode.PercentVbus)
+				{
 					SmartDashboard.putNumber(_name + "_p", _p);
 					SmartDashboard.putNumber(_name + "_i", _i);
 					SmartDashboard.putNumber(_name + "_d", _d);				
@@ -423,9 +391,6 @@ public class XCatsSpeedController{
 			case TALON:
 				((CANTalon) _CANmotor).setPosition(0);			
 				break;
-			case JAGUAR:
-				((CANJaguar) _CANmotor).enableControl(0);
-				break;
 			default:
 				System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
 			}
@@ -446,8 +411,6 @@ public class XCatsSpeedController{
 	{
 		if (_CANmotor != null){		
 			switch (_sctype){
-			case JAGUAR:
-				return ((CANJaguar) motor).getControlMode();
 			default:
 				System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
 				return null;
@@ -548,8 +511,7 @@ public class XCatsSpeedController{
 			//check the control mode, if it's not PercentVbus its going to be PID control
 			if (_dashboardInput )
 			{
-				if (_CANmotor.getControlMode() != CANJaguar.JaguarControlMode.PercentVbus && 
-						_CANmotor.getControlMode() != CANTalon.TalonControlMode.PercentVbus){
+				if (_CANmotor.getControlMode() != CANTalon.TalonControlMode.PercentVbus){
 					_p = SmartDashboard.getNumber(_name + "_p");
 					_i = SmartDashboard.getNumber(_name + "_i");
 					_d = SmartDashboard.getNumber(_name + "_d");					
@@ -566,10 +528,7 @@ public class XCatsSpeedController{
 				SmartDashboard.putNumber(_name + "_current", _CANmotor.getOutputCurrent());
 				SmartDashboard.putNumber(_name + "_speed", _CANmotor.getSpeed());
 				
-				if (_CANmotor instanceof CANJaguar)
-					SmartDashboard.putNumber(_name + "_position", ((CANJaguar) _CANmotor).getPosition());
-				else
-					SmartDashboard.putNumber(_name + "_position", ((CANTalon) _CANmotor).getPosition() / _invert / _scale);					
+				SmartDashboard.putNumber(_name + "_position", ((CANTalon) _CANmotor).getPosition() / _invert / _scale);					
 				//				SmartDashboard.putNumber(_name + "_encoder", ((CANJaguar) motor).);
 			}
 		}
