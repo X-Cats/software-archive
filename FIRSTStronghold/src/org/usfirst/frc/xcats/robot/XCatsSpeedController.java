@@ -512,9 +512,9 @@ public class XCatsSpeedController{
 			if (_dashboardInput )
 			{
 				if (_CANmotor.getControlMode() != CANTalon.TalonControlMode.PercentVbus){
-					_p = SmartDashboard.getNumber(_name + "_p");
-					_i = SmartDashboard.getNumber(_name + "_i");
-					_d = SmartDashboard.getNumber(_name + "_d");					
+					_p = SmartDashboard.getNumber(_name + "_p", 0);
+					_i = SmartDashboard.getNumber(_name + "_i", 0);
+					_d = SmartDashboard.getNumber(_name + "_d", 0);					
 				}
 
 				_CANmotor.setPID(_p, _i, _d);
@@ -535,8 +535,8 @@ public class XCatsSpeedController{
 		
 		if (_dashboardInput)
 		{
-			_useRawInput = SmartDashboard.getBoolean(_name + "_raw_input");
-			_setPoint = SmartDashboard.getNumber(_name + "_set_point");
+			_useRawInput = SmartDashboard.getBoolean(_name + "_raw_input", false);
+			_setPoint = SmartDashboard.getNumber(_name + "_set_point", 0);
 		}
 
 		set(_setPoint);
