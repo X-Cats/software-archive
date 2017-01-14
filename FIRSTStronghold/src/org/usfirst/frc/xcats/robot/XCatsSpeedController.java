@@ -1,16 +1,16 @@
 package org.usfirst.frc.xcats.robot;
 
 
-import edu.wpi.first.wpilibj.CANJaguar;
+import com.ctre.CANJaguar;
 import edu.wpi.first.wpilibj.CANSpeedController;
-import edu.wpi.first.wpilibj.CANTalon;
+import com.ctre.CANTalon;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Jaguar;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.VictorSP;
-import edu.wpi.first.wpilibj.CANTalon.TalonControlMode;
+import com.ctre.CANTalon.TalonControlMode;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class XCatsSpeedController{
