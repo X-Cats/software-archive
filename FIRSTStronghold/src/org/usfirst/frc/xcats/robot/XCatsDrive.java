@@ -18,7 +18,7 @@ public class XCatsDrive {
 	{
 		int channels[];
 		XCatsSpeedController.SCType sctype;
-		sctype = (isTalon ? XCatsSpeedController.SCType.TALON : XCatsSpeedController.SCType.JAGUAR );
+		sctype = XCatsSpeedController.SCType.TALON;
 		
 		channels = new int[Enums.DRIVE_MOTOR_NUMBERS.length];
 		if (useCAN){
@@ -48,7 +48,8 @@ public class XCatsDrive {
 	public XCatsDrive (int channels[], boolean speedMode, boolean isTalon, int codesPerRev, double p, double i, double d)
 	{
 		XCatsSpeedController.SCType sctype;
-		sctype = (isTalon ? XCatsSpeedController.SCType.TALON : XCatsSpeedController.SCType.JAGUAR );
+		
+		sctype = XCatsSpeedController.SCType.TALON;
 		
 		this._motors = new XCatsSpeedController[Enums.DRIVE_MOTOR_NUMBERS.length];
 		
