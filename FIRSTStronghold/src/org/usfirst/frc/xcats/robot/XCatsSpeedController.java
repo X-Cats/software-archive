@@ -513,8 +513,8 @@ public class XCatsSpeedController{
 			{
 				if (_CANmotor.getControlMode() != CANTalon.TalonControlMode.PercentVbus){
 					_p = SmartDashboard.getNumber(_name + "_p", 0);
-					_i = SmartDashboard.getNumber(_name + "_i", 0);
-					_d = SmartDashboard.getNumber(_name + "_d", 0);					
+					_i = SmartDashboard.getNumber(_name + "_i",0);
+					_d = SmartDashboard.getNumber(_name + "_d",0);					
 				}
 
 				_CANmotor.setPID(_p, _i, _d);
