@@ -3,10 +3,10 @@ package org.usfirst.frc.xcats.robot;
 
 import org.usfirst.frc.xcats.robot.XCatsSpeedController.SCType;
 
-import edu.wpi.first.wpilibj.CANTalon;
+import com.ctre.CANTalon;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.CANTalon.TalonControlMode;
-import edu.wpi.first.wpilibj.Joystick.RumbleType;
+import com.ctre.CANTalon.TalonControlMode;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
