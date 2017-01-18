@@ -27,19 +27,14 @@ public class RobotControls {
 
 	public RobotControls ()
 	{
+		
 		if (!Enums.USE_PID){
-			// in our final robot, we have talon drives, in the prototype they are jaguars
-			if (Enums.DRIVE_CONTROLLER_TYPE == "Talon")
-				_drive = new XCatsDrive (Enums.USE_CAN,true);
-			else
-				_drive = new XCatsDrive (Enums.USE_CAN,false);			
+			_drive = new XCatsDrive (Enums.USE_CAN,true);
+			// in our final robot, we have talon drives, in the prototype they are jaguars		
 		}		
 		else {
-			// in our final robot, we have talon drives, in the prototype they are jaguars
-			if (Enums.DRIVE_CONTROLLER_TYPE == "Talon")			
+			// in our final robot, we have talon drives, in the prototype they are jaguars		
 				_drive = new XCatsDrive (Enums.CAN_DRIVE_MOTOR_NUMBERS, true, true, 128, .5, 0, 0);
-			else			
-				_drive = new XCatsDrive (Enums.CAN_DRIVE_MOTOR_NUMBERS, true, false, 128, .5, 0, 0);			
 		}
 
 
