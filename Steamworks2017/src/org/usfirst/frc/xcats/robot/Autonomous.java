@@ -208,12 +208,6 @@ public class Autonomous {
 			case UNGRAB:
 				break;
 			
-			
-			
-				
-			
-				
-			
 				
 			case WAIT:
 				wait(_currentAutoStep.stepTime);
