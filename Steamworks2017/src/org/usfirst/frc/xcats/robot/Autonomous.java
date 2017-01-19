@@ -223,9 +223,7 @@ public class Autonomous {
 				stop();
 				break;
 				
-			case RELEASE:
-				release();
-				break;
+			
 			}
 		}
 
