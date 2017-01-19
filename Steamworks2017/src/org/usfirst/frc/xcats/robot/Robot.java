@@ -29,8 +29,7 @@ public class Robot extends IterativeRobot {
 		chooser.addDefault("Default Auto", defaultAuto);
 		chooser.addObject("My Auto", customAuto);
 		SmartDashboard.putData("Auto choices", chooser);
-		System.out.println("* * * * CANNOT INIT ROBOT * * * *");
-		e.printStackTrace();
+		
 	}
 
 	/**
@@ -55,8 +54,11 @@ public class Robot extends IterativeRobot {
     	catch (Exception e){
     		//keep going!
     		e.printStackTrace();
+    		System.out.println("* * * * CANNOT INIT ROBOT * * * *");
+    		e.printStackTrace();
     	}
 		System.out.println("Auto selected: " + autoSelected);
+		
 	}
 	
 	public void teleopInit() {
