@@ -16,6 +16,9 @@ public class Robot extends IterativeRobot {
 	final String customAuto = "My Auto";
 	String autoSelected;
 	SendableChooser<String> chooser = new SendableChooser<>();
+	  Teleop _teleop;
+	    Autonomous _auto;
+	    RobotControls _controls;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -26,6 +29,8 @@ public class Robot extends IterativeRobot {
 		chooser.addDefault("Default Auto", defaultAuto);
 		chooser.addObject("My Auto", customAuto);
 		SmartDashboard.putData("Auto choices", chooser);
+		System.out.println("* * * * CANNOT INIT ROBOT * * * *");
+		e.printStackTrace();
 	}
 
 	/**
@@ -44,31 +49,77 @@ public class Robot extends IterativeRobot {
 		autoSelected = chooser.getSelected();
 		// autoSelected = SmartDashboard.getString("Auto Selector",
 		// defaultAuto);
+		try {
+        	_auto.init();    		
+    	}
+    	catch (Exception e){
+    		//keep going!
+    		e.printStackTrace();
+    	}
 		System.out.println("Auto selected: " + autoSelected);
 	}
+	
+	public void teleopInit() {
+    	try {
+        	_auto.disable();    		
+    	}
+    	catch (Exception e){
+    		//keep going!
+    		e.printStackTrace();
+    	}
+    }
+
 
 	/**
 	 * This function is called periodically during autonomous
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		switch (autoSelected) {
+		switch (autoSelected){
 		case customAuto:
-			// Put custom auto code here
+			//Put custom auto here
 			break;
 		case defaultAuto:
-		default:
-			// Put default auto code here
-			break;
+			default:
+				//Put default auto code here
+				break;
 		}
-	}
 
+			try {
+	        	_auto.execute();    		
+	    	}
+	    	catch (Exception e)
+	    	{
+	    		e.printStackTrace();
+	    	}
+		}
+
+	
+	
+	public void disabledPeriodic(){
+      	try {
+        	_auto.disable();    		
+    	}
+    	catch (Exception e)
+    	{
+    		// keep going! ignore the error
+    	}  
+    	
+    }
 	/**
 	 * This function is called periodically during operator control
 	 */
 	@Override
 	public void teleopPeriodic() {
-	}
+		try {
+    		_teleop.execute();    		
+    	}
+    	catch (Exception e)
+    	{
+    		// keep going! ignore the error
+    	}  
+    }
+
 
 	/**
 	 * This function is called periodically during test mode
