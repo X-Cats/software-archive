@@ -111,5 +111,8 @@ public class Navx {
 	public void resetStatus(){
 		ahrs.resetDisplacement();
 	}
+	public float getYaw(){
+		return ahrs.getYaw();
+	}
 	}
 
