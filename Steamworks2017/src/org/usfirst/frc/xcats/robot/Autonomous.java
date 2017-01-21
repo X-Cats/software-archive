@@ -18,6 +18,7 @@ public class Autonomous {
 	private ArrayList<AutonomousStep> _steps;
 
 	private int _currentStep;
+	private float _initialYaw;
 	private double _totalAutoTime = Enums.AUTONOMOUS_TIME;
 	private AutonomousStep _currentAutoStep;
 	private Timer _stepTimer = new Timer();
@@ -88,6 +89,7 @@ public class Autonomous {
 			SmartDashboard.putNumber("auto type", 0);
 
 		 */
+		System.out.println("auto constructor");
 
 	}
 
@@ -106,9 +108,12 @@ public class Autonomous {
 	}
 	public void init ()
 	{
+		System.out.println("auto init");
+		
 
 		 //build the steps for the selected autonomous
-
+		setAuto();
+		_initialYaw = _controls.getNavx().getYaw();
 		_currentStep = 0;
 		_currentAutoStep = null;
 		_autoTimer.start();
@@ -116,6 +121,8 @@ public class Autonomous {
 		_isExecuting = false;
 		_cancelExecution = false;
 		this.updateStatus();
+		
+		
 	}
 
 	public void disable(){
@@ -135,7 +142,10 @@ public class Autonomous {
 		//we are going to construct the steps needed for our autonomous mode
 		_steps =  new ArrayList<AutonomousStep>();
 		
-		
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Test",5,.5,.5,0));
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn",0,0,0,90));
+
+		System.out.println("setAuto");
 	}
 	
 //	private void addPortcullisSteps(){
@@ -159,6 +169,7 @@ public class Autonomous {
 
 	public void execute ()
 	{
+		System.out.println("auto execute");
 		
 		double cTime=0;
 		int direction=1;
@@ -191,15 +202,22 @@ public class Autonomous {
 				break;
 				
 			case ROTATE:
-				// assume 102 degrees per second
-				direction = (_currentAutoStep.distance > 0 ? 1 : -1);
-
-				if (Enums.IS_FINAL_ROBOT)					
-					cTime = Math.abs( _currentAutoStep.distance/112.0);
-				else
-					cTime = Math.abs( _currentAutoStep.distance/115.0);
+				float deltaYaw;
+				double  speed =0.5;
 				
-				drive(cTime, direction * 0.5, direction * -0.5);
+				deltaYaw = _initialYaw + _controls.getNavx().getYaw();
+				SmartDashboard.putNumber("deltaYaw", deltaYaw);
+				// 
+				direction = (_currentAutoStep.distance > 0 ? -1 : 1);
+				speed = direction * speed;
+				
+				_controls.getDrive().set(speed, speed, -speed, -speed);
+				
+				
+				if(Math.abs(deltaYaw) > Math.abs(_currentAutoStep.distance)){
+					startNextStep();
+				}
+				
 				break;
 				
 			case GRAB:
@@ -226,16 +244,32 @@ public class Autonomous {
 	}
 
 	private void updateStatus(){
-
+		
 		SmartDashboard.putNumber("Step Count", _steps.size());
 		SmartDashboard.putString("Current Command", this._currentStep + " " + _currentAutoStep.name  + "\n " + _currentAutoStep.stepTime);
 
 	}
 	public void drive (double time, double left, double right)
 	{
-		//if (left == right){
-			
-		//}
+		float deltaYaw;
+		deltaYaw = _initialYaw - _controls.getNavx().getYaw();
+		double offset;
+		
+		SmartDashboard.putNumber("currentYaw", _initialYaw);
+		SmartDashboard.putNumber("deltaYaw", deltaYaw);
+		if (left == right){
+			offset = Math.abs(deltaYaw);
+			if(offset > .1){
+				offset = .1;
+			}
+			if(deltaYaw > 0){
+				left = left * (1+offset);
+				right = right * (1-offset);
+			}else{
+				left = left * (1-offset);
+				right = right * (1+offset);
+			}
+		}
 		
 		if (_stepTimer.get() > time)
 		{
