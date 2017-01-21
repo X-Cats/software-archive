@@ -34,6 +34,8 @@ public class RobotControls {
 	public RobotControls ()
 	{
 		_navx=new Navx();
+		_navx.resetStatus();
+		
 		if (!Enums.USE_PID){
 			// in our final robot, we have talon drives, in the prototype they are jaguars
 			if (Enums.DRIVE_CONTROLLER_TYPE == "Talon")
@@ -59,6 +61,7 @@ public class RobotControls {
 			_rightJS = new Joystick(Enums.RIGHT_DRIVE_JS);
 		}
 		else{
+			
 			_driveJS = new Joystick(Enums.DRIVE_JS);
 			_speedToggleButton = new XCatsJSButton(_driveJS,6);
 		}
@@ -97,6 +100,9 @@ public class RobotControls {
 			e.printStackTrace();
 		}
 	}
+	public Navx getNavx(){
+		return _navx;
+	}
 
 	public void drive ()
 	{
@@ -106,6 +112,7 @@ public class RobotControls {
 			_drive.set(_leftJS, _rightJS);
 		else
 		{
+			System.out.println("in drive");
 			_drive.set(_driveJS);
 
 			if (_driveJS.getRawButton(6) && !_reductionToggle)
