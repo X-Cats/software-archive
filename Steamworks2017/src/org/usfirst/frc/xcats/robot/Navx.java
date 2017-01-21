@@ -108,4 +108,8 @@ public class Navx {
 		SmartDashboard.putNumber(   "IMU_Byte_Count",       ahrs.getByteCount());
 		SmartDashboard.putNumber(   "IMU_Update_Count",     ahrs.getUpdateCount());
 	}
-}
+	public void resetStatus(){
+		ahrs.resetDisplacement();
+	}
+	}
+

@@ -123,7 +123,9 @@ public class RobotControls {
 
 	public void operate ()
 	{
-		
+		if (_operatorJS.getRawButton(1)){
+			_navx.resetStatus();
+		}
 //		
 
 	
