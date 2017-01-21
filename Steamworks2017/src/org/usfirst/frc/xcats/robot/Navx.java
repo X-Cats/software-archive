@@ -2,10 +2,31 @@ package org.usfirst.frc.xcats.robot;
 
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Navx {
 	private AHRS ahrs;
+	public Navx ()
+	{
+		try {
+			/***********************************************************************
+			 * navX-MXP:
+			 * - Communication via RoboRIO MXP (SPI, I2C, TTL UART) and USB.            
+			 * - See http://navx-mxp.kauailabs.com/guidance/selecting-an-interface.
+			 * 
+			 * navX-Micro:
+			 * - Communication via I2C (RoboRIO MXP or Onboard) and USB.
+			 * - See http://navx-micro.kauailabs.com/guidance/selecting-an-interface.
+			 * 
+			 * Multiple navX-model devices on a single robot are supported.
+			 ************************************************************************/
+            ahrs = new AHRS(SPI.Port.kMXP);
+        } catch (RuntimeException ex ) {
+            DriverStation.reportError("Error instantiating navX MXP:  " + ex.getMessage(), true);
+        }
+    }
 	public void updateStatus(){
 		/* Display 6-axis Processed Angle Data                                      */
 		SmartDashboard.putBoolean(  "IMU_Connected",        ahrs.isConnected());
@@ -13,6 +34,7 @@ public class Navx {
 		SmartDashboard.putNumber(   "IMU_Yaw",              ahrs.getYaw());
 		SmartDashboard.putNumber(   "IMU_Pitch",            ahrs.getPitch());
 		SmartDashboard.putNumber(   "IMU_Roll",             ahrs.getRoll());
+
 
 		/* Display tilt-corrected, Magnetometer-based heading (requires             */
 		/* magnetometer calibration to be useful)                                   */
