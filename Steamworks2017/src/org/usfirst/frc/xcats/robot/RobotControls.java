@@ -21,6 +21,7 @@ public class RobotControls {
 	private DigitalOutput _doUltraPing;
 	private DigitalInput _diUltraEcho;
 	private Ultrasonic _ultra;
+	private Navx _navx;
 
 
 
@@ -32,6 +33,7 @@ public class RobotControls {
 	 */
 	public RobotControls ()
 	{
+		_navx=new Navx();
 		if (!Enums.USE_PID){
 			// in our final robot, we have talon drives, in the prototype they are jaguars
 			if (Enums.DRIVE_CONTROLLER_TYPE == "Talon")
@@ -129,7 +131,7 @@ public class RobotControls {
 
 	public void updateStatus ()
 	{
-		
+		_navx.updateStatus();
 		
 		try {
 			if (!Enums.IS_FINAL_ROBOT) {
