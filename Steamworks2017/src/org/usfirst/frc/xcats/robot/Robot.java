@@ -50,6 +50,7 @@ public class Robot extends IterativeRobot {
 	 */
     public void autonomousInit() {
     	try {
+    		System.out.println("calling autonomousInit");
         	_auto.init();    		
     	}
     	catch (Exception e){
@@ -75,6 +76,7 @@ public class Robot extends IterativeRobot {
      */
     public void autonomousPeriodic() {
     	try {
+    		
         	_auto.execute();    		
     	}
     	catch (Exception e)
