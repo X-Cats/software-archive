@@ -1,6 +1,10 @@
 package org.usfirst.frc.xcats.robot;
 
+
+//package org.usfirst.frc.team191.robot;
+
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -12,56 +16,49 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * directory.
  */
 public class Robot extends IterativeRobot {
-	final String defaultAuto = "Default";
-	final String customAuto = "My Auto";
-	String autoSelected;
-	SendableChooser<String> chooser = new SendableChooser<>();
-	  Teleop _teleop;
-	    Autonomous _auto;
-	    RobotControls _controls;
-
+    
+    Teleop _teleop;
+    Autonomous _auto;
+    RobotControls _controls;
+	
+    /**
+     * This function is run when the robot is first started up and should be
+     * used for any initialization code.
+     */
+    public void robotInit() {
+        
+    	try{
+            _controls = new RobotControls();
+            _teleop = new Teleop(_controls);
+            _auto = new Autonomous(_controls);    		
+    	}
+    	catch (Exception e)
+    	{
+    		System.out.println("* * * * CANNOT INIT ROBOT * * * *");
+    		e.printStackTrace();
+    	}
+    }
+    
 	/**
-	 * This function is run when the robot is first started up and should be
-	 * used for any initialization code.
-	 */
-	@Override
-	public void robotInit() {
-		chooser.addDefault("Default Auto", defaultAuto);
-		chooser.addObject("My Auto", customAuto);
-		SmartDashboard.putData("Auto choices", chooser);
-		
-	}
-
-	/**
-	 * This autonomous (along with the chooser code above) shows how to select
-	 * between different autonomous modes using the dashboard. The sendable
-	 * chooser code works with the Java SmartDashboard. If you prefer the
-	 * LabVIEW Dashboard, remove all of the chooser code and uncomment the
-	 * getString line to get the auto name from the text box below the Gyro
+	 * This autonomous (along with the chooser code above) shows how to select between different autonomous modes
+	 * using the dashboard. The sendable chooser code works with the Java SmartDashboard. If you prefer the LabVIEW
+	 * Dashboard, remove all of the chooser code and uncomment the getString line to get the auto name from the text box
+	 * below the Gyro
 	 *
-	 * You can add additional auto modes by adding additional comparisons to the
-	 * switch structure below with additional strings. If using the
-	 * SendableChooser make sure to add them to the chooser code above as well.
+	 * You can add additional auto modes by adding additional comparisons to the switch structure below with additional strings.
+	 * If using the SendableChooser make sure to add them to the chooser code above as well.
 	 */
-	@Override
-	public void autonomousInit() {
-		autoSelected = chooser.getSelected();
-		// autoSelected = SmartDashboard.getString("Auto Selector",
-		// defaultAuto);
-		try {
+    public void autonomousInit() {
+    	try {
         	_auto.init();    		
     	}
     	catch (Exception e){
     		//keep going!
     		e.printStackTrace();
-    		System.out.println("* * * * CANNOT INIT ROBOT * * * *");
-    		e.printStackTrace();
     	}
-		System.out.println("Auto selected: " + autoSelected);
-		
-	}
-	
-	public void teleopInit() {
+    }
+    
+    public void teleopInit() {
     	try {
         	_auto.disable();    		
     	}
@@ -72,33 +69,21 @@ public class Robot extends IterativeRobot {
     }
 
 
-	/**
-	 * This function is called periodically during autonomous
-	 */
-	@Override
-	public void autonomousPeriodic() {
-		switch (autoSelected){
-		case customAuto:
-			//Put custom auto here
-			break;
-		case defaultAuto:
-			default:
-				//Put default auto code here
-				break;
-		}
-
-			try {
-	        	_auto.execute();    		
-	    	}
-	    	catch (Exception e)
-	    	{
-	    		e.printStackTrace();
-	    	}
-		}
-
-	
-	
-	public void disabledPeriodic(){
+    
+    /**
+     * This function is called periodically during autonomous
+     */
+    public void autonomousPeriodic() {
+    	try {
+        	_auto.execute();    		
+    	}
+    	catch (Exception e)
+    	{
+    		e.printStackTrace();
+    	}
+    }
+    
+    public void disabledPeriodic(){
       	try {
         	_auto.disable();    		
     	}
@@ -108,12 +93,17 @@ public class Robot extends IterativeRobot {
     	}  
     	
     }
-	/**
-	 * This function is called periodically during operator control
-	 */
-	@Override
-	public void teleopPeriodic() {
-		try {
+    public void disabledInit(){
+    	
+    }
+  
+    
+    /**
+     * This function is called periodically during operator control
+     */
+    public void teleopPeriodic() {
+    	
+    	try {
     		_teleop.execute();    		
     	}
     	catch (Exception e)
@@ -121,13 +111,13 @@ public class Robot extends IterativeRobot {
     		// keep going! ignore the error
     	}  
     }
-
-
-	/**
-	 * This function is called periodically during test mode
-	 */
-	@Override
-	public void testPeriodic() {
-	}
+    
+ 
+    /**
+     * This function is called periodically during test mode
+     */
+    public void testPeriodic() {
+    
+    }
+    
 }
-
