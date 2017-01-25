@@ -38,7 +38,7 @@ public class Autonomous {
 	final String _auto5 = "Defense 5";
 	final String _autoReadFile = "TextFile read";
 	final String _autoTestSpeed = "Run 3 sec at input speed";
-	
+	final Navx _navx= new Navx();
 
 	public Autonomous (RobotControls controls)
 	{
@@ -143,7 +143,7 @@ public class Autonomous {
 		_steps =  new ArrayList<AutonomousStep>();
 		
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Test",5,.5,.5,0));
-		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn",0,0,0,90));
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn",0,0,0,45));
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
 
 		System.out.println("setAuto");
@@ -205,19 +205,33 @@ public class Autonomous {
 			case ROTATE:
 				//float deltaYaw;
 				double  speed =0.5;
+				double tolerance=0.1;
+				double exceedTolerance=5;
 				
 				//deltaYaw = _initialYaw + _controls.getNavx().getYaw();
 				//SmartDashboard.putNumber("deltaYaw", deltaYaw);
 				// 
 				direction = (_currentAutoStep.distance > 0 ? -1 : 1);
+				//if(_controls.getNavx().getYaw() < Math.abs(_currentAutoStep.distance)){
 				speed = direction * speed;
-				
+				//if(_controls.getNavx().getYaw() < Math.abs(_currentAutoStep.distance)){
 				_controls.getDrive().set(speed, speed, -speed, -speed);
+				//}
 				
 				
 				if(Math.abs(_controls.getNavx().getYaw()) > Math.abs(_currentAutoStep.distance)){
 					SmartDashboard.putNumber("Auto Yaw", _controls.getNavx().getYaw());
-					startNextStep();
+					//if(Math.abs(_controls.getNavx().getYaw())>Math.abs(_currentAutoStep.distance)){
+						speed=-speed/2;
+					_controls.getDrive().set(speed, speed, -speed, -speed);
+					if(Math.abs(_controls.getNavx().getYaw())-Math.abs(_currentAutoStep.distance)<tolerance){
+					    	  startNextStep();
+					      }
+					//if(Math.abs(_controls.getNavx().getYaw())<Math.abs(_currentAutoStep.distance)-exceedTolerance){
+						//startNextStep();
+					//}
+					//}
+					//startNextStep();
 					
 					//System.out.println("tripped stop logic");
 				}
@@ -328,6 +342,8 @@ public class Autonomous {
 
 	public void startNextStep ()
 	{
+		_navx.zeroYaw();
+		SmartDashboard.putNumber("Starting Yaw", _controls.getNavx().getYaw() );
 		_currentStep++;
 		_stepTimer.reset();
 	}	
