@@ -205,7 +205,7 @@ public class Autonomous {
 				float deltaYaw;
 				double  speed =0.5;
 				
-				deltaYaw = _initialYaw + _controls.getNavx().getYaw();
+				//deltaYaw = _initialYaw + _controls.getNavx().getYaw();
 				SmartDashboard.putNumber("deltaYaw", deltaYaw);
 				// 
 				direction = (_currentAutoStep.distance > 0 ? -1 : 1);
@@ -214,7 +214,7 @@ public class Autonomous {
 				_controls.getDrive().set(speed, speed, -speed, -speed);
 				
 				
-				if(Math.abs(deltaYaw) > Math.abs(_currentAutoStep.distance)){
+				if(Math.abs(_controls.getNavx().getYaw) > Math.abs(_currentAutoStep.distance)){
 					startNextStep();
 				}
 				
