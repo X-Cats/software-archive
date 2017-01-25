@@ -214,7 +214,7 @@ public class Autonomous {
 				_controls.getDrive().set(speed, speed, -speed, -speed);
 				
 				
-				if(Math.abs(_controls.getNavx().getYaw) > Math.abs(_currentAutoStep.distance)){
+				if(Math.abs(_controls.getNavx().getYaw()) > Math.abs(_currentAutoStep.distance)){
 					startNextStep();
 				}
 				
