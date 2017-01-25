@@ -114,5 +114,8 @@ public class Navx {
 	public float getYaw(){
 		return ahrs.getYaw();
 	}
+	public void zeroYaw(){
+		ahrs.zeroYaw();
+	}
 	}
 
