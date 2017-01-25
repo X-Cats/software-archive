@@ -35,6 +35,7 @@ public class RobotControls {
 	{
 		_navx=new Navx();
 		_navx.resetStatus();
+		_navx.zeroYaw();
 		
 		if (!Enums.USE_PID){
 			// in our final robot, we have talon drives, in the prototype they are jaguars
