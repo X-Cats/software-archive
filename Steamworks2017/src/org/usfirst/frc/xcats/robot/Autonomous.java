@@ -206,7 +206,7 @@ public class Autonomous {
 				double  speed =0.5;
 				
 				//deltaYaw = _initialYaw + _controls.getNavx().getYaw();
-				SmartDashboard.putNumber("deltaYaw", deltaYaw);
+				//SmartDashboard.putNumber("deltaYaw", deltaYaw);
 				// 
 				direction = (_currentAutoStep.distance > 0 ? -1 : 1);
 				speed = direction * speed;
