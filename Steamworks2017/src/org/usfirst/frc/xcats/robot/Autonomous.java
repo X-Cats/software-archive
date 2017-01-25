@@ -144,6 +144,7 @@ public class Autonomous {
 		
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Test",5,.5,.5,0));
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn",0,0,0,90));
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
 
 		System.out.println("setAuto");
 	}
@@ -202,7 +203,7 @@ public class Autonomous {
 				break;
 				
 			case ROTATE:
-				float deltaYaw;
+				//float deltaYaw;
 				double  speed =0.5;
 				
 				//deltaYaw = _initialYaw + _controls.getNavx().getYaw();
@@ -216,6 +217,7 @@ public class Autonomous {
 				
 				if(Math.abs(_controls.getNavx().getYaw()) > Math.abs(_currentAutoStep.distance)){
 					startNextStep();
+					//System.out.println("tripped stop logic");
 				}
 				
 				break;
