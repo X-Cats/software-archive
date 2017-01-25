@@ -216,7 +216,9 @@ public class Autonomous {
 				
 				
 				if(Math.abs(_controls.getNavx().getYaw()) > Math.abs(_currentAutoStep.distance)){
+					SmartDashboard.putNumber(_controls.getNavx().getYaw());
 					startNextStep();
+					
 					//System.out.println("tripped stop logic");
 				}
 				
