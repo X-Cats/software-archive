@@ -26,7 +26,7 @@ public class Autonomous {
 
 	private boolean _isExecuting = false;
 	private boolean _cancelExecution = false;
-	
+
 	private static final double FIRST_LEG_DISTANCE = 73.0;	// this is the distance from the auto line to the lip of the defenses	
 
 	final String _defaultAuto = "Do Nothing";
@@ -56,8 +56,8 @@ public class Autonomous {
 		 * If using the SendableChooser make sure to add them to the chooser code above as well.
 		 */
 
-		
-		
+
+
 
 		SmartDashboard.putNumber(_autoTestSpeed, 0.5); 			//this is the speed to run the auto calibration test
 		//put any properties here on the smart dashboard that you want to adjust from there.
@@ -100,18 +100,18 @@ public class Autonomous {
 		_totalAutoTime = totalTime;
 		init();	
 	}
-	
+
 	public void setSteps(ArrayList<AutonomousStep> mysteps){
 		_steps = mysteps;
 		init();
-		
+
 	}
 	public void init ()
 	{
 		System.out.println("auto init");
-		
 
-		 //build the steps for the selected autonomous
+
+		//build the steps for the selected autonomous
 		setAuto();
 		_initialYaw = _controls.getNavx().getYaw();
 		_currentStep = 0;
@@ -121,46 +121,46 @@ public class Autonomous {
 		_isExecuting = false;
 		_cancelExecution = false;
 		this.updateStatus();
-		
-		
+
+
 	}
 
 	public void disable(){
 		_steps = null;
-		
+
 		updateStatus();
-		
+
 	}
 	private void setAuto ()
 	{	
-		
-		
-		
-		
-		
-		
+
+
+
+
+
+
 		//we are going to construct the steps needed for our autonomous mode
 		_steps =  new ArrayList<AutonomousStep>();
-		
+
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Test",5,.5,.5,0));
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn",0,0,0,45));
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
 
 		System.out.println("setAuto");
 	}
-	
-//	private void addPortcullisSteps(){
-//		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to Defense", 0, 0.7, 0.7, (FIRST_LEG_DISTANCE - (Enums.ROBOT_LENGTH_EXTENDED - OVERHANG ) +35)/12.0));
-//		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LIFT,"Move shifter home", 0.5, 0, 0, 0));			
-//		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Navigate Defense", 0, 0.6, 0.6, (DEFENSE_DEPTH - OVERHANG + Enums.ROBOT_LENGTH_EXTENDED)/12.0));
-//	}
+
+	//	private void addPortcullisSteps(){
+	//		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Forward to Defense", 0, 0.7, 0.7, (FIRST_LEG_DISTANCE - (Enums.ROBOT_LENGTH_EXTENDED - OVERHANG ) +35)/12.0));
+	//		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LIFT,"Move shifter home", 0.5, 0, 0, 0));			
+	//		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Navigate Defense", 0, 0.6, 0.6, (DEFENSE_DEPTH - OVERHANG + Enums.ROBOT_LENGTH_EXTENDED)/12.0));
+	//	}
 
 	private void  addDefenseSteps() {
-		
-				
+
+
 	}
-	
-	
+
+
 	public boolean isExecuting(){
 		return _isExecuting;
 	}
@@ -171,7 +171,7 @@ public class Autonomous {
 	public void execute ()
 	{
 		System.out.println("auto execute");
-		
+
 		double cTime=0;
 		int direction=1;
 
@@ -191,69 +191,57 @@ public class Autonomous {
 			case DRIVE:
 				drive(_currentAutoStep.stepTime,_currentAutoStep.leftSpeed,_currentAutoStep.rightSpeed);
 				break;
-				
+
 			case DRIVE_DISTANCE:
 
 				if (Enums.IS_FINAL_ROBOT)					
 					cTime = _currentAutoStep.distance/(4.92*_currentAutoStep.leftSpeed + 0.01);
 				else
 					cTime = _currentAutoStep.distance/(6.892*_currentAutoStep.leftSpeed - 1.038);
-				
+
 				drive(cTime,_currentAutoStep.leftSpeed,_currentAutoStep.rightSpeed);
 				break;
-				
+
 			case ROTATE:
 				//float deltaYaw;
-				double  speed =0.5;
+				double  speed =0.25;
 				double tolerance=0.1;
-				double exceedTolerance=5;
-				
+
 				//deltaYaw = _initialYaw + _controls.getNavx().getYaw();
 				//SmartDashboard.putNumber("deltaYaw", deltaYaw);
 				// 
 				direction = (_currentAutoStep.distance > 0 ? -1 : 1);
-				//if(_controls.getNavx().getYaw() < Math.abs(_currentAutoStep.distance)){
-				speed = direction * speed;
-				//if(_controls.getNavx().getYaw() < Math.abs(_currentAutoStep.distance)){
+				speed = direction * speed;	
 				_controls.getDrive().set(speed, speed, -speed, -speed);
-				//}
-				
-				
+
+
 				if(Math.abs(_controls.getNavx().getYaw()) > Math.abs(_currentAutoStep.distance)){
 					SmartDashboard.putNumber("Auto Yaw", _controls.getNavx().getYaw());
-					//if(Math.abs(_controls.getNavx().getYaw())>Math.abs(_currentAutoStep.distance)){
-						speed=-speed/2;
+					speed=-speed/2;
 					_controls.getDrive().set(speed, speed, -speed, -speed);
 					if(Math.abs(_controls.getNavx().getYaw())-Math.abs(_currentAutoStep.distance)<tolerance){
-					    	  startNextStep();
-					      }
-					//if(Math.abs(_controls.getNavx().getYaw())<Math.abs(_currentAutoStep.distance)-exceedTolerance){
-						//startNextStep();
-					//}
-					//}
-					//startNextStep();
-					
-					//System.out.println("tripped stop logic");
+						startNextStep();
+					}
 				}
-				
+
 				break;
-				
+
 			case GRAB:
 				break;
-				
+
 			case UNGRAB:
 				break;
-			
-				
+
+
 			case WAIT:
 				wait(_currentAutoStep.stepTime);
 				break;
-				
+
 			case STOP:
 				stop();
 				break;
-				
-			
+
+
 			}
 		}
 
@@ -262,7 +250,7 @@ public class Autonomous {
 	}
 
 	private void updateStatus(){
-		
+
 		SmartDashboard.putNumber("Step Count", _steps.size());
 		SmartDashboard.putString("Current Command", this._currentStep + " " + _currentAutoStep.name  + "\n " + _currentAutoStep.stepTime);
 
@@ -272,7 +260,7 @@ public class Autonomous {
 		float deltaYaw;
 		deltaYaw = _initialYaw - _controls.getNavx().getYaw();
 		double offset;
-		
+
 		SmartDashboard.putNumber("currentYaw", _initialYaw);
 		SmartDashboard.putNumber("deltaYaw", deltaYaw);
 		if (left == right){
@@ -288,7 +276,7 @@ public class Autonomous {
 				right = right * (1+offset);
 			}
 		}
-		
+
 		if (_stepTimer.get() > time)
 		{
 			_controls.getDrive().set(0, 0, 0, 0);
@@ -318,13 +306,13 @@ public class Autonomous {
 		//			_controls.getElevator().setGrabMotor(grabSetpoint);
 		startNextStep();
 	}
-	
-	
-	
-	
-	
 
-	
+
+
+
+
+
+
 
 	public void wait (double time)
 	{
@@ -332,8 +320,8 @@ public class Autonomous {
 			startNextStep();
 	}
 
-	
-	
+
+
 	public void stop ()
 	{
 		_controls.getDrive().set(0, 0, 0, 0);
