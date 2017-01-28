@@ -9,11 +9,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Navx {
 	private AHRS ahrs;
 	private RobotControls _controls;
-	boolean displayVariables = false;
-	public String navxMode = null;
+	public boolean displayVariables = false;
+	public String navxMode = "";
 	public double navxRotateDistance;
-	public Navx ()
+	private double _degrees = 0;
+	private double _startSpeed = 0.25;
+	private double  _speed =0.25;
+	private double _tolerance=0.1;
+	public Navx (RobotControls controls)
 	{
+		_controls = controls;
 		try {
 			/***********************************************************************
 			 * navX-MXP:
@@ -117,12 +122,13 @@ public class Navx {
 
 
 		switch(navxMode){
-		case "rotate": rotate(navxRotateDistance);
+		case "rotate": rotateContinuous();
 		break;
 		default:
 
 			break;
 		}
+		SmartDashboard.putString("navxMode", navxMode);
 
 	}
 	public void resetStatus(){
@@ -135,25 +141,48 @@ public class Navx {
 		ahrs.zeroYaw();
 	}
 	public void rotate(double degrees){
-		double  speed =0.25;
-		double tolerance=0.1;
+		
+		
 		double direction=1;
+		_degrees = degrees;
+		zeroYaw();
+		navxMode = "rotate";
 
 		//deltaYaw = _initialYaw + _controls.getNavx().getYaw();
 		//SmartDashboard.putNumber("deltaYaw", deltaYaw);
 		// 
 		direction = (degrees > 0 ? -1 : 1);
-		speed = direction * speed;	
-		_controls.getDrive().set(speed, speed, -speed, -speed);
+		_speed = direction * Math.abs(_startSpeed);	
+		_controls.getDrive().set(_speed, _speed, -_speed, -_speed);
 
 
-		if(Math.abs(getYaw()) > Math.abs(degrees)){
+		
+	}
+	private void rotateContinuous(){
+		
+		double deltaYaw = Math.abs(getYaw()) - Math.abs(_degrees);
+		SmartDashboard.putNumber(   "DeltaYaw", deltaYaw);
+
+		if(deltaYaw < 1){
 			SmartDashboard.putNumber("Auto Yaw", getYaw());
-			speed=-speed/2;
-			_controls.getDrive().set(speed, speed, -speed, -speed);
-			if(Math.abs(getYaw())-Math.abs(degrees)<tolerance){
-				navxMode = null;
-			}
+			_speed = - _speed/2.0;
+			_controls.getDrive().set(_speed, _speed, -_speed, -_speed);
+		} 
+		
+		if(Math.abs(getYaw())-Math.abs(_degrees)<_tolerance){
+			navxMode = "";
+		}
+
+//		if(_speed == 0){
+//			navxMode = "";
+//		}
+
+	}
+	public boolean isOperating(){
+		if(navxMode.equals("")){
+			return false;
+		}else{
+			return true;
 		}
 	}
 }

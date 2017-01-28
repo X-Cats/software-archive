@@ -38,13 +38,13 @@ public class Autonomous {
 	final String _auto5 = "Defense 5";
 	final String _autoReadFile = "TextFile read";
 	final String _autoTestSpeed = "Run 3 sec at input speed";
-	final Navx _navx= new Navx();
+	private Navx _navx;
 
 	public Autonomous (RobotControls controls)
 	{
 
 		_controls = controls;      	//passes the controls object reference
-
+		_navx = _controls.getNavx();
 
 		/**
 		 * This autonomous (along with the chooser code above) shows how to select between different autonomous modes
@@ -240,7 +240,7 @@ public class Autonomous {
 
 				if(Math.abs(_controls.getNavx().getYaw()) > Math.abs(_currentAutoStep.distance)){
 					SmartDashboard.putNumber("Auto Yaw", _controls.getNavx().getYaw());
-					speed=-speed/2;
+					speed=-speed/1.5;
 					_controls.getDrive().set(speed, speed, -speed, -speed);
 					if(Math.abs(_controls.getNavx().getYaw())-Math.abs(_currentAutoStep.distance)<tolerance){
 						startNextStep();
