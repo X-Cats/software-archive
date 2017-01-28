@@ -125,7 +125,10 @@ public class RobotControls {
 			
 			_drive.setReductionFactor(slowMode ? 1.0 : Enums.SPEED_REDUCTION_FACTOR )	;
 		}
-
+		if(_driveJS.getRawButton(5)){
+			_navx.navxMode = "rotate";
+			_navx.navxRotateDistance = 90;
+		}
 
 	}
 
