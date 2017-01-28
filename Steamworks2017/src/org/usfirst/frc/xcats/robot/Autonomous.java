@@ -278,8 +278,10 @@ public class Autonomous {
 
 	private void updateStatus(){
 
-		SmartDashboard.putNumber("Step Count", _steps.size());
-		SmartDashboard.putString("Current Command", this._currentStep + " " + _currentAutoStep.name  + "\n " + _currentAutoStep.stepTime);
+		if (_steps != null){
+			SmartDashboard.putNumber("Step Count", _steps.size());
+			SmartDashboard.putString("Current Command", this._currentStep + " " + _currentAutoStep.name  + "\n " + _currentAutoStep.stepTime);			
+		}
 
 	}
 	public void drive (double time, double left, double right)
