@@ -13,7 +13,7 @@ public class Navx {
 	public String navxMode = "";
 	public double navxRotateDistance;
 	private double _degrees = 0;
-	private double _startSpeed = 0.5;
+	private double _startSpeed = 0.25;
 	private double  _speed =0.25;
 	private double _tolerance=1;
 	private float _startingYaw=0;
@@ -171,8 +171,10 @@ public class Navx {
 			SmartDashboard.putNumber("RotateYaw", _degrees);
 			SmartDashboard.putNumber("DeltaYaw", deltaYaw);
 			SmartDashboard.putNumber("Auto Yaw", getYaw());
+			SmartDashboard.putNumber("Raw Yaw", ahrs.getYaw());
+			
 
-			if(deltaYaw < 1){
+			if(deltaYaw < 0){
 				_speed = - _speed;
 			} 
 						
@@ -187,6 +189,7 @@ public class Navx {
 			
 
 			_controls.getDrive().set(_speed,_speed, - _speed, - _speed);
+			
 		}	
 		
 	}
