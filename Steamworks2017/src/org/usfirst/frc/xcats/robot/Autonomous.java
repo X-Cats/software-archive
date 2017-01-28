@@ -135,7 +135,7 @@ public class Autonomous {
 	{	
 
 		//we are going to construct the steps needed for our autonomous mode
-		int choice=1;
+		int choice=3;
 		String caseName;
 		_steps =  new ArrayList<AutonomousStep>();
 		switch (choice) {
@@ -157,7 +157,7 @@ public class Autonomous {
 		case 3: {
 			caseName="Right Gear";
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,8.3));
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn 60",0,0,0,60));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn 60",0,0,0,-60));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,3.75));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
@@ -228,7 +228,7 @@ public class Autonomous {
 			case ROTATE:
 				//float deltaYaw;
 				double  speed =0.25;
-				double tolerance=0.1;
+				double tolerance=0.5;
 
 				//deltaYaw = _initialYaw + _controls.getNavx().getYaw();
 				//SmartDashboard.putNumber("deltaYaw", deltaYaw);
