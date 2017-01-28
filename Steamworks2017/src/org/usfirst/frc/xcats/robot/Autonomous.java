@@ -162,9 +162,10 @@ public class Autonomous {
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
 		}
-		default:
+		default: {
 			caseName="Do Nothing";
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
+		}
 		}
 
 
@@ -249,7 +250,7 @@ public class Autonomous {
 				break;
 
 			case GEAR: {
-
+				startNextStep();
 			}
 			break;
 			case GRAB:
