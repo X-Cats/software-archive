@@ -129,6 +129,9 @@ public class RobotControls {
 			_navx.navxMode = "rotate";
 			_navx.navxRotateDistance = 90;
 		}
+		if(_driveJS.getRawButton(8)){
+			_navx.navxMode = null;
+		}
 
 	}
 
