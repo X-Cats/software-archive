@@ -3,7 +3,7 @@ package org.usfirst.frc.xcats.robot;
 import org.usfirst.frc.xcats.robot.AutonomousStep.stepTypes;
 
 public class AutonomousStep {
-	public enum stepTypes {DRIVE, SHOOT, GRAB, UNGRAB, LIFT, LOWER, LIFT_TO_LOW, WAIT, STOP, RELEASE, DRIVE_DISTANCE,ROTATE};
+	public enum stepTypes {DRIVE, SHOOT, GRAB, UNGRAB, LIFT, LOWER, LIFT_TO_LOW, WAIT, STOP, RELEASE, DRIVE_DISTANCE,ROTATE,GEAR};
 				
 		public String name= "";
 		public double stepTime=0;
