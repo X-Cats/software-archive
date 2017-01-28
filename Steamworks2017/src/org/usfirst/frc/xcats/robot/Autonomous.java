@@ -135,7 +135,7 @@ public class Autonomous {
 	{	
 
 		//we are going to construct the steps needed for our autonomous mode
-		int choice=5;
+		int choice=1;
 		String caseName;
 		_steps =  new ArrayList<AutonomousStep>();
 		switch (choice) {
