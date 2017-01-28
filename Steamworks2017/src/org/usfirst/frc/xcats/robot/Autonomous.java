@@ -134,17 +134,39 @@ public class Autonomous {
 	private void setAuto ()
 	{	
 
-
-
-
-
-
 		//we are going to construct the steps needed for our autonomous mode
+		int choice=5;
+		String caseName;
 		_steps =  new ArrayList<AutonomousStep>();
+		switch (choice) {
+		case 1: {
+			caseName="Middle Gear";
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,8.3)); //assuming 99.64 inches
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
+		}
+		break;
+		case 2: {
+			caseName="Left Gear";
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,8.3));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn 60",0,0,0,60));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,3.75));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
+		}
+		case 3: {
+			caseName="Right Gear";
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,8.3));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn 60",0,0,0,60));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,3.75));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
+		}
+		default:
+			caseName="Do Nothing";
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
+		}
 
-		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Test",5,.5,.5,0));
-		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn",0,0,0,45));
-		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
 
 		System.out.println("setAuto");
 	}
@@ -226,6 +248,10 @@ public class Autonomous {
 
 				break;
 
+			case GEAR: {
+
+			}
+			break;
 			case GRAB:
 				break;
 
