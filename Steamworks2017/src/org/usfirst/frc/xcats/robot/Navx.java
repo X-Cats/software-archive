@@ -13,9 +13,10 @@ public class Navx {
 	public String navxMode = "";
 	public double navxRotateDistance;
 	private double _degrees = 0;
-	private double _startSpeed = 0.25;
+	private double _startSpeed = 0.5;
 	private double  _speed =0.25;
-	private double _tolerance=0.1;
+	private double _tolerance=1;
+	private float _startingYaw=0;
 	public Navx (RobotControls controls)
 	{
 		_controls = controls;
@@ -135,49 +136,61 @@ public class Navx {
 		ahrs.resetDisplacement();
 	}
 	public float getYaw(){
-		return ahrs.getYaw();
+		return ahrs.getYaw() - _startingYaw;
 	}
 	public void zeroYaw(){
 		ahrs.zeroYaw();
+		_startingYaw = ahrs.getYaw();
 	}
 	public void rotate(double degrees){
 		
+		if(!navxMode.equals("")){
+			return;			
+		}
 		
+		
+		navxMode = "rotate";
 		double direction=1;
 		_degrees = degrees;
 		zeroYaw();
-		navxMode = "rotate";
 
 		//deltaYaw = _initialYaw + _controls.getNavx().getYaw();
 		//SmartDashboard.putNumber("deltaYaw", deltaYaw);
 		// 
 		direction = (degrees > 0 ? -1 : 1);
 		_speed = direction * Math.abs(_startSpeed);	
-		_controls.getDrive().set(_speed, _speed, -_speed, -_speed);
+		_controls.getDrive().set(_speed, _speed, - _speed, -_speed);
 
 
 		
 	}
 	private void rotateContinuous(){
-		
-		double deltaYaw = Math.abs(getYaw()) - Math.abs(_degrees);
-		SmartDashboard.putNumber(   "DeltaYaw", deltaYaw);
 
-		if(deltaYaw < 1){
+		if(navxMode.equals("rotate")){
+			double deltaYaw =  _degrees - getYaw();
+			SmartDashboard.putNumber("RotateYaw", _degrees);
+			SmartDashboard.putNumber("DeltaYaw", deltaYaw);
 			SmartDashboard.putNumber("Auto Yaw", getYaw());
-			_speed = - _speed/2.0;
-			_controls.getDrive().set(_speed, _speed, -_speed, -_speed);
-		} 
+
+			if(deltaYaw < 1){
+				_speed = - _speed;
+			} 
+						
+					
+			if(Math.abs(deltaYaw) < _tolerance){
+				_speed =  0;
+				navxMode = "";
+			}
+
+			SmartDashboard.putNumber("Rotate Speed", _speed);
+			
+			
+
+			_controls.getDrive().set(_speed,_speed, - _speed, - _speed);
+		}	
 		
-		if(Math.abs(getYaw())-Math.abs(_degrees)<_tolerance){
-			navxMode = "";
-		}
-
-//		if(_speed == 0){
-//			navxMode = "";
-//		}
-
 	}
+	
 	public boolean isOperating(){
 		if(navxMode.equals("")){
 			return false;
