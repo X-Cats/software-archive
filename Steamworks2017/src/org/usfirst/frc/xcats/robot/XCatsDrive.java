@@ -42,6 +42,14 @@ public class XCatsDrive {
 			this._motors[Enums.REAR_RIGHT] = new XCatsSpeedController("motor"+Enums.REAR_RIGHT,channels[Enums.REAR_RIGHT], useCAN, sctype, null,null);			
 			_motors[Enums.REAR_LEFT].setInverted(true);
 		}		
+		
+		if (Enums.DRIVE_MOTOR_NUMBERS.length > 4){
+			this._motors[Enums.AUX_LEFT] = new XCatsSpeedController("motor"+Enums.AUX_LEFT,channels[Enums.AUX_LEFT], useCAN, sctype, null,null);
+			this._motors[Enums.AUX_LEFT].setFollower(Enums.FRONT_LEFT);
+			this._motors[Enums.AUX_RIGHT] = new XCatsSpeedController("motor"+Enums.AUX_RIGHT,channels[Enums.AUX_RIGHT], useCAN, sctype, null,null);
+			this._motors[Enums.AUX_RIGHT].setFollower(Enums.FRONT_RIGHT);
+			_motors[Enums.AUX_LEFT].setInverted(true);
+		}				
 	}
 	
 
