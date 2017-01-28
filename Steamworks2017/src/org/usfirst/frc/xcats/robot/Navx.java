@@ -8,6 +8,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Navx {
 	private AHRS ahrs;
+	private RobotControls _controls;
+	boolean displayVariables = false;
+	public String navxMode = null;
+	public double navxRotateDistance;
 	public Navx ()
 	{
 		try {
@@ -28,6 +32,7 @@ public class Navx {
         }
     }
 	public void updateStatus(){
+		if(displayVariables){
 		/* Display 6-axis Processed Angle Data                                      */
 		SmartDashboard.putBoolean(  "IMU_Connected",        ahrs.isConnected());
 		SmartDashboard.putBoolean(  "IMU_IsCalibrating",    ahrs.isCalibrating());
@@ -108,6 +113,18 @@ public class Navx {
 		SmartDashboard.putNumber(   "IMU_Byte_Count",       ahrs.getByteCount());
 		SmartDashboard.putNumber(   "IMU_Update_Count",     ahrs.getUpdateCount());
 	}
+		
+			
+		
+		switch(navxMode){
+		case "rotate": rotate(navxRotateDistance);
+		break;
+		default:
+			
+		break;
+		}
+		
+	}
 	public void resetStatus(){
 		ahrs.resetDisplacement();
 	}
@@ -116,6 +133,28 @@ public class Navx {
 	}
 	public void zeroYaw(){
 		ahrs.zeroYaw();
+	}
+	public void rotate(double degrees){
+		double  speed =0.25;
+		double tolerance=0.1;
+		double direction=1;
+
+		//deltaYaw = _initialYaw + _controls.getNavx().getYaw();
+		//SmartDashboard.putNumber("deltaYaw", deltaYaw);
+		// 
+		direction = (degrees > 0 ? -1 : 1);
+		speed = direction * speed;	
+		_controls.getDrive().set(speed, speed, -speed, -speed);
+
+
+		if(Math.abs(getYaw()) > Math.abs(degrees)){
+			SmartDashboard.putNumber("Auto Yaw", getYaw());
+			speed=-speed/2;
+			_controls.getDrive().set(speed, speed, -speed, -speed);
+			if(Math.abs(getYaw())-Math.abs(degrees)<tolerance){
+				navxMode = null;
+			}
+		}
 	}
 	}
 
