@@ -22,6 +22,7 @@ public class RobotControls {
 	private DigitalInput _diUltraEcho;
 	private Ultrasonic _ultra;
 	private Navx _navx;
+	private boolean _otherOperating;
 
 
 
@@ -33,7 +34,7 @@ public class RobotControls {
 	 */
 	public RobotControls ()
 	{
-		_navx=new Navx();
+		_navx=new Navx(this);
 		_navx.resetStatus();
 		_navx.zeroYaw();
 		
@@ -113,9 +114,9 @@ public class RobotControls {
 			_drive.set(_leftJS, _rightJS);
 		else
 		{
-			System.out.println("in drive");
+			if(_otherOperating == false){
 			_drive.set(_driveJS);
-
+			}
 			if (_driveJS.getRawButton(6) && !_reductionToggle)
 				slowMode = !slowMode;
 
@@ -125,13 +126,14 @@ public class RobotControls {
 			
 			_drive.setReductionFactor(slowMode ? 1.0 : Enums.SPEED_REDUCTION_FACTOR )	;
 		}
-		if(_driveJS.getRawButton(5)){
-			_navx.navxMode = "rotate";
-			_navx.navxRotateDistance = 90;
+		if(_driveJS.getRawButton(6)){
+			System.out.println("button to rotate pressed");
+			_navx.rotate(90);
 		}
 		if(_driveJS.getRawButton(8)){
-			_navx.navxMode = null;
+//			_navx.navxMode = "";
 		}
+		
 
 	}
 
@@ -140,6 +142,7 @@ public class RobotControls {
 		if (_operatorJS.getRawButton(1)){
 			_navx.resetStatus();
 		}
+		
 //		
 
 	
@@ -160,7 +163,8 @@ public class RobotControls {
 			e.printStackTrace();			
 		}
 		
-
+		_otherOperating = _navx.isOperating();
+		SmartDashboard.putBoolean("isOperating", _otherOperating);
 	}
 
 
