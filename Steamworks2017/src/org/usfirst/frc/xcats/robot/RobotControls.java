@@ -126,12 +126,12 @@ public class RobotControls {
 			
 			_drive.setReductionFactor(slowMode ? 1.0 : Enums.SPEED_REDUCTION_FACTOR )	;
 		}
-		if(_driveJS.getRawButton(6)){
+		if(_driveJS.getRawButton(5)){
 			System.out.println("button to rotate pressed");
 			_navx.rotate(90);
 		}
 		if(_driveJS.getRawButton(8)){
-//			_navx.navxMode = "";
+			_navx.navxMode = "";
 		}
 		
 
@@ -151,6 +151,8 @@ public class RobotControls {
 	public void updateStatus ()
 	{
 		_navx.updateStatus();
+		_otherOperating = _navx.isOperating();
+		SmartDashboard.putBoolean("isOperating", _otherOperating);
 		
 		try {
 			if (!Enums.IS_FINAL_ROBOT) {
@@ -163,8 +165,6 @@ public class RobotControls {
 			e.printStackTrace();			
 		}
 		
-		_otherOperating = _navx.isOperating();
-		SmartDashboard.putBoolean("isOperating", _otherOperating);
 	}
 
 
