@@ -41,6 +41,11 @@ public class XCatsDrive {
 			this._motors[Enums.REAR_LEFT] = new XCatsSpeedController("motor"+Enums.REAR_LEFT,channels[Enums.REAR_LEFT], useCAN, sctype, null,null);
 			this._motors[Enums.REAR_RIGHT] = new XCatsSpeedController("motor"+Enums.REAR_RIGHT,channels[Enums.REAR_RIGHT], useCAN, sctype, null,null);			
 			_motors[Enums.REAR_LEFT].setInverted(true);
+			
+			if (Enums.USE_2SC_TANK){
+				this._motors[Enums.REAR_LEFT].setFollower(Enums.FRONT_LEFT);
+				this._motors[Enums.REAR_RIGHT].setFollower(Enums.FRONT_RIGHT);				
+			}
 		}		
 		
 		if (Enums.DRIVE_MOTOR_NUMBERS.length > 4){
@@ -79,6 +84,13 @@ public class XCatsDrive {
 //		set(_reductionFactor*drive_js.getRawAxis(0), _reductionFactor*drive_js.getRawAxis(1), _reductionFactor*drive_js.getRawAxis(4), _reductionFactor*drive_js.getRawAxis(5));
 		
 		set(_reductionFactor*drive_js.getRawAxis(1),_reductionFactor*drive_js.getRawAxis(1),_reductionFactor*drive_js.getRawAxis(5),_reductionFactor*drive_js.getRawAxis(5));
+	}
+	
+	public void setInverted(){
+		
+		for (int i = 0; i < Enums.DRIVE_MOTOR_NUMBERS.length; i ++){
+			_motors[i].setInverted(_motors[i].getInverted());
+		}
 	}
 	
 	public void setReductionFactor (double reductionFactor)
@@ -126,6 +138,12 @@ public class XCatsDrive {
 			_motors[Enums.REAR_LEFT].set(leftSpeed);
 			_motors[Enums.REAR_RIGHT].set(rightSpeed);
 		}
+		if (_motors.length > 4){
+			_motors[Enums.AUX_LEFT].set(leftSpeed);
+			_motors[Enums.AUX_RIGHT].set(rightSpeed);
+		}
+
+	
 	}
 
 	public void set (int motor, double speed)
@@ -145,6 +163,10 @@ public class XCatsDrive {
 		if (_motors.length > 2) {
 			_motors[Enums.REAR_LEFT].updateStatus();
 			_motors[Enums.REAR_RIGHT].updateStatus();			
+		}
+		if (_motors.length > 4) {
+			_motors[Enums.AUX_LEFT].updateStatus();
+			_motors[Enums.AUX_RIGHT].updateStatus();			
 		}
 		
 	}
