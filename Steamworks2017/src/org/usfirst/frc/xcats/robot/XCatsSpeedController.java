@@ -299,6 +299,10 @@ public class XCatsSpeedController{
 			this._invert = 1;
 	}
 
+	public boolean getInverted(){
+		return this.getInverted();
+	}
+	
 	public void setDashboardIO (boolean input, boolean output)
 	{
 		this._dashboardInput = input;
