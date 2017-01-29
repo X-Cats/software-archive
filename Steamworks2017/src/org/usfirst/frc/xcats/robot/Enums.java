@@ -15,7 +15,7 @@ public class Enums {
 			*/
 	
 	 //front left, rear left, front right, rear right
-	public static final double SPEED_REDUCTION_FACTOR = 0.7;
+	public static final double SPEED_REDUCTION_FACTOR = 1.0;
 	
 	/*
 	 * offset to calibrate so that at 0.5 on the right side, the left side is going at the same travel
@@ -26,23 +26,31 @@ public class Enums {
 	public static final double SPEED_CALIBRATION = 0.0;  
 	
 	public static final boolean IS_FINAL_ROBOT = true;
-	public static final String DRIVE_CONTROLLER_TYPE = "Talon"; // choices are "Jaguar" or "Talon"
+	public static final String  DRIVE_CONTROLLER_TYPE = "Talon"; // choices are "Jaguar" or "Talon"
 	public static final boolean HAS_MECHANUM_WHEELS = false;
 	public static final boolean USE_PID = false;    	// This is if the drive train is using PID control
-	public static final int MAX_CAN_SPEED = 6000;
+	public static final int     MAX_CAN_SPEED = 6000;
 	public static final boolean USE_CAN = true;			// if the motors are wired with CAN bus use this
-	public static final double MOTOR_STOP_TIME = .1;	//when using coast mode this is how to stop gradually	
+	public static final double  MOTOR_STOP_TIME = .1;	//when using coast mode this is how to stop gradually	
+	public static final boolean USE_NAVX = false;		//when using NAVX set this to true;
+	public static final boolean USE_COMPRESSOR = true;  //set to true when using a compressor
+	public static final boolean USE_SOFTWARE_SPEED_REDUCTION = false; 	//set to true only if you wish to use the trigger button to engage a sofware reduction of speed low/high
+	public static final boolean USE_2SC_TANK = true;     //when true, then the robot drive is 2 moter controllers and the rest are followers
 	
-	public static final double ROBOT_LENGTH_COMPACT = 30.0; //length of robot with shooter in home position
-	public static final double ROBOT_LENGTH_EXTENDED = 40; // length of robot with shooter down
+	public static final double  ROBOT_LENGTH_COMPACT = 30.0; //length of robot with shooter in home position
+	public static final double  ROBOT_LENGTH_EXTENDED = 40; // length of robot with shooter down
+	
 
 	//these values keep track specifically of the specific motor controllers
 	//if we only need 2 motors in the drive, use FRONT_LEFT and FRONT_RIGHT. Make sure that the arrays below have a length of 2
-	public static final int FRONT_LEFT = 0, REAR_LEFT = 1, FRONT_RIGHT = 2, REAR_RIGHT = 3, AUX_LEFT = 4, AUX_RIGHT =5 ;
+	public static final int FRONT_LEFT = 0, REAR_LEFT = 1,  AUX_LEFT = 2, FRONT_RIGHT = 3, REAR_RIGHT = 4, AUX_RIGHT = 5 ;
 //	public static final int DRIVE_MOTOR_NUMBERS[] = {FRONT_LEFT, FRONT_RIGHT}; //if we do not use CAN bus, the motors are created in this sequence
-	public static final int DRIVE_MOTOR_NUMBERS[] = {FRONT_LEFT, REAR_LEFT, FRONT_RIGHT, REAR_RIGHT}; //if we do not use CAN bus, the motors are created in this sequence
-	public static final int CAN_DRIVE_MOTOR_NUMBERS[] = {1, 2, 3, 4}; //these are the CAN bus ids of the motors
+	public static final int     DRIVE_MOTOR_NUMBERS[] = {FRONT_LEFT, REAR_LEFT, AUX_LEFT, FRONT_RIGHT, REAR_RIGHT, AUX_RIGHT}; //if we do not use CAN bus, the motors are created in this sequence
+	public static final int     CAN_DRIVE_MOTOR_NUMBERS[] = {1, 2, 3, 4, 5, 6}; //these are the CAN bus ids of the motors
 		
+	//This is for the use of the compressor
+	public static final int     DO_SHIFTER = 4;  //this is used to shift the gear ration on the drive train from low to high (SHIFTER)
+	
 	//this assembly rotates up and down and in and out
 	public static final int ACQ_LIFT_MOTOR = 7;
 	public static final double ACQ_LIFT_SPEED = 0.40;
