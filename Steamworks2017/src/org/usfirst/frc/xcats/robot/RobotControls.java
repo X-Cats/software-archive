@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotDrive;
@@ -34,14 +35,11 @@ public class RobotControls {
 	private Joystick _leftJS, _rightJS, _driveJS, _operatorJS;
 	private XCatsDrive _drive;
 	private CameraServer _camera;
-	private boolean _reductionToggle = false, slowMode = true;
+	private boolean _slowMode = true;
 	private XCatsJSButton _speedToggleButton;
 	private XCatsJSButton _highSpeedButton;
 	private boolean _highSpeed = false;
-	private DigitalOutput _doShifter;
-	private DigitalOutput _do;
-	private Solenoid _sol;
-	private Solenoid _sol2;
+	private DoubleSolenoid _dblSolShifter;
 	private DigitalInput _diUltraEcho;
 	private Ultrasonic _ultra;
 	private Navx _navx;
@@ -58,11 +56,7 @@ public class RobotControls {
 		if (Enums.USE_COMPRESSOR){
 			_compressor = new Compressor();
 			
-			_doShifter = new DigitalOutput(Enums.DO_SHIFTER);
-			_do = new DigitalOutput(5);
-			_sol = new Solenoid(4);
-			_sol2 = new Solenoid(5);
-			
+			_dblSolShifter = new DoubleSolenoid(4,5);			
 		}
 	
 	    //the NAVX board is our gyro subsystem	
@@ -107,6 +101,7 @@ public class RobotControls {
 	public void drive ()
 	{
 
+		boolean reductionToggle = _slowMode;
 
 		if (Enums.TWO_JOYSTICKS)
 			_drive.set(_leftJS, _rightJS);
@@ -115,19 +110,22 @@ public class RobotControls {
 //			System.out.println("in drive");
 			_drive.set(_driveJS);
 
-//			if (_driveJS.getRawButton(6) && !_reductionToggle){
-//				slowMode = !slowMode;
-//				_doShifter.set(slowMode);
-//				_do.set(slowMode);
-//				_sol.set(slowMode);
-//				_sol2.set(slowMode);
-//			}
-//			
-//			SmartDashboard.putBoolean("Shifter", slowMode);
+			
+			
+			reductionToggle  = _speedToggleButton.isPressed();
+			if (reductionToggle != _slowMode){
+				_slowMode = !_slowMode;
+				if (_slowMode){
+					_dblSolShifter.set(DoubleSolenoid.Value.kForward);
+				} else {
+					_dblSolShifter.set(DoubleSolenoid.Value.kReverse);					
+				}
+				
+			}
+			
+			SmartDashboard.putBoolean("Shifter", _slowMode);
 //
-//			_reductionToggle = _driveJS.getRawButton(6);
 //
-////			slowMode = _speedToggleButton.isPressed();
 //			
 //			if (Enums.USE_SOFTWARE_SPEED_REDUCTION){
 //				_drive.setReductionFactor(slowMode ? 1.0 : Enums.SPEED_REDUCTION_FACTOR )	;				
