@@ -43,17 +43,19 @@ public class XCatsDrive {
 			_motors[Enums.REAR_LEFT].setInverted(true);
 			
 			if (Enums.USE_2SC_TANK){
-				this._motors[Enums.REAR_LEFT].setFollower(Enums.FRONT_LEFT);
-				this._motors[Enums.REAR_RIGHT].setFollower(Enums.FRONT_RIGHT);				
+				this._motors[Enums.REAR_LEFT].setFollower(Enums.CAN_DRIVE_MOTOR_NUMBERS[Enums.FRONT_LEFT]);
+				this._motors[Enums.REAR_RIGHT].setFollower(Enums.CAN_DRIVE_MOTOR_NUMBERS[Enums.FRONT_RIGHT]);				
 			}
 		}		
 		
 		if (Enums.DRIVE_MOTOR_NUMBERS.length > 4){
 			this._motors[Enums.AUX_LEFT] = new XCatsSpeedController("motor"+Enums.AUX_LEFT,channels[Enums.AUX_LEFT], useCAN, sctype, null,null);
-			this._motors[Enums.AUX_LEFT].setFollower(Enums.FRONT_LEFT);
 			this._motors[Enums.AUX_RIGHT] = new XCatsSpeedController("motor"+Enums.AUX_RIGHT,channels[Enums.AUX_RIGHT], useCAN, sctype, null,null);
-			this._motors[Enums.AUX_RIGHT].setFollower(Enums.FRONT_RIGHT);
 			_motors[Enums.AUX_LEFT].setInverted(true);
+
+			
+			this._motors[Enums.AUX_LEFT].setFollower(Enums.CAN_DRIVE_MOTOR_NUMBERS[Enums.FRONT_LEFT]);
+			this._motors[Enums.AUX_RIGHT].setFollower(Enums.CAN_DRIVE_MOTOR_NUMBERS[Enums.FRONT_RIGHT]);
 		}				
 	}
 	
@@ -122,9 +124,13 @@ public class XCatsDrive {
 			_motors[Enums.FRONT_LEFT].set(left_y);
 			_motors[Enums.FRONT_RIGHT].set(right_y );
 
-			if (_motors.length > 2) {
+			if (_motors.length > 2 && !Enums.USE_2SC_TANK) {
 				_motors[Enums.REAR_LEFT].set(left_x);
 				_motors[Enums.REAR_RIGHT].set(right_x);			
+			}
+			if (_motors.length > 4 && !Enums.USE_2SC_TANK) {
+				_motors[Enums.AUX_LEFT].set(left_x);
+				_motors[Enums.AUX_RIGHT].set(right_x);			
 			}
 		}
 	}
@@ -134,11 +140,11 @@ public class XCatsDrive {
 		_motors[Enums.FRONT_LEFT].set(leftSpeed);
 		_motors[Enums.FRONT_RIGHT].set(rightSpeed);
 
-		if (_motors.length > 2){
+		if (_motors.length > 2 && !Enums.USE_2SC_TANK){
 			_motors[Enums.REAR_LEFT].set(leftSpeed);
 			_motors[Enums.REAR_RIGHT].set(rightSpeed);
 		}
-		if (_motors.length > 4){
+		if (_motors.length > 4 && !Enums.USE_2SC_TANK){
 			_motors[Enums.AUX_LEFT].set(leftSpeed);
 			_motors[Enums.AUX_RIGHT].set(rightSpeed);
 		}

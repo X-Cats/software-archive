@@ -43,9 +43,9 @@ public class Enums {
 
 	//these values keep track specifically of the specific motor controllers
 	//if we only need 2 motors in the drive, use FRONT_LEFT and FRONT_RIGHT. Make sure that the arrays below have a length of 2
-	public static final int FRONT_LEFT = 0, REAR_LEFT = 1,  AUX_LEFT = 2, FRONT_RIGHT = 3, REAR_RIGHT = 4, AUX_RIGHT = 5 ;
+	public static final int  REAR_LEFT = 0,  FRONT_LEFT = 1, AUX_LEFT = 2, REAR_RIGHT = 3, FRONT_RIGHT = 4,  AUX_RIGHT = 5 ;
 //	public static final int DRIVE_MOTOR_NUMBERS[] = {FRONT_LEFT, FRONT_RIGHT}; //if we do not use CAN bus, the motors are created in this sequence
-	public static final int     DRIVE_MOTOR_NUMBERS[] = {FRONT_LEFT, REAR_LEFT, AUX_LEFT, FRONT_RIGHT, REAR_RIGHT, AUX_RIGHT}; //if we do not use CAN bus, the motors are created in this sequence
+	public static final int     DRIVE_MOTOR_NUMBERS[] = { REAR_LEFT, FRONT_LEFT, AUX_LEFT,  REAR_RIGHT, FRONT_RIGHT, AUX_RIGHT}; //if we do not use CAN bus, the motors are created in this sequence
 	public static final int     CAN_DRIVE_MOTOR_NUMBERS[] = {1, 2, 3, 4, 5, 6}; //these are the CAN bus ids of the motors
 		
 	//This is for the use of the compressor
