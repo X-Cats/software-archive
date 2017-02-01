@@ -66,7 +66,7 @@ public class Enums {
 	
 	//Joysticks
 	public static final int LEFT_DRIVE_JS = 1, RIGHT_DRIVE_JS = 2, DRIVE_JS = 1, OPERATOR_JS = 0;
-	public static final boolean TWO_JOYSTICKS = false;
+	public static final boolean TWO_JOYSTICKS = true;
 	public static final boolean DASHBOARD_INPUT = false, DASHBOARD_OUTPUT = false;
 	
 	//Autonomous uses the chooser object to select mode
