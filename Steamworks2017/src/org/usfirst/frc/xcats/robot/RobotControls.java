@@ -72,6 +72,7 @@ public class RobotControls {
 		{
 			_leftJS = new Joystick(Enums.LEFT_DRIVE_JS);
 			_rightJS = new Joystick(Enums.RIGHT_DRIVE_JS);
+			_speedToggleButton = new XCatsJSButton(_rightJS,1);
 		}
 		else{
 			
