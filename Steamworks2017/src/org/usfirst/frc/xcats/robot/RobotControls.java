@@ -108,24 +108,8 @@ public class RobotControls {
 			_drive.set(_leftJS, _rightJS);
 		else
 		{
-//			System.out.println("in drive");
 			_drive.set(_driveJS);
 
-			
-			
-			reductionToggle  = _speedToggleButton.isPressed();
-			if (reductionToggle != _slowMode){
-				_slowMode = !_slowMode;
-				if (_slowMode){
-					_dblSolShifter.set(DoubleSolenoid.Value.kForward);
-				} else {
-					_dblSolShifter.set(DoubleSolenoid.Value.kReverse);					
-				}
-				
-			}
-			
-			SmartDashboard.putBoolean("Shifter", _slowMode);
-//
 //
 //			
 //			if (Enums.USE_SOFTWARE_SPEED_REDUCTION){
@@ -133,6 +117,20 @@ public class RobotControls {
 //			}
 		}
 		
+		
+		reductionToggle  = _speedToggleButton.isPressed();
+		if (reductionToggle != _slowMode){
+			_slowMode = !_slowMode;
+			_drive.set(0,0);
+			if (_slowMode){
+				_dblSolShifter.set(DoubleSolenoid.Value.kForward);
+			} else {
+				_dblSolShifter.set(DoubleSolenoid.Value.kReverse);					
+			}
+			
+		}
+		
+		SmartDashboard.putBoolean("Shifter", _slowMode);		
 		if (_navx != null){
 			if(_driveJS.getRawButton(5)){
 				_navx.navxMode = "rotate";
