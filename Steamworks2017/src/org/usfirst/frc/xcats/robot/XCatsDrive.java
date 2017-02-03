@@ -53,9 +53,10 @@ public class XCatsDrive {
 			this._motors[Enums.AUX_RIGHT] = new XCatsSpeedController("motor"+Enums.AUX_RIGHT,channels[Enums.AUX_RIGHT], useCAN, sctype, null,null);
 			_motors[Enums.AUX_LEFT].setInverted(true);
 
-			
-			this._motors[Enums.AUX_LEFT].setFollower(Enums.CAN_DRIVE_MOTOR_NUMBERS[Enums.FRONT_LEFT]);
-			this._motors[Enums.AUX_RIGHT].setFollower(Enums.CAN_DRIVE_MOTOR_NUMBERS[Enums.FRONT_RIGHT]);
+			if (Enums.USE_2SC_TANK){			
+				this._motors[Enums.AUX_LEFT].setFollower(Enums.CAN_DRIVE_MOTOR_NUMBERS[Enums.FRONT_LEFT]);
+				this._motors[Enums.AUX_RIGHT].setFollower(Enums.CAN_DRIVE_MOTOR_NUMBERS[Enums.FRONT_RIGHT]);
+			}
 		}				
 	}
 	
@@ -112,27 +113,32 @@ public class XCatsDrive {
 	
 	public void set (double left_x, double left_y, double right_x, double right_y)
 	{
-		if (_useMechanumWheels){
-			_motors[Enums.FRONT_LEFT].set(left_y - left_x);
-			_motors[Enums.FRONT_RIGHT].set(right_y + right_x);
-			if (_motors.length > 2) {
-				_motors[Enums.REAR_LEFT].set(left_y + left_x);
-				_motors[Enums.REAR_RIGHT].set(right_y - right_x);							
+		try {
+			if (_useMechanumWheels){
+				_motors[Enums.FRONT_LEFT].set(left_y - left_x);
+				_motors[Enums.FRONT_RIGHT].set(right_y + right_x);
+				if (_motors.length > 2) {
+					_motors[Enums.REAR_LEFT].set(left_y + left_x);
+					_motors[Enums.REAR_RIGHT].set(right_y - right_x);							
+				}
 			}
-		}
-		else{
-			_motors[Enums.FRONT_LEFT].set(left_y);
-			_motors[Enums.FRONT_RIGHT].set(right_y );
+			else{
+				_motors[Enums.FRONT_LEFT].set(left_y);
+				_motors[Enums.FRONT_RIGHT].set(right_y );
 
-			if (_motors.length > 2 && !Enums.USE_2SC_TANK) {
-				_motors[Enums.REAR_LEFT].set(left_x);
-				_motors[Enums.REAR_RIGHT].set(right_x);			
-			}
-			if (_motors.length > 4 && !Enums.USE_2SC_TANK) {
-				_motors[Enums.AUX_LEFT].set(left_x);
-				_motors[Enums.AUX_RIGHT].set(right_x);			
-			}
+				if (_motors.length > 2 && !Enums.USE_2SC_TANK) {
+					_motors[Enums.REAR_LEFT].set(left_y);
+					_motors[Enums.REAR_RIGHT].set(right_y);			
+				}
+				if (_motors.length > 4 && !Enums.USE_2SC_TANK) {
+					_motors[Enums.AUX_LEFT].set(left_y);
+					_motors[Enums.AUX_RIGHT].set(right_y);			
+				}
+			}			
 		}
+		catch (Exception e){
+			System.out.println(e);
+			e.printStackTrace();		}
 	}
 
 	public void set (double leftSpeed, double rightSpeed)
@@ -162,18 +168,18 @@ public class XCatsDrive {
 		return _motors[motor].getSetPoint();
 	}
 	
+	public void setDashboardIO(boolean input, boolean output){
+		
+		for (int i=0; i<_motors.length; i++){
+			_motors[i].setDashboardIO(input, output);
+			
+		}		
+	}
 	public void updateStatus ()
 	{
-		_motors[Enums.FRONT_LEFT].updateStatus();
-		_motors[Enums.FRONT_RIGHT].updateStatus();
-		if (_motors.length > 2) {
-			_motors[Enums.REAR_LEFT].updateStatus();
-			_motors[Enums.REAR_RIGHT].updateStatus();			
-		}
-		if (_motors.length > 4) {
-			_motors[Enums.AUX_LEFT].updateStatus();
-			_motors[Enums.AUX_RIGHT].updateStatus();			
-		}
-		
+		for (int i=0; i<_motors.length; i++){
+			_motors[i].updateStatus();
+			
+		}						
 	}
 }

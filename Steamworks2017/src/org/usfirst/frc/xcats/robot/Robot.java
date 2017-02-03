@@ -98,6 +98,9 @@ public class Robot extends IterativeRobot {
     public void disabledInit(){
     	
     }
+    public void robotPeriodic(){
+    	
+    }
   
     
     /**

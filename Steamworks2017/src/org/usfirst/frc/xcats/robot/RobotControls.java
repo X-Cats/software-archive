@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -44,19 +45,24 @@ public class RobotControls {
 	private Ultrasonic _ultra;
 	private Navx _navx;
 	private Compressor _compressor;
+	private Timer _shiftTimer;
+	private boolean _shifting=false;
 	
 
 	public RobotControls ()
 	{
 
+		//
+		_shiftTimer = new Timer();
+		
 		//simple XCatsDrive, no PID etc
 		_drive = new XCatsDrive (Enums.USE_CAN,true);
-		//_drive.setInverted();
-
+		_drive.setDashboardIO(false, true);
+	
 		if (Enums.USE_COMPRESSOR){
 			_compressor = new Compressor();
 			
-			_dblSolShifter = new DoubleSolenoid(4,5);			
+			_dblSolShifter = new DoubleSolenoid(Enums.DO_SHIFTER_LOW,Enums.DO_SHIFTER_HI);			
 		}
 	
 	    //the NAVX board is our gyro subsystem	
@@ -103,34 +109,53 @@ public class RobotControls {
 	{
 
 		boolean reductionToggle = _slowMode;
+		int directionLeft = 1; // this is used to tell if we are going forward or backwards. The shifting speed needs to be in the same direction!
+		int directionRight = 1;
 
-		if (Enums.TWO_JOYSTICKS)
-			_drive.set(_leftJS, _rightJS);
-		else
-		{
-			_drive.set(_driveJS);
-
-//
-//			
-//			if (Enums.USE_SOFTWARE_SPEED_REDUCTION){
-//				_drive.setReductionFactor(slowMode ? 1.0 : Enums.SPEED_REDUCTION_FACTOR )	;				
-//			}
+		if (!_shifting){
+			if (Enums.TWO_JOYSTICKS){
+				_drive.set(_leftJS, _rightJS);
+			}
+			else {
+				_drive.set(_driveJS);
+			}
 		}
+
+		//get the direction of the drive
+		if (_drive.get(Enums.FRONT_LEFT)< 0)
+			directionLeft = -1;
 		
+		if (_drive.get(Enums.FRONT_RIGHT)< 0)
+			directionRight = -1;
 		
+
+		
+		//only transition on the "downstroke" of the button, we dont care how long it is held
 		reductionToggle  = _speedToggleButton.isPressed();
 		if (reductionToggle != _slowMode){
 			_slowMode = !_slowMode;
-			_drive.set(0,0);
-			if (_slowMode){
+			_shiftTimer.reset();
+			_shiftTimer.start();
+			_shifting = true;
+			if (_slowMode)
 				_dblSolShifter.set(DoubleSolenoid.Value.kForward);
-			} else {
-				_dblSolShifter.set(DoubleSolenoid.Value.kReverse);					
-			}
-			
+			 else 
+				_dblSolShifter.set(DoubleSolenoid.Value.kReverse);										
+		}
+
+		//we need to drop the speed for a small time frame so that the gears can handle the gear shift
+		//so this loop will detect the shifting command and at the end of it will resume speed
+		if (_shifting ){
+			if (_shiftTimer.get() >= Enums.SHIFTER_DELAY_TIME)
+				_shifting = false;				
+			else
+				_drive.set( directionLeft * Enums.SHIFTER_DELAY_SPEED,  directionRight * Enums.SHIFTER_DELAY_SPEED);			
 		}
 		
+		SmartDashboard.putNumber("LeftSpeed", _drive.get(Enums.FRONT_LEFT));
+		SmartDashboard.putNumber("Direction", directionLeft);
 		SmartDashboard.putBoolean("Shifter", _slowMode);		
+
 		if (_navx != null){
 			if(_driveJS.getRawButton(5)){
 				_navx.navxMode = "rotate";
@@ -160,6 +185,7 @@ public class RobotControls {
 	
 	public void updateStatus ()
 	{
+		_drive.updateStatus();
 		if (_navx != null){
 			_navx.updateStatus();
 			
