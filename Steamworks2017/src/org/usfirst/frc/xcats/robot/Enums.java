@@ -35,7 +35,7 @@ public class Enums {
 	public static final boolean USE_NAVX = false;		//when using NAVX set this to true;
 	public static final boolean USE_COMPRESSOR = true;  //set to true when using a compressor
 	public static final boolean USE_SOFTWARE_SPEED_REDUCTION = false; 	//set to true only if you wish to use the trigger button to engage a sofware reduction of speed low/high
-	public static final boolean USE_2SC_TANK = true;     //when true, then the robot drive is 2 moter controllers and the rest are followers
+	public static final boolean USE_2SC_TANK = true;     //when true, then the robot drive is 2 motor controllers and the rest are followers
 	
 	public static final double  ROBOT_LENGTH_COMPACT = 30.0; //length of robot with shooter in home position
 	public static final double  ROBOT_LENGTH_EXTENDED = 40; // length of robot with shooter down
@@ -49,7 +49,9 @@ public class Enums {
 	public static final int     CAN_DRIVE_MOTOR_NUMBERS[] = {1, 2, 3, 4, 5, 6}; //these are the CAN bus ids of the motors
 		
 	//This is for the use of the compressor
-	public static final int     DO_SHIFTER = 4;  //this is used to shift the gear ration on the drive train from low to high (SHIFTER)
+	public static final int     DO_SHIFTER_LOW = 4, DO_SHIFTER_HI=5;  //this is used to shift the gear ration on the drive train from low to high (SHIFTER)
+	public static final double  SHIFTER_DELAY_TIME = 0.25;  // this time is used for the "slack speed" inbetween gear shifts
+	public static final double  SHIFTER_DELAY_SPEED = 0.4;  // this is the speed for the "slack" during shifting
 	
 	//this assembly rotates up and down and in and out
 	public static final int ACQ_LIFT_MOTOR = 7;
