@@ -38,6 +38,8 @@ public class Enums {
 	public static final boolean USE_COMPRESSOR = true;  //set to true when using a compressor
 	public static final boolean USE_SOFTWARE_SPEED_REDUCTION = false; 	//set to true only if you wish to use the trigger button to engage a sofware reduction of speed low/high
 	public static final boolean USE_2SC_TANK = true;     //when true, then the robot drive is 2 motor controllers and the rest are followers
+	public static final double BROWNOUT_VOLTAGE_THRESHOLD = 7.5;
+	public static final double BROWNOUT_VOLTAGE_REDUCTIONFACTOR = 0.5;
 	
 	public static final double  ROBOT_LENGTH_COMPACT = 30.0; //length of robot with shooter in home position
 	public static final double  ROBOT_LENGTH_EXTENDED = 40; // length of robot with shooter down
@@ -54,20 +56,7 @@ public class Enums {
 	public static final int     DO_SHIFTER_LOW = 4, DO_SHIFTER_HI=5;  //this is used to shift the gear ration on the drive train from low to high (SHIFTER)
 	public static final double  SHIFTER_DELAY_TIME = 0.25;  // this time is used for the "slack speed" inbetween gear shifts
 	public static final double  SHIFTER_DELAY_SPEED = 0.4;  // this is the speed for the "slack" during shifting
-	
-	//this assembly rotates up and down and in and out
-	public static final int ACQ_LIFT_MOTOR = 7;
-	public static final double ACQ_LIFT_SPEED = 0.40;
-	public static final int ACQ_MOTOR_GRAB = 6;	//this motor controls the green acquisition into the robot 
-	public static final int ACQ_MOTOR_SHOOT = 5;    //this motor controls the dispense of the ball into the shooter
-	public static final int ACQ_MOTOR_SHOOT_PWM = 9;    //this motor controls the dispense of the ball into the shooter
-	public static final double ACQ_SPEED = 1;
-	
-	//This assembly controls the shooter wheels
-	public static final int SHOOTER_MOTOR_MASTER = 8, SHOOTER_MOTOR_FOLLOWER = 9;
-	public static final double SHOOT_TIME = 2.0;
-	public static final int SHOOTER_OPTICAL_DI = 1;
-	
+		
 	//Joysticks
 	public static final int LEFT_DRIVE_JS = 1, RIGHT_DRIVE_JS = 2, DRIVE_JS = 1, OPERATOR_JS = 0;
 	public static final boolean TWO_JOYSTICKS = true;

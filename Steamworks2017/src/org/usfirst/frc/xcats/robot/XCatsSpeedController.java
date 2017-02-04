@@ -4,6 +4,7 @@ package org.usfirst.frc.xcats.robot;
 import edu.wpi.first.wpilibj.CANSpeedController;
 import com.ctre.CANTalon;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Timer;
@@ -41,6 +42,10 @@ public class XCatsSpeedController{
 	private Timer _stopTimer;
 	private DigitalInput _upperLimit;
 	private DigitalInput _lowerLimit;
+	private PowerDistributionPanel _pdp;
+	private double _pdpVoltageThreshold;
+	private double _pdpVoltageReductionFactor = 0; // setpoint = setpoint - _pdpVoltageReductionFactor* setpoint;
+	
 
 	//this constructor is used with a controller that has a digital input that acts as a switch
 	public XCatsSpeedController (String name, int channel, boolean useCan, SCType sctype,  DigitalInput lowerLimit, DigitalInput upperLimit)
@@ -169,6 +174,11 @@ public class XCatsSpeedController{
 		}		
 	}
 
+	public void setPDP(PowerDistributionPanel pdp, double voltageThreshold, double reductionFactor){
+		_pdp = pdp;
+		this._pdpVoltageThreshold = voltageThreshold;
+		this._pdpVoltageReductionFactor=reductionFactor;
+	}
 	public void set (double setPoint)
 	{
 		//i don't know why we are getting a stack dump at the beginning of the code, maybe it is an initialization thing
@@ -189,6 +199,14 @@ public class XCatsSpeedController{
 				if (_upperLimit.get() && _cutOffDirection * setPoint > 0 )
 					return;
 		 */
+		
+		if (_pdp != null){
+
+			if (_pdp.getVoltage() <= this._pdpVoltageThreshold){
+				setPoint = setPoint * (1.0 - setPoint * this._pdpVoltageReductionFactor);
+			}
+			
+		}
 
 		if (_cutOffDirection * setPoint <= 0)
 		{

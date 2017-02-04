@@ -36,7 +36,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class RobotControls {
 	private Joystick _leftJS, _rightJS, _driveJS, _operatorJS;
 	private XCatsDrive _drive;
-	private CameraServer _camera;
 	private boolean _slowMode = true;
 	private XCatsJSButton _speedToggleButton;
 	private XCatsJSButton _highSpeedButton;
@@ -56,10 +55,14 @@ public class RobotControls {
 		//
 		_shiftTimer = new Timer();
 		_pdp = new PowerDistributionPanel(Enums.PDP_CAN_ID);
+		
 		//simple XCatsDrive, no PID etc
 		_drive = new XCatsDrive (Enums.USE_CAN,true);
-		_drive.setDashboardIO(false, true);
+		_drive.setDashboardIO(false, false);
 	
+		//_drive.setPDP(_pdp, Enums.BROWNOUT_VOLTAGE_THRESHOLD, Enums.BROWNOUT_VOLTAGE_REDUCTIONFACTOR);
+		
+		
 		if (Enums.USE_COMPRESSOR){
 			_compressor = new Compressor(Enums.PCM_CAN_ID);
 			
@@ -91,8 +94,8 @@ public class RobotControls {
 				
 		try
 		{
-			_camera = CameraServer.getInstance();
-			_camera.startAutomaticCapture(0);
+//			CameraServer camera = CameraServer.getInstance();
+//			camera.startAutomaticCapture(0);
 		}
 		catch (Exception e)
 		{
@@ -158,24 +161,26 @@ public class RobotControls {
 		SmartDashboard.putBoolean("Shifter", _slowMode);		
 
 		if (_navx != null){
-			//if(_driveJS.getRawButton(5)){
-				//_navx.navxMode = "rotate";
-				//_navx.navxRotateDistance = 90;
-			//}
-			if(_driveJS.getRawButton(8)){
-				_navx.navxMode = "";
-			}			
+			
+			if (Enums.TWO_JOYSTICKS){
+			}
+			else {
+				if(_driveJS.getRawButton(5)){
+				_navx.navxMode = "rotate";
+				_navx.navxRotateDistance = 90;
+				}
+				if(_driveJS.getRawButton(5)){
+				_navx.navxMode = "rotate";
+				_navx.navxRotateDistance = 90;
+				}
+			}
 		}
 
 	}
 
 	public void operate ()
 	{
-		if (_navx != null) {
-			if (_operatorJS.getRawButton(1)){
-				_navx.resetStatus();
-			}
-		}
+		// do something there
 	}
 
 
@@ -186,12 +191,17 @@ public class RobotControls {
 	
 	public void updateStatus ()
 	{
-		
-		SmartDashboard.putNumber("pdp total current", _pdp.getTotalCurrent());
-		SmartDashboard.putNumber("pdp total energy",_pdp.getTotalEnergy());
-		SmartDashboard.putNumber("pdp total power" ,_pdp.getTotalPower());
-		SmartDashboard.putNumber("pdp temperature",_pdp.getTemperature());
-		SmartDashboard.putNumber("pdp voltage",_pdp.getVoltage());
+		try {
+//			SmartDashboard.putNumber("pdp total current", _pdp.getTotalCurrent());
+//			SmartDashboard.putNumber("pdp total energy",_pdp.getTotalEnergy());
+//			SmartDashboard.putNumber("pdp total power" ,_pdp.getTotalPower());
+//			SmartDashboard.putNumber("pdp temperature",_pdp.getTemperature());
+//			SmartDashboard.putNumber("pdp voltage",_pdp.getVoltage());			
+		}
+		catch (Exception e){
+			System.out.println("error reading PDP... RobotControls.updateStatus");
+		}
+	
 		_drive.updateStatus();
 		if (_navx != null){
 			_navx.updateStatus();

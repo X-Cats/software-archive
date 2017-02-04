@@ -16,10 +16,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * directory.
  */
 public class Robot extends IterativeRobot {
+	Thread visionThread;
     
     Teleop _teleop;
     Autonomous _auto;
     RobotControls _controls;
+    AutoTarget _autoTarget;
 	
     /**
      * This function is run when the robot is first started up and should be
@@ -28,9 +30,22 @@ public class Robot extends IterativeRobot {
     public void robotInit() {
         
     	try{
+    		
+    		visionThread = new Thread(() -> {
+    			_autoTarget = new AutoTarget();
+    			
+    			while (!Thread.interrupted()) {
+    				_autoTarget.processImage();
+    			}
+    		});
+    		visionThread.setDaemon(true);
+    		visionThread.start();    			
+
             _controls = new RobotControls();
             _teleop = new Teleop(_controls);
             _auto = new Autonomous(_controls);    		
+    		
+    		
     	}
     	catch (Exception e)
     	{

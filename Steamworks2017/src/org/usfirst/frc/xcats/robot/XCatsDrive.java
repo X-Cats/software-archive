@@ -2,6 +2,7 @@ package org.usfirst.frc.xcats.robot;
 
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
 
 public class XCatsDrive {
 	//we need to keep an array of the motors required for the drive. This will work for a 2 or 4 drive system
@@ -13,6 +14,11 @@ public class XCatsDrive {
 	
 	//we can control whether we can support mechanum movement with this
 	private boolean _useMechanumWheels = Enums.HAS_MECHANUM_WHEELS;
+	
+	private PowerDistributionPanel _pdp;
+	private double _pdpVoltageThreshold;
+	private double _pdpVoltageReductionFactor = 0; // setpoint = setpoint - _pdpVoltageReductionFactor* setpoint;
+
 	
 	public XCatsDrive (boolean useCAN, boolean isTalon)
 	{
@@ -80,6 +86,16 @@ public class XCatsDrive {
 		}
 	}
 	
+	public void setPDP(PowerDistributionPanel pdp, double voltageThreshold, double reductionFactor){
+		_pdp = pdp;
+		this._pdpVoltageThreshold = voltageThreshold;
+		this._pdpVoltageReductionFactor=reductionFactor;
+		
+		for (int i=0; i<_motors.length; i++){
+			_motors[i].setPDP(pdp,voltageThreshold,reductionFactor);
+			
+		}				
+	}	
 	public void set (Joystick drive_js)
 	{
 		
