@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -47,22 +48,22 @@ public class RobotControls {
 	private Compressor _compressor;
 	private Timer _shiftTimer;
 	private boolean _shifting=false;
-	
+	private PowerDistributionPanel _pdp;
 
 	public RobotControls ()
 	{
 
 		//
 		_shiftTimer = new Timer();
-		
+		_pdp = new PowerDistributionPanel(Enums.PDP_CAN_ID);
 		//simple XCatsDrive, no PID etc
 		_drive = new XCatsDrive (Enums.USE_CAN,true);
 		_drive.setDashboardIO(false, true);
 	
 		if (Enums.USE_COMPRESSOR){
-			_compressor = new Compressor();
+			_compressor = new Compressor(Enums.PCM_CAN_ID);
 			
-			_dblSolShifter = new DoubleSolenoid(Enums.DO_SHIFTER_LOW,Enums.DO_SHIFTER_HI);			
+			_dblSolShifter = new DoubleSolenoid(Enums.PCM_CAN_ID,Enums.DO_SHIFTER_LOW,Enums.DO_SHIFTER_HI);			
 		}
 	
 	    //the NAVX board is our gyro subsystem	
@@ -157,10 +158,10 @@ public class RobotControls {
 		SmartDashboard.putBoolean("Shifter", _slowMode);		
 
 		if (_navx != null){
-			if(_driveJS.getRawButton(5)){
-				_navx.navxMode = "rotate";
-				_navx.navxRotateDistance = 90;
-			}
+			//if(_driveJS.getRawButton(5)){
+				//_navx.navxMode = "rotate";
+				//_navx.navxRotateDistance = 90;
+			//}
 			if(_driveJS.getRawButton(8)){
 				_navx.navxMode = "";
 			}			
@@ -185,6 +186,12 @@ public class RobotControls {
 	
 	public void updateStatus ()
 	{
+		
+		SmartDashboard.putNumber("pdp total current", _pdp.getTotalCurrent());
+		SmartDashboard.putNumber("pdp total energy",_pdp.getTotalEnergy());
+		SmartDashboard.putNumber("pdp total power" ,_pdp.getTotalPower());
+		SmartDashboard.putNumber("pdp temperature",_pdp.getTemperature());
+		SmartDashboard.putNumber("pdp voltage",_pdp.getVoltage());
 		_drive.updateStatus();
 		if (_navx != null){
 			_navx.updateStatus();

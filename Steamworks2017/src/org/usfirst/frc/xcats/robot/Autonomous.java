@@ -135,31 +135,37 @@ public class Autonomous {
 	{	
 
 		//we are going to construct the steps needed for our autonomous mode
-		int choice=3;
+		int choice=1;
+		double speedTest =1.0;
 		String caseName;
 		_steps =  new ArrayList<AutonomousStep>();
 		switch (choice) {
 		case 1: {
 			caseName="Middle Gear";
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,8.3)); //assuming 99.64 inches
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,72)); //assuming 99.64 inches
+			//_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
 		}
 		break;
 		case 2: {
 			caseName="Left Gear";
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,8.3));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,72));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn 60",0,0,0,60));
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,3.75));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,5));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
 		}
 		case 3: {
 			caseName="Right Gear";
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,8.3));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,72));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn 60",0,0,0,-60));
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,3.75));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,72));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
+		}
+		case 4:{
+			caseName="Speed Test";
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Drive Straight",5,speedTest,speedTest,0));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
 		}
 		default: {
@@ -220,7 +226,7 @@ public class Autonomous {
 				if (Enums.IS_FINAL_ROBOT)					
 					cTime = _currentAutoStep.distance/(4.92*_currentAutoStep.leftSpeed + 0.01);
 				else
-					cTime = _currentAutoStep.distance/(6.892*_currentAutoStep.leftSpeed - 1.038);
+					cTime = _currentAutoStep.distance/(59*_currentAutoStep.leftSpeed - 2.5);
 
 				drive(cTime,_currentAutoStep.leftSpeed,_currentAutoStep.rightSpeed);
 				break;
