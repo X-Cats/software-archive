@@ -15,6 +15,8 @@ public class Enums {
 			*/
 	
 	 //front left, rear left, front right, rear right
+	public static final int PDP_CAN_ID = 20;
+	public static final int PCM_CAN_ID = 21;
 	public static final double SPEED_REDUCTION_FACTOR = 1.0;
 	
 	/*
@@ -25,14 +27,14 @@ public class Enums {
 	*/
 	public static final double SPEED_CALIBRATION = 0.0;  
 	
-	public static final boolean IS_FINAL_ROBOT = true;
+	public static final boolean IS_FINAL_ROBOT = false;
 	public static final String  DRIVE_CONTROLLER_TYPE = "Talon"; // choices are "Jaguar" or "Talon"
 	public static final boolean HAS_MECHANUM_WHEELS = false;
 	public static final boolean USE_PID = false;    	// This is if the drive train is using PID control
 	public static final int     MAX_CAN_SPEED = 6000;
 	public static final boolean USE_CAN = true;			// if the motors are wired with CAN bus use this
 	public static final double  MOTOR_STOP_TIME = .1;	//when using coast mode this is how to stop gradually	
-	public static final boolean USE_NAVX = false;		//when using NAVX set this to true;
+	public static final boolean USE_NAVX = true;		//when using NAVX set this to true;
 	public static final boolean USE_COMPRESSOR = true;  //set to true when using a compressor
 	public static final boolean USE_SOFTWARE_SPEED_REDUCTION = false; 	//set to true only if you wish to use the trigger button to engage a sofware reduction of speed low/high
 	public static final boolean USE_2SC_TANK = true;     //when true, then the robot drive is 2 motor controllers and the rest are followers
