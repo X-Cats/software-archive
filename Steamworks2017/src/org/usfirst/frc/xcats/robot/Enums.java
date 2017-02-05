@@ -53,7 +53,7 @@ public class Enums {
 	public static final int     CAN_DRIVE_MOTOR_NUMBERS[] = {1, 2, 3, 4, 5, 6}; //these are the CAN bus ids of the motors
 		
 	//This is for the use of the compressor
-	public static final int     DO_SHIFTER_LOW = 4, DO_SHIFTER_HI=5;  //this is used to shift the gear ration on the drive train from low to high (SHIFTER)
+	public static final int     PCM_SHIFTER_FORWARD = 4, PCM_SHIFTER_REVERSE=5;  //this is used to shift the gear ration on the drive train from low to high (SHIFTER)
 	public static final double  SHIFTER_DELAY_TIME = 0.25;  // this time is used for the "slack speed" inbetween gear shifts
 	public static final double  SHIFTER_DELAY_SPEED = 0.4;  // this is the speed for the "slack" during shifting
 		
@@ -61,6 +61,17 @@ public class Enums {
 	public static final int LEFT_DRIVE_JS = 1, RIGHT_DRIVE_JS = 2, DRIVE_JS = 1, OPERATOR_JS = 0;
 	public static final boolean TWO_JOYSTICKS = true;
 	public static final boolean DASHBOARD_INPUT = false, DASHBOARD_OUTPUT = false;
+	
+	//Winch
+	public static final int WINCH_CAN_ID = 8; //CAN ID of the winch
+	public static final double WINCH_CLIMB_SPEED = 1.0; // speed to climb
+	
+	//Gear Ejector
+	public static final int GEAR_ROTATOR_CAN_ID = 7;
+	public static final int GEAR_PCM = 3; // PCM id for the gear ejector
+	public static final int GEAR_POSITIONED_OPT = 1; //optical sensor that detects if gear is position(rotated) correctly
+	public static final int GEAR_ONBOARD_OPT = 2;    //optical sensor that detects if the gear is positioned far enough in the robot to eject
+	public static final double GEAR_ROTATOR_SPEED = 0.25;
 	
 	//Autonomous uses the chooser object to select mode
 	public static final int AUTONOMOUS_TIME = 15;
