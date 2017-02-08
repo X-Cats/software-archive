@@ -48,6 +48,7 @@ public class RobotControls {
 	private Timer _shiftTimer;
 	private boolean _shifting=false;
 	private PowerDistributionPanel _pdp;
+	private Gear _gear;
 
 	public RobotControls ()
 	{
@@ -180,7 +181,8 @@ public class RobotControls {
 
 	public void operate ()
 	{
-		// do something there
+		if(_operatorJS.getRawButton(8))
+			_gear.eject();
 	}
 
 
@@ -206,6 +208,8 @@ public class RobotControls {
 		if (_navx != null){
 			_navx.updateStatus();
 			
-		}		
+		}
+		if(_gear.isOnBoard())
+			_operatorJS.setRumble(RumbleType.kRightRumble, 1);
 	}
 }
