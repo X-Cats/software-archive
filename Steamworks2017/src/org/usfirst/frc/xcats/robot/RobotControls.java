@@ -49,6 +49,7 @@ public class RobotControls {
 	private boolean _shifting=false;
 	private PowerDistributionPanel _pdp;
 	private Gear _gear;
+	private Feeder _feeder;
 
 	public RobotControls ()
 	{
@@ -183,6 +184,12 @@ public class RobotControls {
 	{
 		if(_operatorJS.getRawButton(8))
 			_gear.eject();
+		if(_operatorJS.getRawButton(1))
+			_feeder.intake();
+		if(_operatorJS.getRawButton(2))
+			_feeder.feed();
+		if(_operatorJS.getRawButton(3))
+			_feeder.lowGoal();
 	}
 
 
