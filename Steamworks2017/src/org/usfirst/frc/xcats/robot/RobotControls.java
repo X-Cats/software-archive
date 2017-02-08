@@ -186,10 +186,16 @@ public class RobotControls {
 			_gear.eject();
 		if(_operatorJS.getRawButton(1))
 			_feeder.intake();
+		else
+			_feeder.stop();
 		if(_operatorJS.getRawButton(2))
 			_feeder.feed();
+		else
+			_feeder.stop();
 		if(_operatorJS.getRawButton(3))
 			_feeder.lowGoal();
+		else
+			_feeder.stop();
 	}
 
 
@@ -213,6 +219,7 @@ public class RobotControls {
 	
 		_drive.updateStatus();
 		_gear.updateStatus();
+		_feeder.updateStatus();
 		if (_navx != null){
 			_navx.updateStatus();
 			
