@@ -205,6 +205,7 @@ public class RobotControls {
 		}
 	
 		_drive.updateStatus();
+		_gear.updateStatus();
 		if (_navx != null){
 			_navx.updateStatus();
 			
