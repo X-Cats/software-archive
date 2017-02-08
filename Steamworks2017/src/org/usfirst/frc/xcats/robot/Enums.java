@@ -75,6 +75,12 @@ public class Enums {
 	public static final int GEAR_ONBOARD_OPT = 2;    //optical sensor that detects if the gear is positioned far enough in the robot to eject
 	public static final double GEAR_ROTATOR_SPEED = 0.25;
 	
+	//Feeder
+	public static final int FEEDER_TOP_CAN = 10;
+	public static final int FEEDER_BOTTOM_CAN = 11;
+	public static final double FEEDER_INTAKE_SPEED = 0.5; //speed at which balls are sucked in
+	public static final double FEEDER_FEED_SPEED = 0.5;  //speed at which balls are spit out
+	
 	//Autonomous uses the chooser object to select mode
 	public static final int AUTONOMOUS_TIME = 15;
 	
