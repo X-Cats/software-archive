@@ -8,8 +8,8 @@ public class Feeder {
 	
 	public Feeder(){
 		
-		_topFeeder =  new XCatsSpeedController("Top Feeder",Enums.FEEDER_TOP_CAN,false,SCType.TALON,null,null);
-		_bottomFeeder =  new XCatsSpeedController("Top Feeder",Enums.FEEDER_TOP_CAN,false,SCType.TALON,null,null);
+		_topFeeder =  new XCatsSpeedController("Top Feeder",Enums.FEEDER_TOP_CAN,true,SCType.TALON,null,null);
+		_bottomFeeder =  new XCatsSpeedController("Top Feeder",Enums.FEEDER_TOP_CAN,true,SCType.TALON,null,null);
 		
 	}
 
