@@ -52,8 +52,8 @@ public class Gear {
 
 	//this needs to be called by robot controls to update the acquisition of the gear
 	public void updateStatus(){
-		SmartDashboard.putBoolean("Gear on Board",_optoOnBoard.get());
-		SmartDashboard.putBoolean("Gear Positioned", _optoRotate.get());
+//		SmartDashboard.putBoolean("Gear on Board",_optoOnBoard.get());
+//		SmartDashboard.putBoolean("Gear Positioned", _optoRotate.get());
 		
 		if (_ejecting){
 			if (_ejectTimer.get() >= Enums.GEAR_EJECT_TIME){
