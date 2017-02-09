@@ -12,6 +12,8 @@ public class Gear {
 	private DoubleSolenoid _sol;
 	private DigitalInput _optoRotate;
 	private DigitalInput _optoOnBoard;
+	private DigitalInput _LS;
+	private DigitalInput _RS;
 	private XCatsSpeedController _gearRotator;
 	private boolean _acquiring = false;
     private boolean _ejecting = false;
@@ -21,6 +23,8 @@ public class Gear {
 		
 		// constructor
 		_sol = new DoubleSolenoid(Enums.PCM_CAN_ID,Enums.GEAR_PCM_FORWARD,Enums.GEAR_PCM_REVERSE);
+		_RS= new DigitalInput(Enums.GEAR_LS_CHANNEL);
+		_LS= new DigitalInput(Enums.GEAR_RS_CHANNEL);
 //		_optoRotate = new DigitalInput(Enums.GEAR_POSITIONED_OPT);
 //		_optoOnBoard = new DigitalInput(Enums.GEAR_ONBOARD_OPT);
 		//_gearRotator =  new XCatsSpeedController("Gear Rotator",Enums.GEAR_ROTATOR_PWM_ID,false,SCType.VICTOR_SP,null,null);
@@ -55,6 +59,9 @@ public class Gear {
 //		SmartDashboard.putBoolean("Gear on Board",_optoOnBoard.get());
 //		SmartDashboard.putBoolean("Gear Positioned", _optoRotate.get());
 		
+		SmartDashboard.putBoolean("Limit Switch Direction", _LS.get());
+		SmartDashboard.putBoolean("Limit Switch Direction", _RS.get());
+		
 		if (_ejecting){
 			if (_ejectTimer.get() >= Enums.GEAR_EJECT_TIME){
 				_sol.set(Value.kReverse);
@@ -64,6 +71,13 @@ public class Gear {
 		}
 		
 		if (_acquiring){
+			if(_LS.get() || _RS.get()){
+				_gearRotator.set(0);
+				_acquiring=false;
+			}
+			else{
+				_gearRotator.set(Enums.GEAR_ROTATOR_SPEED);
+			}
 			if (_optoRotate != null){
 				if (_optoRotate.get())
 					_gearRotator.set(Enums.GEAR_ROTATOR_SPEED);
