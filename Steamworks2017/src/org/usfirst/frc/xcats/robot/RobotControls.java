@@ -63,6 +63,10 @@ public class RobotControls {
 		_drive = new XCatsDrive (Enums.USE_CAN,true);
 		_drive.setDashboardIO(false, false);
 	
+		_feeder = new Feeder();
+		_climber = new Climber();
+		_gear = new Gear();
+		
 		//_drive.setPDP(_pdp, Enums.BROWNOUT_VOLTAGE_THRESHOLD, Enums.BROWNOUT_VOLTAGE_REDUCTIONFACTOR);
 		
 		
@@ -185,18 +189,17 @@ public class RobotControls {
 	{
 		if(_operatorJS.getRawButton(8))
 			_gear.eject();
+		
+		
 		if(_operatorJS.getRawButton(1))
 			_feeder.intake();
-		else
-			_feeder.stop();
-		if(_operatorJS.getRawButton(2))
+		else if (_operatorJS.getRawButton(2))
 			_feeder.feed();
-		else
-			_feeder.stop();
-		if(_operatorJS.getRawButton(3))
+		else if(_operatorJS.getRawButton(3))
 			_feeder.lowGoal();
 		else
 			_feeder.stop();
+		
 		if(_operatorJS.getRawButton(7))
 			_climber.climb();
 		else
@@ -226,6 +229,7 @@ public class RobotControls {
 		_gear.updateStatus();
 		_feeder.updateStatus();
 		_climber.updateStatus();
+		
 		if (_navx != null){
 			_navx.updateStatus();
 			
