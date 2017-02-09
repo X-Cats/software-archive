@@ -74,6 +74,8 @@ public class Enums {
 	public static final int GEAR_POSITIONED_OPT = 1; //optical sensor that detects if gear is position(rotated) correctly
 	public static final int GEAR_ONBOARD_OPT = 2;    //optical sensor that detects if the gear is positioned far enough in the robot to eject
 	public static final double GEAR_ROTATOR_SPEED = 0.25;
+	public static final int GEAR_LS_CHANNEL=1; //Left limit switch
+    public static final int GEAR_RS_CHANNEL=0; //Right limit switch
 	
 	//Feeder
 	public static final int FEEDER_TOP_CAN = 9;
