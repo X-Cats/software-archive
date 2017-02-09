@@ -23,7 +23,7 @@ public class Gear {
 		_sol = new DoubleSolenoid(Enums.PCM_CAN_ID,Enums.GEAR_PCM_FORWARD,Enums.GEAR_PCM_REVERSE);
 //		_optoRotate = new DigitalInput(Enums.GEAR_POSITIONED_OPT);
 //		_optoOnBoard = new DigitalInput(Enums.GEAR_ONBOARD_OPT);
-		//_gearRotator =  new XCatsSpeedController("Gear Rotator",Enums.GEAR_ROTATOR_CAN_ID,false,SCType.VICTOR_SP,null,null);
+		//_gearRotator =  new XCatsSpeedController("Gear Rotator",Enums.GEAR_ROTATOR_PWM_ID,false,SCType.VICTOR_SP,null,null);
 		
 	}
 	
