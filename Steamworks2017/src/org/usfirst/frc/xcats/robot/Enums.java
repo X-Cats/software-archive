@@ -67,7 +67,7 @@ public class Enums {
 	public static final double WINCH_CLIMB_SPEED = 1.0; // speed to climb
 	
 	//Gear Ejector
-	public static final int GEAR_ROTATOR_CAN_ID = 7;
+	public static final int GEAR_ROTATOR_PWM_ID = 7;
 	public static final int GEAR_PCM_FORWARD = 7; // PCM id for the gear ejector
 	public static final int GEAR_PCM_REVERSE = 6; // PCM id for the gear ejector
 	public static final double GEAR_EJECT_TIME = 0.5; // time in seconds before retracting ejector piston
