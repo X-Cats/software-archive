@@ -50,6 +50,7 @@ public class RobotControls {
 	private PowerDistributionPanel _pdp;
 	private Gear _gear;
 	private Feeder _feeder;
+	private Climber _climber;
 
 	public RobotControls ()
 	{
@@ -196,6 +197,10 @@ public class RobotControls {
 			_feeder.lowGoal();
 		else
 			_feeder.stop();
+		if(_operatorJS.getRawButton(7))
+			_climber.climb();
+		else
+			_climber.stop();
 	}
 
 
@@ -220,6 +225,7 @@ public class RobotControls {
 		_drive.updateStatus();
 		_gear.updateStatus();
 		_feeder.updateStatus();
+		_climber.updateStatus();
 		if (_navx != null){
 			_navx.updateStatus();
 			
