@@ -59,8 +59,8 @@ public class Gear {
 //		SmartDashboard.putBoolean("Gear on Board",_optoOnBoard.get());
 //		SmartDashboard.putBoolean("Gear Positioned", _optoRotate.get());
 		
-		SmartDashboard.putBoolean("Limit Switch Direction", _LS.get());
-		SmartDashboard.putBoolean("Limit Switch Direction", _RS.get());
+		SmartDashboard.putBoolean("Left Limit Switch Direction", _LS.get());
+		SmartDashboard.putBoolean("Right Limit Switch Direction", _RS.get());
 		
 		if (_ejecting){
 			if (_ejectTimer.get() >= Enums.GEAR_EJECT_TIME){
@@ -72,6 +72,7 @@ public class Gear {
 		
 		if (_acquiring){
 			if(_LS.get() || _RS.get()){
+				SmartDashboard.putBoolean("Running", true);
 				_gearRotator.set(0);
 				_acquiring=false;
 			}
