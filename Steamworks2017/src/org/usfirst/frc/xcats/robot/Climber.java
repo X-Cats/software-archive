@@ -19,6 +19,11 @@ public class Climber {
 		_winch.set(Enums.WINCH_CLIMB_SPEED);
 		
 	}
+
+	public void release(){
+		_winch.set(-Enums.WINCH_CLIMB_SPEED);
+		
+	}
 	public void stop(){
 		_winch.set(0);
 	}
