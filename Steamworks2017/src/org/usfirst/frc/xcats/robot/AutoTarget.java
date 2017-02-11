@@ -192,7 +192,7 @@ public class AutoTarget {
 		if (filename.length() == 0){
 			Date date = new Date();
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			filename = dateFormat.format(date)+".jpg";			
+			filename = "/home/lvuser/"+dateFormat.format(date)+".jpg";			
 		}
 		Imgcodecs.imwrite(filename,_mat);
 		
