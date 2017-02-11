@@ -51,6 +51,7 @@ public class RobotControls {
 	private Gear _gear;
 	private Feeder _feeder;
 	private Climber _climber;
+	private AutoTarget _autoTarget;
 
 	public RobotControls ()
 	{
@@ -66,6 +67,7 @@ public class RobotControls {
 		_feeder = new Feeder();
 		_climber = new Climber();
 		_gear = new Gear();
+		_autoTarget = new AutoTarget(false);
 		
 		//_drive.setPDP(_pdp, Enums.BROWNOUT_VOLTAGE_THRESHOLD, Enums.BROWNOUT_VOLTAGE_REDUCTIONFACTOR);
 		
@@ -182,6 +184,15 @@ public class RobotControls {
 				}
 			}
 		}
+		if(Enums.TWO_JOYSTICKS){
+			if(_leftJS.getRawButton(1)){
+				_autoTarget.captureImage();
+			}
+		}else{
+			if(_driveJS.getRawButton(7)){
+				_autoTarget.captureImage();
+			}
+		}
 
 	}
 
@@ -206,6 +217,7 @@ public class RobotControls {
 			_climber.release();
 		else
 			_climber.stop();
+		
 	}
 
 
