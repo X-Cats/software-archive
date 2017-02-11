@@ -71,7 +71,7 @@ public class Enums {
 	public static final int GEAR_PCM_FORWARD = 7; // PCM id for the gear ejector
 	public static final int GEAR_PCM_REVERSE = 6; // PCM id for the gear ejector
 	public static final double GEAR_EJECT_TIME = 1; // time in seconds before retracting ejector piston
-	public static final int GEAR_POSITIONED_OPT = 1; //optical sensor that detects if gear is position(rotated) correctly
+	public static final int GEAR_POSITIONED_OPT = 2; //optical sensor that detects if gear is position(rotated) correctly
 	public static final int GEAR_ONBOARD_OPT = 2;    //optical sensor that detects if the gear is positioned far enough in the robot to eject
 	public static final double GEAR_ROTATOR_SPEED = 0.25;
 	public static final int GEAR_LS_CHANNEL=0; //Left limit switch

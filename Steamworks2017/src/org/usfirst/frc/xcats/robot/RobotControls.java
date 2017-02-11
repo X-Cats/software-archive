@@ -201,6 +201,8 @@ public class RobotControls {
 		if(_operatorJS.getRawButton(8))
 			_gear.eject();
 		
+		if (_operatorJS.getRawButton(6))
+			_gear.acquireGear();
 		
 		if(_operatorJS.getRawButton(1))
 			_feeder.intake();
