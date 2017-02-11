@@ -161,32 +161,19 @@ public class Navx {
 		_speed = direction * Math.abs(_startSpeed);	
 		_controls.getDrive().set(_speed, _speed, - _speed, -_speed);
 
-
 		
 	}
 	private void rotateContinuous(){
 
 		if(navxMode.equals("rotate")){
-			double deltaYaw =  Math.abs(getYaw());
-			SmartDashboard.putNumber("RotateYaw", _degrees);
-			SmartDashboard.putNumber("DeltaYaw", deltaYaw);
-			SmartDashboard.putNumber("Auto Yaw", getYaw());
-			SmartDashboard.putNumber("Raw Yaw", ahrs.getYaw());
-			
-			if(Math.abs(deltaYaw)-Math.abs(_degrees) < _tolerance){
-				_speed =  0;
-				navxMode = "";
+
+			if(Math.abs(getYaw()) > Math.abs(_degrees)){
+				_speed=-_speed/1.5;
+				_controls.getDrive().set(_speed, _speed, -_speed, -_speed);
+				if(Math.abs(getYaw())-Math.abs(_degrees)<_tolerance){
+					navxMode = "";
+				}
 			}
-
-			if(deltaYaw>Math.abs(_degrees)){
-				System.out.println("Speed switched");
-				_speed = - _speed;
-			} 
-
-			SmartDashboard.putNumber("Rotate Speed", _speed);
-			
-			_controls.getDrive().set(_speed,_speed, - _speed, - _speed);
-			
 		}	
 		
 	}

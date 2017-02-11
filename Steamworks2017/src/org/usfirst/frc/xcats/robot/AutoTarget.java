@@ -86,10 +86,18 @@ public class AutoTarget {
 
 			// Mats are very memory expensive. Lets reuse this Mat.
 			_mat = new Mat();
+//			
+//			int P0x;
+//			int 
+//			if (Enums.IS_FINAL_ROBOT){
+//				
+//			} else{
+//				
+//			}
 
-			_P0 	= new Point(240,0);
+			_P0 	= new Point(320,0);
 			_P1 	= new Point(0,420);
-			_P2 	= new Point(240,280);
+			_P2 	= new Point(320,280);
 			_P3 	= new Point(640,420);
 			_P4 	= new Point(20,320);
 			_P4_0 = new Point(20,0);

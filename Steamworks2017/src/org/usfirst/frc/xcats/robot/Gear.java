@@ -18,6 +18,9 @@ public class Gear {
 	private boolean _acquiring = false;
     private boolean _ejecting = false;
     private Timer _ejectTimer= new Timer();
+    private int _movingRight = 1;
+    private int _movingLeft = -1;
+    private int _gearDirection = _movingRight;
 	
 	public Gear(){
 		
@@ -25,9 +28,10 @@ public class Gear {
 		_sol = new DoubleSolenoid(Enums.PCM_CAN_ID,Enums.GEAR_PCM_FORWARD,Enums.GEAR_PCM_REVERSE);
 		_RS= new DigitalInput(Enums.GEAR_LS_CHANNEL);
 		_LS= new DigitalInput(Enums.GEAR_RS_CHANNEL);
-//		_optoRotate = new DigitalInput(Enums.GEAR_POSITIONED_OPT);
+		_optoRotate = new DigitalInput(Enums.GEAR_POSITIONED_OPT);
+		
 //		_optoOnBoard = new DigitalInput(Enums.GEAR_ONBOARD_OPT);
-		//_gearRotator =  new XCatsSpeedController("Gear Rotator",Enums.GEAR_ROTATOR_PWM_ID,false,SCType.VICTOR_SP,null,null);
+		_gearRotator =  new XCatsSpeedController("Gear Rotator",Enums.GEAR_ROTATOR_PWM_ID,true,SCType.TALON,null,null);
 		
 	}
 	
@@ -35,6 +39,9 @@ public class Gear {
 		if (_acquiring)
 			return;
 		
+		if ((_LS.get() && _gearDirection == _movingLeft) || (_RS.get() && _gearDirection == _movingRight)){
+			_gearDirection = -1 * _gearDirection;
+		}
 		_acquiring = true;
 		
 	}
@@ -61,6 +68,9 @@ public class Gear {
 		
 		SmartDashboard.putBoolean("Left Limit Switch Direction", _LS.get());
 		SmartDashboard.putBoolean("Right Limit Switch Direction", _RS.get());
+		SmartDashboard.putBoolean("Gear Positioned", _optoRotate.get());
+		SmartDashboard.putBoolean("Gear Aquiring", _acquiring);
+		SmartDashboard.putNumber("Gear Rotation",_gearDirection);
 		
 		if (_ejecting){
 			if (_ejectTimer.get() >= Enums.GEAR_EJECT_TIME){
@@ -71,23 +81,21 @@ public class Gear {
 		}
 		
 		if (_acquiring){
-			if(_LS.get() || _RS.get()){
-				SmartDashboard.putBoolean("Running", true);
+			if((_LS.get() && _gearDirection == _movingLeft) || ( _RS.get() && _gearDirection == _movingRight) ){
+				SmartDashboard.putBoolean("Running", false);
 				_gearRotator.set(0);
+				_gearDirection = _gearDirection * -1;
 				_acquiring=false;
 			}
+//			else if (!_optoRotate.get()){
+//				_gearRotator.set(0);
+//				_gearDirection = _gearDirection * -1;
+//				_acquiring=false;				
+//			}
 			else{
-				_gearRotator.set(Enums.GEAR_ROTATOR_SPEED);
-			}
-			if (_optoRotate != null){
-				if (_optoRotate.get())
-					_gearRotator.set(Enums.GEAR_ROTATOR_SPEED);
-				else {
-					_gearRotator.set(0);
-					_acquiring = false;
-				}				
-			}
-				
+				SmartDashboard.putBoolean("Running", true);
+				_gearRotator.set(_gearDirection * Enums.GEAR_ROTATOR_SPEED);
+			}				
 		}
 		
 	}
