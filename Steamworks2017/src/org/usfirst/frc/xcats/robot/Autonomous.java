@@ -230,7 +230,6 @@ public class Autonomous {
 
 				drive(cTime,_currentAutoStep.leftSpeed,_currentAutoStep.rightSpeed);
 				break;
-
 			case ROTATE:
 				//float deltaYaw;
 				double  speed =0.25;
@@ -256,6 +255,7 @@ public class Autonomous {
 				break;
 
 			case GEAR: {
+				_controls.getGear().eject();
 				startNextStep();
 			}
 			break;
