@@ -143,7 +143,8 @@ public class Autonomous {
 		case 1: {
 			caseName="Middle Gear";
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,72)); //assuming 99.64 inches
-			//_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.WAIT,"Wait for gear to eject",0,0,0,Enums.GEAR_EJECT_TIME));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
 		}
 		break;
