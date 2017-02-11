@@ -68,7 +68,7 @@ public class Gear {
 		
 		SmartDashboard.putBoolean("Left Limit Switch Direction", _LS.get());
 		SmartDashboard.putBoolean("Right Limit Switch Direction", _RS.get());
-		SmartDashboard.putBoolean("Gear Positioned", _optoRotate.get());
+		SmartDashboard.putBoolean("Gear Positioner", _optoRotate.get());
 		SmartDashboard.putBoolean("Gear Aquiring", _acquiring);
 		SmartDashboard.putNumber("Gear Rotation",_gearDirection);
 		
@@ -87,11 +87,11 @@ public class Gear {
 				_gearDirection = _gearDirection * -1;
 				_acquiring=false;
 			}
-//			else if (!_optoRotate.get()){
-//				_gearRotator.set(0);
-//				_gearDirection = _gearDirection * -1;
-//				_acquiring=false;				
-//			}
+			else if (!_optoRotate.get()){
+				_gearRotator.set(0);
+				_gearDirection = _gearDirection * -1;
+				_acquiring=false;				
+			}
 			else{
 				SmartDashboard.putBoolean("Running", true);
 				_gearRotator.set(_gearDirection * Enums.GEAR_ROTATOR_SPEED);
