@@ -6,10 +6,16 @@ import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.imgcodecs.Imgcodecs;
+
 
 
 /*
@@ -53,14 +59,14 @@ public class AutoTarget {
 	private CvSink _cvs;
 	private CvSource _outputStream;
 	private Mat _mat;
-	private Point _P0 	= new Point(240,0);
-	private Point _P1 	= new Point(0,420);
-	private Point _P2 	= new Point(240,280);
-	private Point _P3 	= new Point(640,420);
-	private Point _P4 	= new Point(20,320);
-	private Point _P4_0 = new Point(20,0);
-	private Point _P5 	= new Point(620,320);
-	private Point _P5_0 = new Point(620,0);
+	private Point _P0;
+	private Point _P1;
+	private Point _P2;
+	private Point _P3;
+	private Point _P4;
+	private Point _P4_0;
+	private Point _P5;
+	private Point _P5_0;
 	private Scalar _lineColor = new Scalar(0,255,255);
 	private Scalar _ejectColor = new Scalar(0,0,255);
 	
@@ -81,6 +87,15 @@ public class AutoTarget {
 			// Mats are very memory expensive. Lets reuse this Mat.
 			_mat = new Mat();
 
+			_P0 	= new Point(240,0);
+			_P1 	= new Point(0,420);
+			_P2 	= new Point(240,280);
+			_P3 	= new Point(640,420);
+			_P4 	= new Point(20,320);
+			_P4_0 = new Point(20,0);
+			_P5 	= new Point(620,320);
+			_P5_0 = new Point(620,0);			
+			
 //			SmartDashboard.putNumber("P1x", 100);
 //			SmartDashboard.putNumber("P1y", 100);
 //			SmartDashboard.putNumber("P2x", 400);
@@ -93,6 +108,31 @@ public class AutoTarget {
 			e.printStackTrace();
 		}
 
+	}
+	
+	public AutoTarget(boolean noDashboard){
+		
+		try{
+			_camera = CameraServer.getInstance().startAutomaticCapture();
+			// Set the resolution
+			_camera.setResolution(640, 480);
+			//_camera.setFPS(5);
+
+			// Get a CvSink. This will capture Mats from the camera
+			_cvs = CameraServer.getInstance().getVideo();
+			
+			// Mats are very memory expensive. Lets reuse this Mat.
+			_mat = new Mat();
+	
+		}
+		catch (Exception e)
+		{
+			System.out.println(e);
+			e.printStackTrace();
+		}
+
+		
+		
 	}
 
 	public void processImage(){
@@ -136,13 +176,28 @@ public class AutoTarget {
 		_outputStream.putFrame(_mat);				
 	}
 	
-//	public void captureImage(String filename){
-//		
-//		if (_camera == null)
-//			return;
-//		
-//		
-//	}
+	public void captureImage(){
+		
+		String filename="";
+		
+		if (_camera == null)
+			return;
+
+		if (_cvs.grabFrame(_mat) == 0) {
+			// Send the output the error.
+			System.out.println("Cannot get output in AutoTarget.captureImage");
+			// skip the rest of the current iteration
+			return;	
+		}
+		if (filename.length() == 0){
+			Date date = new Date();
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			filename = dateFormat.format(date)+".jpg";			
+		}
+		Imgcodecs.imwrite(filename,_mat);
+		
+		
+	}
 	
 	public void updateStatus(){
 		//update status here
