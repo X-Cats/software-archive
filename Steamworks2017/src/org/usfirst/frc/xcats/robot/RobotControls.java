@@ -214,6 +214,10 @@ public class RobotControls {
 		return _drive;
 	}
 	
+	public Gear getGear(){
+		return _gear;
+	}
+	
 	public void updateStatus ()
 	{
 		try {
