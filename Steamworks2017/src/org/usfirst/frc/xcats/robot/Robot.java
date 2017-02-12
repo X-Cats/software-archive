@@ -1,6 +1,9 @@
 package org.usfirst.frc.xcats.robot;
 
 
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.wpilibj.CameraServer;
+
 //package org.usfirst.frc.team191.robot;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -22,6 +25,7 @@ public class Robot extends IterativeRobot {
     Autonomous _auto;
     RobotControls _controls;
     AutoTarget _autoTarget;
+    UsbCamera _camera;
 	
     /**
      * This function is run when the robot is first started up and should be
@@ -30,9 +34,8 @@ public class Robot extends IterativeRobot {
     public void robotInit() {
         
     	try{
-    		
     		visionThread = new Thread(() -> {
-    			_autoTarget = new AutoTarget();
+    			_autoTarget = new AutoTarget(_camera);
     			
     			while (!Thread.interrupted()) {
     				_autoTarget.processImage();
@@ -41,7 +44,7 @@ public class Robot extends IterativeRobot {
     		visionThread.setDaemon(true);
     		visionThread.start();    			
 
-            _controls = new RobotControls();
+            _controls = new RobotControls(_camera);
             _teleop = new Teleop(_controls);
             _auto = new Autonomous(_controls);    		
     		
