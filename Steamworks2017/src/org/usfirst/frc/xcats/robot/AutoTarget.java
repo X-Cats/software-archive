@@ -202,14 +202,13 @@ public class AutoTarget {
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			filename = "/home/lvuser/"+dateFormat.format(date)+".jpg";			
 		}
-		Imgcodecs.imwrite(filename,_mat);
+		Imgcodecs.imwrite(filename, _mat);
 		
-		
+		GearPlacementVision gpv = new GearPlacementVision();
+		VisionData visionData = gpv.processImage(_mat);
 	}
 	
 	public void updateStatus(){
 		//update status here
 	}
-	
-
 }
