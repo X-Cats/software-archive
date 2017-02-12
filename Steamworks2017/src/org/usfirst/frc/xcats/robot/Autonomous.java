@@ -26,19 +26,23 @@ public class Autonomous {
 
 	private boolean _isExecuting = false;
 	private boolean _cancelExecution = false;
+	private boolean _isEjecting = false;
 
 	private static final double FIRST_LEG_DISTANCE = 73.0;	// this is the distance from the auto line to the lip of the defenses	
 
 	final String _defaultAuto = "Do Nothing";
 	final String _autoForwardOnly = "Go forward only and stop";
-	final String _auto1 = "Defense 1";
-	final String _auto2 = "Defense 2";
-	final String _auto3 = "Defense 3";
-	final String _auto4 = "Defense 4";
-	final String _auto5 = "Defense 5";
+	final String _auto1 = "Left Gear Peg";
+	final String _auto2 = "Center Gear Peg";
+	final String _auto3 = "Right Gear Peg";
 	final String _autoReadFile = "TextFile read";
 	final String _autoTestSpeed = "Run 3 sec at input speed";
 	private Navx _navx;
+	
+	String _autoSelected;
+	String _defenseSelected;
+	String _shooterModeSelected;
+	SendableChooser _defensePosition;
 
 	public Autonomous (RobotControls controls)
 	{
@@ -46,6 +50,16 @@ public class Autonomous {
 		_controls = controls;      	//passes the controls object reference
 		_navx = _controls.getNavx();
 
+		_defensePosition = new SendableChooser();
+		_defensePosition.addDefault("Default Auto", _defaultAuto);
+		_defensePosition.addObject(_autoForwardOnly, _autoForwardOnly);
+		_defensePosition.addObject(_auto1, _auto1);
+		_defensePosition.addObject(_auto2, _auto2);
+		_defensePosition.addObject(_auto3, _auto3);
+		_defensePosition.addObject(_autoReadFile,_autoReadFile);
+		_defensePosition.addObject(_autoTestSpeed, _autoTestSpeed);
+		SmartDashboard.putData("Auto choices", _defensePosition);			
+		
 		/**
 		 * This autonomous (along with the chooser code above) shows how to select between different autonomous modes
 		 * using the dashboard. The sendable chooser code works with the Java SmartDashboard. If you prefer the LabVIEW
@@ -55,9 +69,6 @@ public class Autonomous {
 		 * You can add additional auto modes by adding additional comparisons to the switch structure below with additional strings.
 		 * If using the SendableChooser make sure to add them to the chooser code above as well.
 		 */
-
-
-
 
 		SmartDashboard.putNumber(_autoTestSpeed, 0.5); 			//this is the speed to run the auto calibration test
 		//put any properties here on the smart dashboard that you want to adjust from there.
@@ -110,6 +121,9 @@ public class Autonomous {
 	{
 		System.out.println("auto init");
 
+		_autoSelected = (String) _defensePosition.getSelected();
+		System.out.println("Auto selected: " + _autoSelected);		
+
 
 		//build the steps for the selected autonomous
 		setAuto();
@@ -135,44 +149,48 @@ public class Autonomous {
 	{	
 
 		//we are going to construct the steps needed for our autonomous mode
-		int choice=1;
+//		int choice=1;
 		double speedTest =1.0;
 		String caseName;
 		_steps =  new ArrayList<AutonomousStep>();
-		switch (choice) {
-		case 1: {
+		
+		switch (_autoSelected) {
+		case _auto2: 
 			caseName="Middle Gear";
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,72)); //assuming 99.64 inches
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,92)); //assuming 99.64 inches
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.WAIT,"Wait for gear to eject",0,0,0,Enums.GEAR_EJECT_TIME));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
-		}
-		break;
-		case 2: {
+		
+			break;
+		case _auto1: 
 			caseName="Left Gear";
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,72));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn 60",0,0,0,60));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,5));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
-		}
-		case 3: {
+			break;
+			
+		case _auto3: 
 			caseName="Right Gear";
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,72));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn 60",0,0,0,-60));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,72));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
-		}
-		case 4:{
+			break;
+
+		case _autoTestSpeed:
 			caseName="Speed Test";
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Drive Straight",5,speedTest,speedTest,0));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
-		}
-		default: {
+			break;
+			
+		default: 
 			caseName="Do Nothing";
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
-		}
+			break;
 		}
 
 
@@ -255,11 +273,21 @@ public class Autonomous {
 
 				break;
 
-			case GEAR: {
-				_controls.getGear().eject();
-				startNextStep();
-			}
-			break;
+			case GEAR: 
+				//if we have not requested an ejection, do so now
+				if (!_isEjecting){
+					_isEjecting = true;
+					_controls.getGear().eject();					
+				}					
+				
+				//wait until the gear is fully deployed, this will back up the robot too
+				if (! _controls.getGear().isEjecting()){
+					_isEjecting = false;
+					startNextStep();
+				} 
+			
+				break;
+				
 			case GRAB:
 				break;
 
