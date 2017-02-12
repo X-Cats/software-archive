@@ -20,8 +20,8 @@ public class GearPlacementVision
     {
     	boolean result = false;
         int distance_in_inches = 0;
-        int angle_from_center_in_deg = 0;
-        int angle_from_target = 0;
+        int angle_from_center_line_in_deg = 0;
+        int facing_angle_in_deg = 0;
     	
         System.loadLibrary( Core.NATIVE_LIBRARY_NAME);
         long t0 = System.currentTimeMillis();
@@ -117,7 +117,7 @@ public class GearPlacementVision
         System.out.println("Distance to target: " + distance_in_inches + " inches");
         System.out.println("Done in " + (t1-t0) + " ms");
 
-       	VisionData data = new VisionData(result, distance_in_inches, angle_from_center_in_deg, angle_from_center_in_deg);
+       	VisionData data = new VisionData(result, distance_in_inches, angle_from_center_line_in_deg, facing_angle_in_deg);
        
         return data;
     }
