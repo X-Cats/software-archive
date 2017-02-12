@@ -23,13 +23,13 @@ import org.opencv.imgcodecs.Imgcodecs;
  * 
  *     0,0                                                             640, 0
  *      +----------------------------P0-----------------------------------+
- *      |      P4_0                  .                            P5_0    |
+ *      |      P4_0     P6_0         .         P7_0               P5_0    |
  *      |                            .                                    |
  *      |                            .                                    |
  *      |                            .                                    |
  *      |                            .                                    |
- *      |                            .                                    |
- *      |                    .    "  P2  "     .                          |
+ *      |                            .          P7                        |
+ *      |                P6  .    "  P2  "     .                          |
  *      |      P4 .     "                              "     .    P5      |
  *      | .   "                                                    "    . |
  *      |P1                                                             P3|
@@ -63,17 +63,18 @@ public class AutoTarget {
 	private Point _P1;
 	private Point _P2;
 	private Point _P3;
-	private Point _P4;
-	private Point _P4_0;
-	private Point _P5;
-	private Point _P5_0;
+	private Point _P4, _P4_0;
+	private Point _P5, _P5_0;
+	private Point _P6, _P6_0;
+	private Point _P7, _P7_0;
 	private Scalar _lineColor = new Scalar(0,255,255);
 	private Scalar _ejectColor = new Scalar(0,0,255);
 	
-	public AutoTarget(){
+	public AutoTarget(UsbCamera camera){
 		
 		try{
 			_camera = CameraServer.getInstance().startAutomaticCapture();
+			//_camera = camera;
 			// Set the resolution
 			_camera.setResolution(640, 480);
 			//_camera.setFPS(5);
@@ -86,23 +87,39 @@ public class AutoTarget {
 
 			// Mats are very memory expensive. Lets reuse this Mat.
 			_mat = new Mat();
-//			
-//			int P0x;
-//			int 
-//			if (Enums.IS_FINAL_ROBOT){
-//				
-//			} else{
-//				
-//			}
+			
+			int inRangeDeltaX;
+			int outRangeDeltaX;
+			int P0x;
+			int P1y;
+			int P2y;
+			int P4y;
+			if (Enums.IS_FINAL_ROBOT){
+				
+			} else{
+				inRangeDeltaX = 150;
+				outRangeDeltaX = 157;
+				P0x = 320;
+				P1y = 420;
+				P2y = 280;
+				P4y = 320;
+			}
 
-			_P0 	= new Point(320,0);
-			_P1 	= new Point(0,420);
-			_P2 	= new Point(320,280);
-			_P3 	= new Point(640,420);
-			_P4 	= new Point(20,320);
-			_P4_0 = new Point(20,0);
-			_P5 	= new Point(620,320);
-			_P5_0 = new Point(620,0);			
+			_P0 	= new Point(P0x,0);
+			_P1 	= new Point(0,P1y);
+			_P2 	= new Point(P0x,P2y);
+			_P3 	= new Point(640,P1y);
+			
+			_P4 	= new Point(P0x-inRangeDeltaX,P4y);
+			_P4_0 = new Point(P0x-inRangeDeltaX,0);
+			_P5 	= new Point(P0x+inRangeDeltaX,P4y);
+			_P5_0 = new Point(P0x+inRangeDeltaX,0);		
+			
+			_P6 	= new Point(P0x-outRangeDeltaX,P4y);			
+			_P6_0 = new Point(P0x-outRangeDeltaX,0);
+			_P7 	= new Point(P0x+outRangeDeltaX,P4y);
+			_P7_0 = new Point(P0x+outRangeDeltaX,0);		
+
 			
 //			SmartDashboard.putNumber("P1x", 100);
 //			SmartDashboard.putNumber("P1y", 100);
@@ -118,9 +135,11 @@ public class AutoTarget {
 
 	}
 	
-	public AutoTarget(boolean noDashboard){
+	public AutoTarget(UsbCamera camera,boolean noDashboard){
 		
 		try{
+			//pass the shared camera in.
+			//_camera = camera;
 			_camera = CameraServer.getInstance().startAutomaticCapture();
 			// Set the resolution
 			_camera.setResolution(640, 480);
@@ -174,6 +193,14 @@ public class AutoTarget {
 		
 		//Draw the P5 segment (to top of screen)
 		Imgproc.line(_mat, _P5, _P5_0, _ejectColor, 3 , 8, 0);
+
+//		//Draw the P4 segment (to top of screen)
+//		Imgproc.line(_mat, _P6, _P6_0, _ejectColor, 3 , 8, 0);
+//		
+//		//Draw the P5 segment (to top of screen)
+//		Imgproc.line(_mat, _P7, _P7_0, _ejectColor, 3 , 8, 0);
+		
+		
 		
 //		Imgproc.rectangle(_mat, new Point(120, 100), new Point(450, 250),
 //				new Scalar(0, 0, 255), 5);
@@ -189,7 +216,10 @@ public class AutoTarget {
 		String filename="";
 		
 		if (_camera == null)
+		{
+			System.out.println("The camera server is null");
 			return;
+		}
 
 		if (_cvs.grabFrame(_mat) == 0) {
 			// Send the output the error.
@@ -203,7 +233,8 @@ public class AutoTarget {
 			filename = "/home/lvuser/"+dateFormat.format(date)+".jpg";			
 		}
 		Imgcodecs.imwrite(filename, _mat);
-		
+		GearPlacementVision gpv = new GearPlacementVision();
+		VisionData visionData = gpv.processImage(_mat);
 		GearPlacementVision gpv = new GearPlacementVision();
 		VisionData visionData = gpv.processImage(_mat);
 	}
