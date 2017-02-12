@@ -22,7 +22,8 @@ public class GearPlacementVision
         int distance_in_inches = 0;
         int angle_from_center_line_in_deg = 0;
         int facing_angle_in_deg = 0;
-    	
+       	VisionData visionData = new VisionData();
+
         System.loadLibrary( Core.NATIVE_LIBRARY_NAME);
         long t0 = System.currentTimeMillis();
         System.out.println("Extracting distance/angle from processed image...\n");
@@ -32,7 +33,7 @@ public class GearPlacementVision
         
   	    ArrayList<Rect> rectList = new ArrayList<Rect>();
         int rectNum = 0;
-  	  
+  	    
         for (MatOfPoint mop : gp.findContoursOutput())
         {
             rectNum++;
@@ -46,15 +47,23 @@ public class GearPlacementVision
           		              + ", X=" + rect.x
           		              + ", Y=" + rect.y);
         }
-       
-  	    Rect left = rectList.get(0);
-  	    Rect right = rectList.get(0);
-  	    Rect taller = rectList.get(0);
+        
+        if (rectList.size() == 0)
+        {
+            System.out.println("VISION: NOT ACCURATE - OPERATOR CONTROL NEEDED!!!");
+        	visionData.setResult(false);
+        	return visionData;
+        }
+        
+  	    Rect left = null;
+  	    Rect right = null;
+  	    Rect taller = null;
   	    
         if ( (rectList.size() < 2) )
         {
             System.out.println("VISION: NOT ACCURATE - OPERATOR CONTROL NEEDED!!!");
-            result = false;
+        	visionData.setResult(false);
+        	return visionData;
         }
         else if (rectList.size() == 2)
         {  
@@ -137,8 +146,6 @@ public class GearPlacementVision
         System.out.println("Facing angle to target: " + facing_angle_in_deg + " degrees");
         System.out.println("Done in " + (t1-t0) + " ms");
 
-       	VisionData data = new VisionData(result, distance_in_inches, angle_from_center_line_in_deg, facing_angle_in_deg);
-       
-        return data;
+        return visionData;
     }
 }
