@@ -120,6 +120,15 @@ public class GearPlacementVision
         int offset_to_center_of_camera = center_pixel_between_tape - center_pixel_of_camera;
         facing_angle_in_deg = offset_to_center_of_camera / Enums.PIXEL_PER_DEGREE;
         
+        if (facing_angle_in_deg < 0)
+        {
+            System.out.println("Robot has to be rotated left...");       	
+        }
+        else
+        {
+            System.out.println("Robot has to be rotated right...");       	
+        }
+        
         result = true;
               
         long t1 = System.currentTimeMillis();
