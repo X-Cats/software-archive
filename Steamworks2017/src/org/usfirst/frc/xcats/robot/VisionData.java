@@ -2,17 +2,32 @@ package org.usfirst.frc.xcats.robot;
 
 public class VisionData
 {
-    boolean result;
-    int distance_in_inches;
-    int angle_from_center_line_in_deg;
-    int facing_angle_in_deg;
+    boolean result = false;
+    int distance_in_inches = 0;
+    int angle_from_center_line_in_deg = 0;
+    int facing_angle_in_deg = 0;
     
-    public VisionData(boolean res, int distance, int afcl, int fa)
+    public VisionData()
+    {}
+    
+    public void setResult(boolean res)
     {
-        result = res;
-        distance_in_inches = distance;
-        angle_from_center_line_in_deg = afcl;
-        facing_angle_in_deg = fa;    	
+    	result = res;
+    }
+    
+    public void setDistanceInInches(int distance)
+    {
+    	distance_in_inches = distance;
+    }
+    
+    public void setAngleFromCenterLineInDeg(int angle_from_center)
+    {
+    	angle_from_center_line_in_deg = angle_from_center;
+    }
+    
+    public void setFacingAngleInDeg(int facing_angle)
+    {
+    	facing_angle_in_deg = facing_angle;
     }
     
     public boolean getResult()
