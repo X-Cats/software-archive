@@ -233,8 +233,14 @@ public class AutoTarget {
 			filename = "/home/lvuser/"+dateFormat.format(date)+".jpg";			
 		}
 		Imgcodecs.imwrite(filename, _mat);
-		GearPlacementVision gpv = new GearPlacementVision();
-		VisionData visionData = gpv.processImage(_mat);
+		try {
+			GearPlacementVision gpv = new GearPlacementVision();
+			VisionData visionData = gpv.processImage(_mat);
+		} catch (Exception e){
+			System.out.println("Error in Autotarget.CaptureImage");
+			e.printStackTrace();
+		}
+				
 	}
 	
 	public void updateStatus(){
