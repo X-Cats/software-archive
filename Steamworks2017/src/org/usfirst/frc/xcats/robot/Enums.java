@@ -74,6 +74,9 @@ public class Enums {
 	public static final int GEAR_PCM_FORWARD = 7; // PCM id for the gear ejector
 	public static final int GEAR_PCM_REVERSE = 6; // PCM id for the gear ejector
 	public static final double GEAR_EJECT_TIME = 1; // time in seconds before retracting ejector piston
+	public static final double GEAR_EJECT_REVERSE_START_TIME = 0.5; // Start reversing this long after the piston deploys
+	public static final double GEAR_EJECT_REVERSE_TIME = 2; // time to reverse
+	public static final double GEAR_EJECT_REVERSE_SPEED = 0.4; //speed to reverse with when ejecting
 	public static final int GEAR_POSITIONED_OPT = 2; //optical sensor that detects if gear is position(rotated) correctly
 	public static final int GEAR_ONBOARD_OPT = 2;    //optical sensor that detects if the gear is positioned far enough in the robot to eject
 	public static final double GEAR_ROTATOR_SPEED = 0.25;
@@ -85,18 +88,12 @@ public class Enums {
 	public static final int FEEDER_BOTTOM_CAN = 10;
 	public static final double FEEDER_INTAKE_SPEED = 0.5; //speed at which balls are sucked in
 	public static final double FEEDER_FEED_SPEED = 0.5;  //speed at which balls are spit out
+	public static final int FEEDER_LIFT_PCM_FORWARD = 2;
+	public static final int FEEDER_LIFT_PCM_BACKWARD = 3;
 	
 	//Autonomous uses the chooser object to select mode
 	public static final int AUTONOMOUS_TIME = 15;
 	
-/*	old stuff from last year		
-	public static final int GRABBER_LIMIT_SWITCH = 2, LIFT_TOP_LIMIT_SWITCH = 1,
-			LIFT_BOTTOM_LIMIT_SWITCH = 0;
-	public static final double LIFT_MAX = -60, FINAL_LIFT_MAX = -120000;
-	public static final double ELEVATOR_ROTATIONS_PER_LEVEL = 16, FINAL_ELEVATOR_ROTATIONS_PER_LEVEL = 21000;
-	public static final double GRABBER_CURRENT_CUTOFF = 60;
-
-*/
 	
 	
 }
