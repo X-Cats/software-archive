@@ -157,7 +157,7 @@ public class Autonomous {
 		switch (_autoSelected) {
 		case _auto2: 
 			caseName="Middle Gear";
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,92)); //assuming 99.64 inches
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,89)); //assuming 99.64 inches
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.WAIT,"Wait for gear to eject",0,0,0,Enums.GEAR_EJECT_TIME));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
@@ -322,6 +322,7 @@ public class Autonomous {
 	public void drive (double time, double left, double right)
 	{
 		float deltaYaw;
+
 		deltaYaw = _initialYaw - _controls.getNavx().getYaw();
 		double offset;
 
