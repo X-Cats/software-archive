@@ -106,15 +106,26 @@ public class GearPlacementVision
       			   rectList.get(biggest_i) : rectList.get(bigger_i);    
         }
         
-        // Calculate the distance based on the center point of the 2 rectangles
-        int center_to_center_dist = ( ( right.x + (right.width / 2) ) - ( left.x + (left.width / 2) ) ); 
+        // Find the center pixels of the left and right tape
+        int center_of_left_tape = (left.x + (left.width / 2)); 
+        int center_of_right_tape = (right.x + (right.width / 2));
+        
+        // Calculate the distance based on the center point of the 2 rectangles        
+        int center_to_center_dist = (center_of_right_tape - center_of_left_tape); 
         distance_in_inches = 5116 / center_to_center_dist;
+        
+        // Calculate the Facing Angle based on center pixel of tape compared to center of image captured by camera
+        int center_pixel_between_tape = (center_of_left_tape + (center_to_center_dist / 2));
+        int center_pixel_of_camera = Enums.CAMERA_X_PIXELS_TOTAL / 2;
+        int offset_to_center_of_camera = center_pixel_between_tape - center_pixel_of_camera;
+        facing_angle_in_deg = offset_to_center_of_camera / Enums.PIXEL_PER_DEGREE;
         
         result = true;
               
         long t1 = System.currentTimeMillis();
 //        System.out.println("\nImage used: " + imageName);
         System.out.println("Distance to target: " + distance_in_inches + " inches");
+        System.out.println("Facing angle to target: " + facing_angle_in_deg + " degrees");
         System.out.println("Done in " + (t1-t0) + " ms");
 
        	VisionData data = new VisionData(result, distance_in_inches, angle_from_center_line_in_deg, facing_angle_in_deg);
