@@ -43,7 +43,10 @@ public class Enums {
 	
 	public static final double  ROBOT_LENGTH_COMPACT = 30.0; //length of robot with shooter in home position
 	public static final double  ROBOT_LENGTH_EXTENDED = 40; // length of robot with shooter down
-	
+	//vision constants
+	public static final int PIXEL_PER_DEGREE = 14; 
+	public static final int CAMERA_X_PIXELS_TOTAL = 640;
+	public static final int CAMERA_Y_PIXELS_TOTAL = 480;
 
 	//these values keep track specifically of the specific motor controllers
 	//if we only need 2 motors in the drive, use FRONT_LEFT and FRONT_RIGHT. Make sure that the arrays below have a length of 2
