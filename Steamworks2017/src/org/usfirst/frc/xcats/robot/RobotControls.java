@@ -1,6 +1,7 @@
 package org.usfirst.frc.xcats.robot;
 
 
+import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -52,8 +53,9 @@ public class RobotControls {
 	private Feeder _feeder;
 	private Climber _climber;
 	private AutoTarget _autoTarget;
+	private UsbCamera _camera;
 
-	public RobotControls ()
+	public RobotControls (UsbCamera camera)
 	{
 
 		//
@@ -66,8 +68,8 @@ public class RobotControls {
 	
 		_feeder = new Feeder();
 		_climber = new Climber();
-		_gear = new Gear();
-		_autoTarget = new AutoTarget(false);
+		_gear = new Gear(_drive);
+		_autoTarget = new AutoTarget(_camera,false);
 		
 		//_drive.setPDP(_pdp, Enums.BROWNOUT_VOLTAGE_THRESHOLD, Enums.BROWNOUT_VOLTAGE_REDUCTIONFACTOR);
 		
@@ -121,6 +123,11 @@ public class RobotControls {
 	public void drive ()
 	{
 
+		SmartDashboard.putBoolean("isEjecting", _gear.isEjecting());
+		
+		if (_gear.isEjecting())
+			return;
+			
 		boolean reductionToggle = _slowMode;
 		int directionLeft = 1; // this is used to tell if we are going forward or backwards. The shifting speed needs to be in the same direction!
 		int directionRight = 1;
@@ -161,7 +168,7 @@ public class RobotControls {
 		if (_shifting ){
 			if (_shiftTimer.get() >= Enums.SHIFTER_DELAY_TIME)
 				_shifting = false;				
-			else
+			else if (Math.abs(_drive.get(Enums.FRONT_LEFT)) > Enums.SHIFTER_DELAY_SPEED)
 				_drive.set( directionLeft * Enums.SHIFTER_DELAY_SPEED,  directionRight * Enums.SHIFTER_DELAY_SPEED);			
 		}
 		
@@ -212,14 +219,15 @@ public class RobotControls {
 			_feeder.lowGoal();
 		else
 			_feeder.stop();
-		
+
+		/*
 		if(_operatorJS.getRawButton(7))
 			_climber.climb();
 		else if (_operatorJS.getRawButton(5))
 			_climber.release();
 		else
 			_climber.stop();
-		
+	*/	
 	}
 
 
