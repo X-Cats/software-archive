@@ -235,8 +235,6 @@ public class AutoTarget {
 		Imgcodecs.imwrite(filename, _mat);
 		GearPlacementVision gpv = new GearPlacementVision();
 		VisionData visionData = gpv.processImage(_mat);
-		GearPlacementVision gpv = new GearPlacementVision();
-		VisionData visionData = gpv.processImage(_mat);
 	}
 	
 	public void updateStatus(){
