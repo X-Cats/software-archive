@@ -17,12 +17,19 @@ public class Gear {
 	private XCatsSpeedController _gearRotator;
 	private boolean _acquiring = false;
     private boolean _ejecting = false;
+    private boolean _reversing = false;
     private Timer _ejectTimer= new Timer();
+    private Timer _ejectReverseTimer = new Timer();
     private int _movingRight = 1;
     private int _movingLeft = -1;
     private int _gearDirection = _movingRight;
+    private XCatsDrive _xcDrive;
+    private Timer _sanityTimer = new Timer();
 	
-	public Gear(){
+	public Gear(XCatsDrive drive){
+		
+		//pass in the reference to the drive train
+		_xcDrive = drive;
 		
 		// constructor
 		_sol = new DoubleSolenoid(Enums.PCM_CAN_ID,Enums.GEAR_PCM_FORWARD,Enums.GEAR_PCM_REVERSE);
@@ -51,7 +58,12 @@ public class Gear {
 			_ejecting = true;
 			_ejectTimer.reset();
 			_ejectTimer.start();
+			_sanityTimer.reset();
+			_sanityTimer.start();
 		}
+	}
+	public boolean isEjecting(){
+		return _ejecting;
 	}
 	public boolean isOnBoard(){
 		if (_optoOnBoard != null){
@@ -70,19 +82,49 @@ public class Gear {
 		SmartDashboard.putBoolean("Right Limit Switch Direction", _RS.get());
 		SmartDashboard.putBoolean("Gear Positioner", _optoRotate.get());
 		SmartDashboard.putBoolean("Gear Aquiring", _acquiring);
-		SmartDashboard.putNumber("Gear Rotation",_gearDirection);
 		
+		//this checks to see if we are in the ejection mode
 		if (_ejecting){
-			if (_ejectTimer.get() >= Enums.GEAR_EJECT_TIME){
-				_sol.set(Value.kReverse);
+			
+			if (_sanityTimer.get() > Enums.GEAR_EJECT_TIME + Enums.GEAR_EJECT_REVERSE_START_TIME + 0.25){
 				_ejectTimer.stop();
+				_ejectReverseTimer.stop();
 				_ejecting = false;
+				_reversing = false;
+				
+			}else
+			{
+				//check to see if we have surpassed the start of the reverse time
+				if (_ejectTimer.get() >= Enums.GEAR_EJECT_REVERSE_START_TIME){
+					//if reversing then we should be setting the speed of the drive train to the reverse speed
+					if (_reversing){
+						//if the reverse time has timed out, we are done.
+						if (_ejectReverseTimer.get() >= Enums.GEAR_EJECT_REVERSE_TIME){
+							_ejectReverseTimer.stop();
+							_ejectTimer.stop();
+							_reversing = false;
+							_ejecting = false;
+							this.acquireGear(); // this will rotate the platen back to the home position.
+						} else{
+							_xcDrive.set(Enums.GEAR_EJECT_REVERSE_SPEED, Enums.GEAR_EJECT_REVERSE_SPEED);
+						}
+					} else {
+						_ejectReverseTimer.reset();
+						_ejectReverseTimer.start();
+						_reversing = true;					
+					}
+					//check to see if we have retracted the piston yet. only do this once.
+					if (_ejectTimer.get() >= Enums.GEAR_EJECT_TIME && _sol.get() == Value.kForward ){
+						_sol.set(Value.kReverse);
+					}				
+				}
+			
 			}
+			
 		}
 		
 		if (_acquiring){
 			if((_LS.get() && _gearDirection == _movingLeft) || ( _RS.get() && _gearDirection == _movingRight) ){
-				SmartDashboard.putBoolean("Running", false);
 				_gearRotator.set(0);
 				_gearDirection = _gearDirection * -1;
 				_acquiring=false;
@@ -93,7 +135,6 @@ public class Gear {
 				_acquiring=false;				
 			}
 			else{
-				SmartDashboard.putBoolean("Running", true);
 				_gearRotator.set(_gearDirection * Enums.GEAR_ROTATOR_SPEED);
 			}				
 		}
