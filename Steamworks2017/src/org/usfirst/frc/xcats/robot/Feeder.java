@@ -15,10 +15,17 @@ public class Feeder {
 		
 		_topFeeder =  new XCatsSpeedController("Top Feeder",Enums.FEEDER_TOP_CAN,true,SCType.TALON,null,null);
 		_bottomFeeder =  new XCatsSpeedController("Bottom Feeder",Enums.FEEDER_BOTTOM_CAN,true,SCType.TALON,null,null);
-		//_lifter = new DoubleSolenoid(Enums.PCM_CAN_ID,Enums.FEEDER_LIFT_PCM_FORWARD,Enums.FEEDER_LIFT_PCM_BACKWARD);
+		_lifter = new DoubleSolenoid(Enums.PCM_CAN_ID,Enums.FEEDER_LIFT_PCM_FORWARD,Enums.FEEDER_LIFT_PCM_BACKWARD);
 		
 	}
 
+	public void toggleLifter(){
+		if (_lifter.get() == Value.kForward)
+			lower();
+		else
+			lift();
+	}
+	
 	public void lift(){
 		_lifter.set(Value.kForward);
 	}

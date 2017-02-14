@@ -10,7 +10,7 @@ public class Climber {
 	public Climber(){
 		//constructor
 		_winch = new XCatsSpeedController("Winch",Enums.WINCH_CAN_ID,true,SCType.TALON,null,null);
-		_winch.setInverted(true);
+		//_winch.setInverted(true);
 		}
 	
 	
