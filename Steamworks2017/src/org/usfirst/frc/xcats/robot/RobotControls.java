@@ -38,8 +38,10 @@ public class RobotControls {
 	private Joystick _leftJS, _rightJS, _driveJS, _operatorJS;
 	private XCatsDrive _drive;
 	private boolean _slowMode = true;
+	private boolean _liftMode = false;
 	private XCatsJSButton _speedToggleButton;
 	private XCatsJSButton _highSpeedButton;
+	private XCatsJSButton _feederLifter;
 	private boolean _highSpeed = false;
 	private DoubleSolenoid _dblSolShifter;
 	private DigitalInput _diUltraEcho;
@@ -102,6 +104,7 @@ public class RobotControls {
 		}
 
 		_operatorJS = new Joystick(Enums.OPERATOR_JS);
+		_feederLifter = new XCatsJSButton(_operatorJS,5);
 				
 		try
 		{
@@ -211,6 +214,8 @@ public class RobotControls {
 		if (_operatorJS.getRawButton(6))
 			_gear.acquireGear();
 		
+		//these feeder buttons are mutually exclusive, but need to be on a 
+		//different thumb from the feeder raise and lower
 		if(_operatorJS.getRawButton(1))
 			_feeder.intake();
 		else if (_operatorJS.getRawButton(2))
@@ -220,14 +225,21 @@ public class RobotControls {
 		else
 			_feeder.stop();
 
-		/*
+		boolean liftToggle = _feederLifter.isPressed();
+		if (liftToggle != _liftMode ){
+			_liftMode = ! _liftMode;
+			_feeder.toggleLifter();
+		}
+		
+	
+		
 		if(_operatorJS.getRawButton(7))
 			_climber.climb();
-		else if (_operatorJS.getRawButton(5))
-			_climber.release();
+//		else if (_operatorJS.getRawButton(5))
+//			_climber.release();
 		else
 			_climber.stop();
-	*/	
+		
 	}
 
 
