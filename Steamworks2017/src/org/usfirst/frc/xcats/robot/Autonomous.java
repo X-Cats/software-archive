@@ -37,6 +37,7 @@ public class Autonomous {
 	final String _auto3 = "Right Gear Peg";
 	final String _autoReadFile = "TextFile read";
 	final String _autoTestSpeed = "Run 3 sec at input speed";
+	final String _autoInTeleop = "TeleopCommands";
 	private Navx _navx;
 	
 	String _autoSelected;
@@ -106,6 +107,7 @@ public class Autonomous {
 
 	public Autonomous (RobotControls controls, ArrayList<AutonomousStep> mysteps, double totalTime){
 		// this "autonomous" instantiation can be called from teleop to do a set of steps
+		_autoSelected = this._autoInTeleop;
 		_controls = controls;
 		_steps = mysteps;
 		_totalAutoTime = totalTime;
@@ -121,12 +123,15 @@ public class Autonomous {
 	{
 		System.out.println("auto init");
 
-		_autoSelected = (String) _defensePosition.getSelected();
-		System.out.println("Auto selected: " + _autoSelected);		
-
-
-		//build the steps for the selected autonomous
-		setAuto();
+		if (_autoSelected != this._autoInTeleop){
+			_autoSelected = (String) _defensePosition.getSelected();
+			System.out.println("Auto selected: " + _autoSelected);		
+	
+	
+			//build the steps for the selected autonomous
+			setAuto();
+		}
+		
 		_initialYaw = _controls.getNavx().getYaw();
 		_currentStep = 0;
 		_currentAutoStep = null;
@@ -203,10 +208,6 @@ public class Autonomous {
 	//		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Navigate Defense", 0, 0.6, 0.6, (DEFENSE_DEPTH - OVERHANG + Enums.ROBOT_LENGTH_EXTENDED)/12.0));
 	//	}
 
-	private void  addDefenseSteps() {
-
-
-	}
 
 
 	public boolean isExecuting(){
@@ -311,9 +312,9 @@ public class Autonomous {
 		_controls.updateStatus();
 	}
 
-	private void updateStatus(){
+	public void updateStatus(){
 
-		if (_steps != null){
+		if (_steps != null && _currentAutoStep != null){
 			SmartDashboard.putNumber("Step Count", _steps.size());
 			SmartDashboard.putString("Current Command", this._currentStep + " " + _currentAutoStep.name  + "\n " + _currentAutoStep.stepTime);			
 		}

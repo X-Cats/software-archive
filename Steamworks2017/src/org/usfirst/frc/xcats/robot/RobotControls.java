@@ -1,6 +1,8 @@
 package org.usfirst.frc.xcats.robot;
 
 
+import java.util.ArrayList;
+
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
@@ -56,6 +58,7 @@ public class RobotControls {
 	private Climber _climber;
 	private AutoTarget _autoTarget;
 	private UsbCamera _camera;
+	private Autonomous _commandAuto;
 
 	public RobotControls (UsbCamera camera)
 	{
@@ -123,17 +126,68 @@ public class RobotControls {
 		return _navx;
 	}
 
+	private void executeCommandAuto(){
+		//check to see if we have some commands
+		if (_commandAuto == null)
+			return;
+		
+		//if we are done clear the memory
+		if (_commandAuto.isExecuting()){
+			System.out.println(". . . Executing commands for vision system response!");
+			_commandAuto.execute();
+		}else {
+			_commandAuto = null;			
+		}
+		
+	}
+	private void prepAuto(){
+		
+		System.out.println("Prepping commands for vision system response!");
+		ArrayList<AutonomousStep> steps;		
+		steps =  new ArrayList<AutonomousStep>();
+		
+		steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,12.0)); //assuming 99.64 inches
+		steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
+		steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));	
+		
+		_commandAuto = new Autonomous(this,steps,5);
+	}
+	
+	private void shiftTransmission(){
+
+		_slowMode = !_slowMode;
+		_shiftTimer.reset();
+		_shiftTimer.start();
+		_shifting = true;
+		
+		if (_slowMode)
+			_dblSolShifter.set(DoubleSolenoid.Value.kForward);
+		 else 
+			_dblSolShifter.set(DoubleSolenoid.Value.kReverse);										
+		
+	}
 	public void drive ()
 	{
 
 		SmartDashboard.putBoolean("isEjecting", _gear.isEjecting());
+		SmartDashboard.putBoolean("isShifting", _shifting);
 		
 		if (_gear.isEjecting())
 			return;
+		
+		//if we are executing commands then execute it but exit response to driver.
+		//we will need to allow some escape sequence to cancel this, maybe respond to both triggers on the drivers joysticks
+		if (_commandAuto != null){
+			SmartDashboard.putBoolean("executing command", true);
+			this.executeCommandAuto();
+			return;
+		} else {
+			SmartDashboard.putBoolean("executing command", false);
+		}
 			
 		boolean reductionToggle = _slowMode;
-		int directionLeft = 1; // this is used to tell if we are going forward or backwards. The shifting speed needs to be in the same direction!
-		int directionRight = 1;
+//		int directionLeft = 1; // this is used to tell if we are going forward or backwards. The shifting speed needs to be in the same direction!
+//		int directionRight = 1;
 
 		if (!_shifting){
 			if (Enums.TWO_JOYSTICKS){
@@ -144,58 +198,31 @@ public class RobotControls {
 			}
 		}
 
-		//get the direction of the drive
-		if (_drive.get(Enums.FRONT_LEFT)< 0)
-			directionLeft = -1;
-		
-		if (_drive.get(Enums.FRONT_RIGHT)< 0)
-			directionRight = -1;
-		
-
 		
 		//only transition on the "downstroke" of the button, we dont care how long it is held
 		reductionToggle  = _speedToggleButton.isPressed();
 		if (reductionToggle != _slowMode){
-			_slowMode = !_slowMode;
-			_shiftTimer.reset();
-			_shiftTimer.start();
-			_shifting = true;
-			if (_slowMode)
-				_dblSolShifter.set(DoubleSolenoid.Value.kForward);
-			 else 
-				_dblSolShifter.set(DoubleSolenoid.Value.kReverse);										
+			shiftTransmission();							
 		}
-
-		//we need to drop the speed for a small time frame so that the gears can handle the gear shift
-		//so this loop will detect the shifting command and at the end of it will resume speed
-		if (_shifting ){
-			if (_shiftTimer.get() >= Enums.SHIFTER_DELAY_TIME)
-				_shifting = false;				
-			else if (Math.abs(_drive.get(Enums.FRONT_LEFT)) > Enums.SHIFTER_DELAY_SPEED)
-				_drive.set( directionLeft * Enums.SHIFTER_DELAY_SPEED,  directionRight * Enums.SHIFTER_DELAY_SPEED);			
-		}
-		
-		SmartDashboard.putNumber("LeftSpeed", _drive.get(Enums.FRONT_LEFT));
-		SmartDashboard.putNumber("Direction", directionLeft);
-		SmartDashboard.putBoolean("Shifter", _slowMode);		
 
 		if (_navx != null){
 			
 			if (Enums.TWO_JOYSTICKS){
+				if (_leftJS.getRawButton(3)){
+					this.prepAuto();
+				}
 			}
 			else {
 				if(_driveJS.getRawButton(5)){
-				_navx.navxMode = "rotate";
-				_navx.navxRotateDistance = 90;
-				}
-				if(_driveJS.getRawButton(5)){
-				_navx.navxMode = "rotate";
-				_navx.navxRotateDistance = 90;
+					this.prepAuto();
 				}
 			}
 		}
+		
+		//image capture
 		if(Enums.TWO_JOYSTICKS){
-			if(_leftJS.getRawButton(1)){
+			//button 1 is the "trigger" button
+			if (_leftJS.getRawButton(1)){
 				_autoTarget.captureImage();
 			}
 		}else{
@@ -208,6 +235,11 @@ public class RobotControls {
 
 	public void operate ()
 	{
+		//if we are executing commands then exit response to operator
+		if (_commandAuto != null){
+			return;
+		}
+		
 		if(_operatorJS.getRawButton(8))
 			_gear.eject();
 		
@@ -265,10 +297,37 @@ public class RobotControls {
 			System.out.println("error reading PDP... RobotControls.updateStatus");
 		}
 	
+		//we need to drop the speed for a small time frame so that the gears can handle the gear shift
+		//so this loop will detect the shifting command and at the end of it will resume speed
+		//get the direction of the drive
+		if (_shifting ){
+			int directionLeft = 1; // this is used to tell if we are going forward or backwards. The shifting speed needs to be in the same direction!
+			int directionRight = 1;
+			
+			if (_drive.get(Enums.FRONT_LEFT)< 0)
+				directionLeft = -1;
+			
+			if (_drive.get(Enums.FRONT_RIGHT)< 0)
+				directionRight = -1;
+
+			if (_shiftTimer.get() >= Enums.SHIFTER_DELAY_TIME)
+				_shifting = false;				
+			else if (Math.abs(_drive.get(Enums.FRONT_LEFT)) > Enums.SHIFTER_DELAY_SPEED)
+				_drive.set( directionLeft * Enums.SHIFTER_DELAY_SPEED,  directionRight * Enums.SHIFTER_DELAY_SPEED);			
+		}
+		
+//		SmartDashboard.putNumber("LeftSpeed", _drive.get(Enums.FRONT_LEFT));
+//		SmartDashboard.putNumber("Direction", directionLeft);
+		SmartDashboard.putBoolean("Shifter", _slowMode);		
+		
+		SmartDashboard.putBoolean("DriverLeftButton", _leftJS.getRawButton(3));
+		
 		_drive.updateStatus();
 		_gear.updateStatus();
 		_feeder.updateStatus();
 		_climber.updateStatus();
+		if (_commandAuto != null)
+			_commandAuto.updateStatus();
 		
 		if (_navx != null){
 			_navx.updateStatus();
