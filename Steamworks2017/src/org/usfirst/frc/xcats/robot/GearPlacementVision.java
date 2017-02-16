@@ -33,6 +33,7 @@ public class GearPlacementVision
         
   	    ArrayList<Rect> rectList = new ArrayList<Rect>();
         int rectNum = 0;
+        rectList = null;
   	    
         for (MatOfPoint mop : gp.findContoursOutput())
         {
@@ -48,7 +49,7 @@ public class GearPlacementVision
           		              + ", Y=" + rect.y);
         }
         
-        if (rectList.size() == 0)
+        if (rectList == null)
         {
             System.out.println("VISION: NOT ACCURATE - OPERATOR CONTROL NEEDED!!!");
         	visionData.setResult(false);
@@ -122,6 +123,8 @@ public class GearPlacementVision
         // Calculate the distance based on the center point of the 2 rectangles        
         int center_to_center_dist = (center_of_right_tape - center_of_left_tape); 
         distance_in_inches = 5116 / center_to_center_dist;
+        // Subtract fixed distance from Tape to tip of Pin
+        visionData.setDistanceInInches(distance_in_inches);
         
         // Calculate the Facing Angle based on center pixel of tape compared to center of image captured by camera
         int center_pixel_between_tape = (center_of_left_tape + (center_to_center_dist / 2));
@@ -138,7 +141,32 @@ public class GearPlacementVision
             System.out.println("Robot has to be rotated right...");       	
         }
         
-        result = true;
+        visionData.setFacingAngleInDeg(facing_angle_in_deg);
+        
+		// Compute the ratio of the width of the two main rectangles.
+		// Because the peg delivery channel may obstruct the full view of 
+		// both tape/rect's when the robot is off the centerline by > N degrees (TBD), 
+		// this computation *should* be related to our desired "AngleFromCenterline".
+		// We will make a convention that the ratio is positive when the angle is 
+		// counterclockwise from the centerline, negative otherwise.
+		double rw = right.width; double lw = left.width;
+		double widthRatio = (rw > lw) ? lw / rw : rw / lw;
+
+		widthRatio = (rw > lw) ? widthRatio : - widthRatio;
+		System.out.println("\nLEFT width = " + left.width + ", RIGHT width = " + right.width + 
+				", Width ratio = " + widthRatio);
+		
+		// Compute the ratio of the area of the two main rectangles.
+		double ra = right.area; double la = left.area;
+		double areaRatio = (ra > la) ? la / ra : ra / la;
+
+		areaRatio = (ra > la) ? areaRatio : - areaRatio;
+		System.out.println("LEFT area = " + left.area + ", RIGHT area = " + right.area + 
+				", Area ratio = " + areaRatio);
+		
+//		visionData.setAngleFromCenterLineInDeg(angle_from_center_line_in_deg);
+        
+        visionData.setResult(true);
               
         long t1 = System.currentTimeMillis();
 //        System.out.println("\nImage used: " + imageName);
