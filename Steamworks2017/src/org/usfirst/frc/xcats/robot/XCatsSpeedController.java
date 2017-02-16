@@ -236,6 +236,32 @@ public class XCatsSpeedController{
 			//				this.stop();
 	}
 
+	public void setBrakeMode(){
+	if (_CANmotor != null){
+			
+			switch ( _sctype){
+			case TALON:
+				((CANTalon) _CANmotor).enableBrakeMode(true);				
+				break;
+			default:
+				System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
+			}			
+		}		
+	}
+
+	public void setCoastMode(){
+	if (_CANmotor != null){
+			
+			switch ( _sctype){
+			case TALON:
+				((CANTalon) _CANmotor).enableBrakeMode(false);		
+				break;
+			default:
+				System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
+			}			
+		}		
+	}
+	
 	public void stop ()
 	{
 		set(-_setPoint);
@@ -318,7 +344,11 @@ public class XCatsSpeedController{
 	}
 
 	public boolean getInverted(){
-		return this.getInverted();
+		
+		if (_invert == 1)
+			return true;
+		else
+			return false;
 	}
 	
 	public void setDashboardIO (boolean input, boolean output)

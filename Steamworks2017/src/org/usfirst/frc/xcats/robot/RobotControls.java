@@ -70,6 +70,8 @@ public class RobotControls {
 		//simple XCatsDrive, no PID etc
 		_drive = new XCatsDrive (Enums.USE_CAN,true);
 		_drive.setDashboardIO(false, false);
+		_drive.setInverted();
+		_drive.setCoastMode();
 	
 		_feeder = new Feeder();
 		_climber = new Climber();
@@ -121,7 +123,12 @@ public class RobotControls {
 		}
 	}
 	
-	
+	public void setCoastMode(){
+		_drive.setCoastMode();
+	}
+	public void setBrakeMode(){
+		_drive.setBrakeMode();
+	}
 	public Navx getNavx(){
 		return _navx;
 	}
@@ -208,7 +215,7 @@ public class RobotControls {
 		if (_navx != null){
 			
 			if (Enums.TWO_JOYSTICKS){
-				if (_leftJS.getRawButton(3)){
+				if (_leftJS.getRawButton(3) && _commandAuto == null){
 					this.prepAuto();
 				}
 			}

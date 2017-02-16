@@ -111,6 +111,18 @@ public class XCatsDrive {
 			_motors[i].setInverted(_motors[i].getInverted());
 		}
 	}
+	public void setCoastMode(){
+		
+		for (int i = 0; i < Enums.DRIVE_MOTOR_NUMBERS.length; i ++){
+			_motors[i].setCoastMode();
+		}
+	}
+	public void setBrakeMode(){
+		
+		for (int i = 0; i < Enums.DRIVE_MOTOR_NUMBERS.length; i ++){
+			_motors[i].setBrakeMode();
+		}
+	}
 	
 	public void setReductionFactor (double reductionFactor)
 	{
