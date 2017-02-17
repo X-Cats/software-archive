@@ -64,7 +64,7 @@ public class Feeder {
 		if (_lifter.get() == Value.kForward)
 			liftState = true;
 		
-		SmartDashboard.putBoolean("Ball Lifter is Up", liftState);
+		SmartDashboard.putBoolean("Ball Lifter is Up", !liftState);
 		
 	}
 }

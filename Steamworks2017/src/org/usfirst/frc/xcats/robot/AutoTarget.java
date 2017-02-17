@@ -69,14 +69,17 @@ public class AutoTarget {
 	private Point _P7, _P7_0;
 	private Scalar _lineColor = new Scalar(0,255,255);
 	private Scalar _ejectColor = new Scalar(0,0,255);
+	private boolean _bProcessing =false;
 	
-	public AutoTarget(UsbCamera camera){
+	public AutoTarget(){
 		
 		try{
+			System.out.print("Constructing camera from Robot Init");			
 			_camera = CameraServer.getInstance().startAutomaticCapture();
 			//_camera = camera;
 			// Set the resolution
 			_camera.setResolution(640, 480);
+			_camera.setFPS(25);
 			//_camera.setFPS(5);
 
 			// Get a CvSink. This will capture Mats from the camera
@@ -135,15 +138,16 @@ public class AutoTarget {
 
 	}
 	
-	public AutoTarget(UsbCamera camera,boolean noDashboard){
+	public AutoTarget(boolean noDashboard){
 		
 		try{
 			//pass the shared camera in.
 			//_camera = camera;
-			_camera = CameraServer.getInstance().startAutomaticCapture();
-			// Set the resolution
-			_camera.setResolution(640, 480);
-			//_camera.setFPS(5);
+			System.out.print("Constructing camera from RobotControls");
+//			_camera = CameraServer.getInstance().startAutomaticCapture();
+//			// Set the resolution
+//			_camera.setResolution(640, 480);
+//			//_camera.setFPS(5);
 
 			// Get a CvSink. This will capture Mats from the camera
 			_cvs = CameraServer.getInstance().getVideo();
@@ -213,14 +217,13 @@ public class AutoTarget {
 	
 	public void captureImage(){
 		
-		String filename="";
-		
-		if (_camera == null)
-		{
-			System.out.println("The camera server is null");
+		if (_bProcessing){
 			return;
 		}
-
+		_bProcessing = true;
+		
+		String filename="";
+		
 		if (_cvs.grabFrame(_mat) == 0) {
 			// Send the output the error.
 			System.out.println("Cannot get output in AutoTarget.captureImage");
@@ -240,7 +243,8 @@ public class AutoTarget {
 			System.out.println("Error in Autotarget.CaptureImage");
 			e.printStackTrace();
 		}
-				
+		
+		_bProcessing = false;
 	}
 	
 	public void updateStatus(){

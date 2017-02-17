@@ -17,7 +17,7 @@ public class Autonomous {
 	private RobotControls _controls;
 	private ArrayList<AutonomousStep> _steps;
 
-	private int _currentStep;
+	private int _currentStep=0;
 	private float _initialYaw;
 	private double _totalAutoTime = Enums.AUTONOMOUS_TIME;
 	private AutonomousStep _currentAutoStep;
@@ -49,7 +49,6 @@ public class Autonomous {
 	{
 
 		_controls = controls;      	//passes the controls object reference
-		_navx = _controls.getNavx();
 
 		_defensePosition = new SendableChooser();
 		_defensePosition.addDefault("Default Auto", _defaultAuto);
@@ -132,7 +131,8 @@ public class Autonomous {
 			setAuto();
 		}
 		
-		_initialYaw = _controls.getNavx().getYaw();
+		_navx = _controls.getNavx();
+		_initialYaw = _navx.getYaw();
 		_currentStep = 0;
 		_currentAutoStep = null;
 		_autoTimer.start();
@@ -229,12 +229,22 @@ public class Autonomous {
 
 	public void execute ()
 	{
-		System.out.println("auto execute");
+//		System.out.println("auto execute");
+		if (_steps == null ){
+			_isExecuting = false;
+			return;
+			
+		}
+		
+		if (_steps.size() == 0){
+			System.out.println("trying to execute no steps in Autonomous 234");
+			_isExecuting = false;	
+			return;
+		}
 
 		double cTime=0;
 		int direction=1;
 
-		_currentAutoStep = _steps.get(_currentStep);
 
 		if (_autoTimer.get() > _totalAutoTime || _currentStep >= _steps.size() || _cancelExecution){
 			_controls.getDrive().set(0, 0, 0, 0);
@@ -243,6 +253,8 @@ public class Autonomous {
 		}
 		else
 		{
+			_currentAutoStep = _steps.get(_currentStep);
+			
 			_isExecuting = true;
 			//switch (_steps.get(_currentStep))
 			switch (_currentAutoStep.stepType)
