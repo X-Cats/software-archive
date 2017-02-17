@@ -25,7 +25,6 @@ public class Robot extends IterativeRobot {
     Autonomous _auto;
     RobotControls _controls;
     AutoTarget _autoTarget;
-    UsbCamera _camera;
 	
     /**
      * This function is run when the robot is first started up and should be
@@ -35,7 +34,7 @@ public class Robot extends IterativeRobot {
         
     	try{
     		visionThread = new Thread(() -> {
-    			_autoTarget = new AutoTarget(_camera);
+    			_autoTarget = new AutoTarget();
     			
     			while (!Thread.interrupted()) {
     				_autoTarget.processImage();
@@ -44,7 +43,7 @@ public class Robot extends IterativeRobot {
     		visionThread.setDaemon(true);
     		visionThread.start();    			
 
-            _controls = new RobotControls(_camera);
+            _controls = new RobotControls();
             _teleop = new Teleop(_controls);
             _auto = new Autonomous(_controls);    		
     		

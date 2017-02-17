@@ -38,29 +38,36 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class RobotControls {
 	private Joystick _leftJS, _rightJS, _driveJS, _operatorJS;
+	
 	private XCatsDrive _drive;
+	private Timer _shiftTimer;
+	private boolean _shifting=false;
+
 	private boolean _slowMode = true;
 	private boolean _liftMode = false;
 	private XCatsJSButton _speedToggleButton;
 	private XCatsJSButton _highSpeedButton;
-	private XCatsJSButton _feederLifter;
+	
+	private Timer _gearTimer;  // use this so that the 
+	private Gear _gear;
+
 	private boolean _highSpeed = false;
 	private DoubleSolenoid _dblSolShifter;
-	private DigitalInput _diUltraEcho;
-	private Ultrasonic _ultra;
 	private Navx _navx;
-	private Compressor _compressor;
-	private Timer _shiftTimer;
-	private boolean _shifting=false;
-	private PowerDistributionPanel _pdp;
-	private Gear _gear;
-	private Feeder _feeder;
-	private Climber _climber;
-	private AutoTarget _autoTarget;
-	private UsbCamera _camera;
-	private Autonomous _commandAuto;
 
-	public RobotControls (UsbCamera camera)
+	private Feeder _feeder;
+	private XCatsJSButton _feederLifter;
+
+	private Climber _climber;
+	
+	private Compressor _compressor;
+	private PowerDistributionPanel _pdp;
+		
+	private Autonomous _commandAuto;
+	private AutoTarget _autoTarget;
+	private boolean _autoMode=false; 
+
+	public RobotControls ()
 	{
 
 		//
@@ -76,7 +83,10 @@ public class RobotControls {
 		_feeder = new Feeder();
 		_climber = new Climber();
 		_gear = new Gear(_drive);
-		_autoTarget = new AutoTarget(_camera,false);
+		_autoTarget = new AutoTarget(false);
+		
+		_gearTimer = new Timer();
+		_gearTimer.reset();
 		
 		//_drive.setPDP(_pdp, Enums.BROWNOUT_VOLTAGE_THRESHOLD, Enums.BROWNOUT_VOLTAGE_REDUCTIONFACTOR);
 		
@@ -143,13 +153,20 @@ public class RobotControls {
 			System.out.println(". . . Executing commands for vision system response!");
 			_commandAuto.execute();
 		}else {
-			_commandAuto = null;			
+			System.out.print("......Auto Completed for vision system response!");
+			_commandAuto = null;
+			_autoMode = false;
 		}
 		
 	}
 	private void prepAuto(){
+
+		if (_commandAuto != null)
+			return;
 		
 		System.out.println("Prepping commands for vision system response!");
+		
+		_autoMode = true;
 		ArrayList<AutonomousStep> steps;		
 		steps =  new ArrayList<AutonomousStep>();
 		
@@ -158,6 +175,7 @@ public class RobotControls {
 		steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));	
 		
 		_commandAuto = new Autonomous(this,steps,5);
+		_commandAuto.execute();
 	}
 	
 	private void shiftTransmission(){
@@ -215,7 +233,9 @@ public class RobotControls {
 		if (_navx != null){
 			
 			if (Enums.TWO_JOYSTICKS){
-				if (_leftJS.getRawButton(3) && _commandAuto == null){
+				boolean aToggle = _leftJS.getRawButton(3);
+				if (aToggle != _autoMode ){
+					System.out.println("PREP auto");
 					this.prepAuto();
 				}
 			}
@@ -325,7 +345,7 @@ public class RobotControls {
 		
 //		SmartDashboard.putNumber("LeftSpeed", _drive.get(Enums.FRONT_LEFT));
 //		SmartDashboard.putNumber("Direction", directionLeft);
-		SmartDashboard.putBoolean("Shifter", _slowMode);		
+		SmartDashboard.putBoolean("Shifter in HIGH Gear", _slowMode);		
 		
 		SmartDashboard.putBoolean("DriverLeftButton", _leftJS.getRawButton(3));
 		
