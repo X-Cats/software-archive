@@ -68,6 +68,7 @@ public class Enums {
 	//Winch
 	public static final int WINCH_CAN_ID =11; //CAN ID of the winch
 	public static final double WINCH_CLIMB_SPEED = 1.0; // speed to climb
+	public static final int WINCH_LIMIT_SWITCH = 3;// limit switch for the winch
 	
 	//Gear Ejector
 	public static final int GEAR_ROTATOR_PWM_ID = 7;

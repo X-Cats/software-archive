@@ -2,21 +2,28 @@ package org.usfirst.frc.xcats.robot;
 
 import org.usfirst.frc.xcats.robot.XCatsSpeedController.SCType;
 
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 public class Climber {
 //motor
 //method climb
+	private DigitalInput _lsWinch;
 	private XCatsSpeedController _winch;
 	
 	public Climber(){
 		//constructor
 		_winch = new XCatsSpeedController("Winch",Enums.WINCH_CAN_ID,true,SCType.TALON,null,null);
+		_lsWinch = new DigitalInput (Enums.WINCH_LIMIT_SWITCH);
 		//_winch.setInverted(true);
 		}
 	
 	
 	public void climb(){
-		
-		_winch.set(Enums.WINCH_CLIMB_SPEED);
+		if (_lsWinch.get()){
+			_winch.set(Enums.WINCH_CLIMB_SPEED);
+			
+		}
 		
 	}
 
@@ -28,6 +35,7 @@ public class Climber {
 		_winch.set(0);
 	}
 	public void updateStatus(){
+		SmartDashboard.putBoolean("Winch Limit Switch", _lsWinch.get());
 		
 	}
 }
