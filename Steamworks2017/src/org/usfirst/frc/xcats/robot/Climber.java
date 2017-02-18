@@ -22,6 +22,7 @@ public class Climber {
 	public void climb(){
 		if (_lsWinch.get()){
 			_winch.set(Enums.WINCH_CLIMB_SPEED);
+			System.out.println("Winch speed getting set");
 			
 		}
 		
