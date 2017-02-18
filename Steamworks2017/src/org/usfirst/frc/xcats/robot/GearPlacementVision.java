@@ -34,10 +34,8 @@ public class GearPlacementVision
   	    ArrayList<Rect> rectList = new ArrayList<Rect>();
         int rectNum = 0;
   	    
-        for (MatOfPoint mop : gp.findContoursOutput())
+        for (MatOfPoint mop : gp.filterContoursOutput())
         {
-            rectNum++;
-
             Rect rect = Imgproc.boundingRect(mop);
             rectList.add(rect);
             System.out.println("Rectangle #" + rectNum
@@ -46,6 +44,7 @@ public class GearPlacementVision
           		              + ", Area=" + rect.area()
           		              + ", X=" + rect.x
           		              + ", Y=" + rect.y);
+            rectNum++;
         }
         
         if (rectList.size() == 0)
@@ -122,9 +121,8 @@ public class GearPlacementVision
         // Calculate the distance based on the center point of the 2 rectangles        
         int center_to_center_dist = (center_of_right_tape - center_of_left_tape); 
         distance_in_inches = 5116 / center_to_center_dist;
-        // Subtract fixed distance from Tape to tip of Pin
-        visionData.setDistanceInInches((int)(distance_in_inches - Enums.PEG_LENGTH 
-        		- Enums.PEG_CHANNEL_DEPTH - Enums.CAMERA_DIST_FROM_FRONT));
+        distance_in_inches = (int)(distance_in_inches - Enums.PEG_LENGTH 
+        		- Enums.PEG_CHANNEL_DEPTH - Enums.CAMERA_DIST_FROM_FRONT);
         
         // Calculate the Facing Angle based on center pixel of tape compared to center of image captured by camera
         int center_pixel_between_tape = (center_of_left_tape + (center_to_center_dist / 2));
@@ -166,11 +164,11 @@ public class GearPlacementVision
 
 		// Determine which zone we're in, use the area ratio
 		// if areas are close (>= 70 percent), then zone 1
-		if ((ra/la) >= 0.95)
+		if ((Math.abs(areaRatio)) >= 0.95)
 		{
 			zone = 0;
 		}
-		else if ((ra/la) <= 0.7)
+		else if ((Math.abs(areaRatio)) <= 0.7)
 		{
 			zone = 2;
 		}
@@ -180,21 +178,14 @@ public class GearPlacementVision
 		}
 		
 		// if right area larger than left area, then left rectangle is occluded
-		// so right of center and positive zone
-		if (zone == 2)
-		{
-			zone = (ra > la) ? zone : - zone;
-		}
+		// or barely smaller by parallax so right of center and positive zone
+		zone = (ra > la) ? zone : - zone;
 
 		visionData.setZone(zone);
 
-			// Rotate robot right ?? degrees
-			// Move forward ?? inches to centerline
-			// Rotate robot 90 degrees to the left
-
-			// Rotate robot left ?? degrees
-			// Move forward ?? inches to centerline
-			// Rotate robot 90 degrees to the right	
+		// Rotate robot right/left ?? degrees
+		// Move forward ?? inches to centerline
+		// Rotate robot 90 degrees to the left/right
 		
         visionData.setResult(true);
               
@@ -203,6 +194,7 @@ public class GearPlacementVision
         System.out.println("Distance to target: " + distance_in_inches + " inches");
         System.out.println("Facing angle to target: " + facing_angle_in_deg + " degrees");
         System.out.println("Zone: " + zone);
+        System.out.println("Angle to center line: " + (60 - facing_angle_in_deg) + " degrees");
         System.out.println("Done in " + (t1-t0) + " ms");
 
         return visionData;
