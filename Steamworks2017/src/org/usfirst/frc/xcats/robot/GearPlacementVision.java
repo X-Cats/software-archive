@@ -164,6 +164,20 @@ public class GearPlacementVision
 		areaRatio = (ra > la) ? areaRatio : - areaRatio;
 		System.out.println("LEFT area = " + left.area() + ", RIGHT area = " + right.area() + 
 				", Area ratio = " + areaRatio);
+
+		// Determine which zone we're in, use the area ratio
+		// if areas are close (>= 75 percent), then zone 1
+		// else zone 2
+		
+		// Determine left or right of center line
+		// if area ratio is negative, then robot is left of centerline as it faces the peg
+			// Rotate robot right ?? degrees
+			// Move forward ?? inches to centerline
+			// Rotate robot 90 degrees to the left
+		// else robot is right of centerline as it faces the peg
+			// Rotate robot left ?? degrees
+			// Move forward ?? inches to centerline
+			// Rotate robot 90 degrees to the right		
 		
 //		visionData.setAngleFromCenterLineInDeg(angle_from_center_line_in_deg);
         
