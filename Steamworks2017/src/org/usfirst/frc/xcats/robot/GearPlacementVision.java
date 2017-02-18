@@ -33,7 +33,6 @@ public class GearPlacementVision
         
   	    ArrayList<Rect> rectList = new ArrayList<Rect>();
         int rectNum = 0;
-        rectList = null;
   	    
         for (MatOfPoint mop : gp.findContoursOutput())
         {
@@ -49,7 +48,7 @@ public class GearPlacementVision
           		              + ", Y=" + rect.y);
         }
         
-        if (rectList == null)
+        if (rectList.size() == 0)
         {
             System.out.println("VISION: NOT ACCURATE - OPERATOR CONTROL NEEDED!!!");
         	visionData.setResult(false);
@@ -166,18 +165,36 @@ public class GearPlacementVision
 				", Area ratio = " + areaRatio);
 
 		// Determine which zone we're in, use the area ratio
-		// if areas are close (>= 75 percent), then zone 1
-		// else zone 2
+		int zone = 0;
+		
+		// if areas are close (>= 70 percent), then zone 1
+		if (Math.abs(ra/la) >= 0.7)
+		{
+			zone = 1;
+		}
+		else
+		{
+			zone = 2;
+		}
 		
 		// Determine left or right of center line
+		String sideOfCenterLine = "";
+		
 		// if area ratio is negative, then robot is left of centerline as it faces the peg
+		if (areaRatio <= 0)
+		{
+			sideOfCenterLine = "left";
 			// Rotate robot right ?? degrees
 			// Move forward ?? inches to centerline
 			// Rotate robot 90 degrees to the left
-		// else robot is right of centerline as it faces the peg
+		}
+		else
+		{
+			sideOfCenterLine = "right";
 			// Rotate robot left ?? degrees
 			// Move forward ?? inches to centerline
-			// Rotate robot 90 degrees to the right		
+			// Rotate robot 90 degrees to the right	
+		}	
 		
 //		visionData.setAngleFromCenterLineInDeg(angle_from_center_line_in_deg);
         
