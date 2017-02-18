@@ -22,6 +22,11 @@ public class GearPlacementVision
         int distance_in_inches = 0;
         int zone = 0;
         int facing_angle_in_deg = 0;
+        int res_x = 640;  // default value of image resolution, horizontally (e.g. 640x480)
+        res_x = _mat.width();
+    	int pixels_per_degree_X = res_x / Enums.CAMERA_FOV_HORIZONTAL;  // Horizontal field of view for MSoft Lifecam
+        System.out.println("Horizontal resolution: " + res_x + 
+        		"  Horizontal pixels per degree = " + pixels_per_degree_X);
        	VisionData visionData = new VisionData();
 
         System.loadLibrary( Core.NATIVE_LIBRARY_NAME);
@@ -126,9 +131,9 @@ public class GearPlacementVision
         
         // Calculate the Facing Angle based on center pixel of tape compared to center of image captured by camera
         int center_pixel_between_tape = (center_of_left_tape + (center_to_center_dist / 2));
-        int center_pixel_of_camera = Enums.CAMERA_X_PIXELS_TOTAL / 2;
+        int center_pixel_of_camera = res_x / 2;
         int offset_to_center_of_camera = center_pixel_between_tape - center_pixel_of_camera;
-        facing_angle_in_deg = offset_to_center_of_camera / Enums.PIXEL_PER_DEGREE;
+        facing_angle_in_deg = offset_to_center_of_camera / pixels_per_degree_X;
         
         if (facing_angle_in_deg < 0)
         {
