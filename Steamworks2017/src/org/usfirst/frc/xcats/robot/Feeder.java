@@ -4,18 +4,22 @@ import org.usfirst.frc.xcats.robot.XCatsSpeedController.SCType;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Feeder {
 	private XCatsSpeedController _topFeeder;
 	private XCatsSpeedController _bottomFeeder;
 	private DoubleSolenoid _lifter;
+	private Timer _initTimer = new Timer();
+	private boolean _init = false;
 	
 	public Feeder(){
 		
 		_topFeeder =  new XCatsSpeedController("Top Feeder",Enums.FEEDER_TOP_CAN,true,SCType.TALON,null,null);
 		_bottomFeeder =  new XCatsSpeedController("Bottom Feeder",Enums.FEEDER_BOTTOM_CAN,true,SCType.TALON,null,null);
 		_lifter = new DoubleSolenoid(Enums.PCM_CAN_ID,Enums.FEEDER_LIFT_PCM_FORWARD,Enums.FEEDER_LIFT_PCM_BACKWARD);
+		dropBar();
 		
 	}
 
@@ -49,6 +53,14 @@ public class Feeder {
 		_topFeeder.set(- Enums.FEEDER_FEED_SPEED);
 		_bottomFeeder.set(0);
 	}
+	public void dropBar(){
+		if(_init){
+			return;
+		}
+		_init = true;
+		_initTimer.reset();
+		_initTimer.start();
+	}
 	public void stop(){
 		_topFeeder.set(0);
 		_bottomFeeder.set(0);
@@ -66,5 +78,14 @@ public class Feeder {
 		
 		SmartDashboard.putBoolean("Ball Lifter is Up", !liftState);
 		
+		if(_init){
+			if(_initTimer.get() < 0.25){
+			_topFeeder.set(- Enums.FEEDER_FEED_SPEED);
+			}else{
+				_initTimer.stop();
+				_topFeeder.set(0);
+				_init = false;
+			}
+		}
 	}
 }
