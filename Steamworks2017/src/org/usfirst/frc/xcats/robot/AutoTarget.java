@@ -102,7 +102,7 @@ public class AutoTarget {
 			} else{
 				inRangeDeltaX = 150;
 				outRangeDeltaX = 157;
-				P0x = 320;
+				P0x = 350;
 				P1y = 420;
 				P2y = 280;
 				P4y = 320;
@@ -215,10 +215,12 @@ public class AutoTarget {
 		_outputStream.putFrame(_mat);				
 	}
 	
-	public void captureImage(){
+	public VisionData captureImage(){
+
+		VisionData myVisiondata = null;
 		
 		if (_bProcessing){
-			return;
+			return myVisiondata;
 		}
 		_bProcessing = true;
 		
@@ -228,9 +230,10 @@ public class AutoTarget {
 			// Send the output the error.
 			System.out.println("Cannot get output in AutoTarget.captureImage");
 			// skip the rest of the current iteration
-			return;	
+			_bProcessing = false;
+			return myVisiondata;	
 		}
-		if (filename.length() == 0){
+		if (Enums.CAMERA_SAVE_IMAGES){
 			Date date = new Date();
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			filename = "/home/lvuser/"+dateFormat.format(date)+".jpg";			
@@ -238,13 +241,14 @@ public class AutoTarget {
 		Imgcodecs.imwrite(filename, _mat);
 		try {
 			GearPlacementVision gpv = new GearPlacementVision();
-			VisionData visionData = gpv.processImage(_mat);
+			myVisiondata = gpv.processImage(_mat);
 		} catch (Exception e){
 			System.out.println("Error in Autotarget.CaptureImage");
 			e.printStackTrace();
 		}
 		
 		_bProcessing = false;
+		return myVisiondata;
 	}
 	
 	public void updateStatus(){

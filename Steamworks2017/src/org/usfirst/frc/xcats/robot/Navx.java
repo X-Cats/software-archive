@@ -129,7 +129,7 @@ public class Navx {
 
 			break;
 		}
-		SmartDashboard.putString("navxMode", navxMode);
+//		SmartDashboard.putString("navxMode", navxMode);
 
 	}
 	public void resetStatus(){

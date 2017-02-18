@@ -50,6 +50,7 @@ public class Enums {
 	public static final double PEG_LENGTH = 10.5;  // inches
 	public static final double PEG_CHANNEL_DEPTH = 3.375; // inches
 	public static final double CAMERA_DIST_FROM_FRONT = 5.0;  // inches
+	public static final boolean CAMERA_SAVE_IMAGES = true; //
 
 	//these values keep track specifically of the specific motor controllers
 	//if we only need 2 motors in the drive, use FRONT_LEFT and FRONT_RIGHT. Make sure that the arrays below have a length of 2
