@@ -157,11 +157,11 @@ public class GearPlacementVision
 				", Width ratio = " + widthRatio);
 		
 		// Compute the ratio of the area of the two main rectangles.
-		double ra = right.area; double la = left.area;
+		double ra = right.area(); double la = left.area();
 		double areaRatio = (ra > la) ? la / ra : ra / la;
 
 		areaRatio = (ra > la) ? areaRatio : - areaRatio;
-		System.out.println("LEFT area = " + left.area + ", RIGHT area = " + right.area + 
+		System.out.println("LEFT area = " + left.area() + ", RIGHT area = " + right.area() + 
 				", Area ratio = " + areaRatio);
 		
 //		visionData.setAngleFromCenterLineInDeg(angle_from_center_line_in_deg);
