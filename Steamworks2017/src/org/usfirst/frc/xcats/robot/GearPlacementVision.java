@@ -20,7 +20,7 @@ public class GearPlacementVision
     {
     	boolean result = false;
         int distance_in_inches = 0;
-        int angle_from_center_line_in_deg = 0;
+        int zone = 0;
         int facing_angle_in_deg = 0;
        	VisionData visionData = new VisionData();
 
@@ -165,45 +165,44 @@ public class GearPlacementVision
 				", Area ratio = " + areaRatio);
 
 		// Determine which zone we're in, use the area ratio
-		int zone = 0;
-		
 		// if areas are close (>= 70 percent), then zone 1
-		if (Math.abs(ra/la) >= 0.7)
+		if ((ra/la) >= 0.95)
 		{
-			zone = 1;
+			zone = 0;
 		}
-		else
+		else if ((ra/la) <= 0.7)
 		{
 			zone = 2;
 		}
-		
-		// Determine left or right of center line
-		String sideOfCenterLine = "";
-		
-		// if area ratio is negative, then robot is left of centerline as it faces the peg
-		if (areaRatio <= 0)
+		else
 		{
-			sideOfCenterLine = "left";
+			zone = 1;
+		}
+		
+		// if right area larger than left area, then left rectangle is occluded
+		// so right of center and positive zone
+		if (zone == 2)
+		{
+			zone = (ra > la) ? zone : - zone;
+		}
+
+		visionData.setZone(zone);
+
 			// Rotate robot right ?? degrees
 			// Move forward ?? inches to centerline
 			// Rotate robot 90 degrees to the left
-		}
-		else
-		{
-			sideOfCenterLine = "right";
+
 			// Rotate robot left ?? degrees
 			// Move forward ?? inches to centerline
 			// Rotate robot 90 degrees to the right	
-		}	
 		
-//		visionData.setAngleFromCenterLineInDeg(angle_from_center_line_in_deg);
-        
         visionData.setResult(true);
               
         long t1 = System.currentTimeMillis();
 //        System.out.println("\nImage used: " + imageName);
         System.out.println("Distance to target: " + distance_in_inches + " inches");
         System.out.println("Facing angle to target: " + facing_angle_in_deg + " degrees");
+        System.out.println("Zone: " + zone);
         System.out.println("Done in " + (t1-t0) + " ms");
 
         return visionData;
