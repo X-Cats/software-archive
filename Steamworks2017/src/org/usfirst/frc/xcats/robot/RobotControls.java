@@ -54,6 +54,8 @@ public class RobotControls {
 	private boolean _highSpeed = false;
 	private DoubleSolenoid _dblSolShifter;
 	private Navx _navx;
+	private boolean _driveStraight=false;
+	private float _initialYaw=0;
 
 	private Feeder _feeder;
 	private XCatsJSButton _feederLifter;
@@ -133,6 +135,9 @@ public class RobotControls {
 		}
 	}
 	
+	public void feederInit(){
+		_feeder.dropBar();
+	}
 	public void setCoastMode(){
 		_drive.setCoastMode();
 	}
@@ -216,7 +221,20 @@ public class RobotControls {
 
 		if (!_shifting){
 			if (Enums.TWO_JOYSTICKS){
-				_drive.set(_leftJS, _rightJS);
+				if (_rightJS.getRawButton(11)){
+					if (_driveStraight){
+						driveStraight(0.3,0.3);
+						
+					}else{
+						_navx.zeroYaw();
+						_initialYaw = _navx.getYaw();
+						_driveStraight = true;
+					}
+					
+				} else{
+					_driveStraight = false;
+					_drive.set(_leftJS, _rightJS);
+				}
 			}
 			else {
 				_drive.set(_driveJS);
@@ -260,6 +278,34 @@ public class RobotControls {
 
 	}
 
+	public void driveStraight ( double left, double right)
+	{
+		float deltaYaw;
+
+		deltaYaw = _initialYaw - _navx.getYaw();
+		double offset=0;
+
+		SmartDashboard.putNumber("currentYaw", _initialYaw);
+		SmartDashboard.putNumber("deltaYaw", deltaYaw);
+		double  offsetLimit = 0.10;
+		if (left == right){
+			offset = Math.abs(deltaYaw);
+			if(offset > offsetLimit){
+				offset = offsetLimit;
+			}
+			if(deltaYaw > 0){
+				left = left * (1+offset);
+				right = right * (1-offset);
+			}else{
+				left = left * (1-offset);
+				right = right * (1+offset);
+			}
+		}
+//			System.out.println("Drive Straight " + deltaYaw +"   "+ offset +"      " + left +"    "+ right);
+			_drive.set(-left, -left, -right, -right);
+	}
+	
+	
 	public void operate ()
 	{
 		//if we are executing commands then exit response to operator

@@ -79,7 +79,8 @@ public class Feeder {
 		SmartDashboard.putBoolean("Ball Lifter is Up", !liftState);
 		
 		if(_init){
-			if(_initTimer.get() < 0.25){
+			if(_initTimer.get() < 0.10){
+				System.out.println("initializing feeder");
 			_topFeeder.set(- Enums.FEEDER_FEED_SPEED);
 			}else{
 				_initTimer.stop();

@@ -78,7 +78,9 @@ public class Robot extends IterativeRobot {
     
     public void teleopInit() {
     	try {
-        	_auto.disable();    		
+    		System.out.println("Teleop init");
+        	_auto.disable();    
+        	_teleop.init();
     	}
     	catch (Exception e){
     		//keep going!
