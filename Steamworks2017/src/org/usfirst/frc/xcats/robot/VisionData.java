@@ -4,7 +4,7 @@ public class VisionData
 {
     boolean result = false;
     int distance_in_inches = 0;
-    int angle_from_center_line_in_deg = 0;
+    int zone = 0;
     int facing_angle_in_deg = 0;
     
     public VisionData()
@@ -20,9 +20,9 @@ public class VisionData
     	distance_in_inches = distance;
     }
     
-    public void setAngleFromCenterLineInDeg(int angle_from_center)
+    public void setZone(int z)
     {
-    	angle_from_center_line_in_deg = angle_from_center;
+    	zone = z;
     }
     
     public void setFacingAngleInDeg(int facing_angle)
@@ -40,9 +40,9 @@ public class VisionData
     	return distance_in_inches;
     }
     
-    public int getAngleFromCenterLineInDeg()
+    public int getZone()
     {
-    	return angle_from_center_line_in_deg;
+    	return zone;
     }
     
     public int getFacingAngleInDeg()
