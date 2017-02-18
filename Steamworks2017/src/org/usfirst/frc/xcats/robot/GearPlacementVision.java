@@ -124,7 +124,8 @@ public class GearPlacementVision
         int center_to_center_dist = (center_of_right_tape - center_of_left_tape); 
         distance_in_inches = 5116 / center_to_center_dist;
         // Subtract fixed distance from Tape to tip of Pin
-        visionData.setDistanceInInches(distance_in_inches);
+        visionData.setDistanceInInches((int)(distance_in_inches - Enums.PEG_LENGTH 
+        		- Enums.PEG_CHANNEL_DEPTH - Enums.CAMERA_DIST_FROM_FRONT));
         
         // Calculate the Facing Angle based on center pixel of tape compared to center of image captured by camera
         int center_pixel_between_tape = (center_of_left_tape + (center_to_center_dist / 2));
