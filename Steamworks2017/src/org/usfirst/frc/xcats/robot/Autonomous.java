@@ -7,7 +7,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -157,13 +160,41 @@ public class Autonomous {
 		//we are going to construct the steps needed for our autonomous mode
 //		int choice=1;
 		double speedTest =SmartDashboard.getNumber(_autoTestSpeed, 0.5);
-		String caseName;
+		String caseName="";
 		_steps =  new ArrayList<AutonomousStep>();
 		
+		boolean blueAlliance = false;
+		
+		if (DriverStation.getInstance().getAlliance() == DriverStation.Alliance.Blue){
+			blueAlliance = true;
+		}
+		
+		if (Enums.IS_FINAL_ROBOT){
+			//use the switch on the robot to identify autonomous
+			
+			AnalogInput autoSelector = new AnalogInput(Enums.AUTO_SWITCH_ANALOG);
+			
+			if (autoSelector.getValue() < 0.5)
+				_autoSelected = _defaultAuto;
+			else if (autoSelector.getValue() < 1.5 && autoSelector.getValue() > 0.5)
+				_autoSelected = _auto1;  //left
+			else if (autoSelector.getValue() < 2.5 && autoSelector.getValue() > 1.5)
+				_autoSelected = _auto2;  //center
+			else if (autoSelector.getValue() < 3.5 && autoSelector.getValue() > 2.5)
+				_autoSelected = _auto3;  //right
+			else if (autoSelector.getValue() < 4.5 && autoSelector.getValue() > 3.5)
+				//read from the sendable chooser
+				System.out.println("Using Sendable Chooser Autonomous mode" + _autoSelected);
+			else
+				_autoSelected = _defaultAuto;
+		}
+		
+					
 		switch (_autoSelected) {
 		case _auto2: 
 			caseName="Middle Gear";
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.BRAKEMODE,"Brake Mode",0,0,0,0)); //Set brake mode for drive train
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LOW_SPEED,"Low speed transmission",0,0,0,0)); //make sure we are in low speed
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,87)); //assuming 99.64 inches
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.WAIT,"Wait for gear to eject",0,0,0,Enums.GEAR_EJECT_TIME));
@@ -173,17 +204,15 @@ public class Autonomous {
 			break;
 		case _auto1: 
 			caseName="Left Gear";
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.BRAKEMODE,"Brake Mode",0,0,0,0)); //Set brake mode for drive train
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,119-22));
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn 60",0,0,0,58));
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,37));
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.COASTMODE,"Coast Mode",0,0,0,0)); //Set COAST mode for drive train
+			addSideSteps(blueAlliance);
+	
 			break;
 			
 		case _auto3: 
 			caseName="Right Gear";
+			addSideSteps(blueAlliance);			
+			
+
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.BRAKEMODE,"Brake Mode",0,0,0,0)); //Set brake mode for drive train
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,103.5-22));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn 60",0,0,0,-62));
@@ -218,6 +247,39 @@ public class Autonomous {
 	//	}
 
 
+	private void addSideSteps(boolean isBlueAlliance){
+		double rotationAngle = 0;
+		double distanceLeg1 = 0;
+		double distanceLeg2 = 0;
+		
+		double boilerSideLeg1 = 119-22;
+		double feederSideLeg1 = 101.5-22;
+		double boilerSideLeg2 = 37;
+		double feederSideLeg2 = 56;
+		
+		
+		if (_autoSelected == _auto2){
+			//left 
+			rotationAngle = (isBlueAlliance ? 58 : -62);
+			distanceLeg1 = (isBlueAlliance ? boilerSideLeg1 : feederSideLeg1 );
+			distanceLeg2 = (isBlueAlliance ? boilerSideLeg2 : feederSideLeg2);			
+		} else if (_autoSelected == _auto2){
+			//right
+			rotationAngle = (isBlueAlliance ? -62 : 58);
+			distanceLeg1 = (isBlueAlliance ? feederSideLeg1 : boilerSideLeg1);
+			distanceLeg2 = (isBlueAlliance ? feederSideLeg2 : boilerSideLeg2);			
+		}
+					
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.BRAKEMODE,"Brake Mode",0,0,0,0)); //Set brake mode for drive train
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LOW_SPEED,"Low speed transmission",0,0,0,0)); //make sure we are in low speed
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,distanceLeg1));
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn 60",0,0,0,58));
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,distanceLeg2));
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,rotationAngle));
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.COASTMODE,"Coast Mode",0,0,0,0)); //Set COAST mode for drive train		
+		
+	}
 
 	
 	public boolean isExecuting(){
@@ -238,7 +300,7 @@ public class Autonomous {
 		}
 		
 		if (_steps.size() == 0){
-			System.out.println("trying to execute no steps in Autonomous 234");
+			System.out.println("trying to execute no steps in Autonomous 272");
 			_isExecuting = false;	
 			return;
 		}
@@ -319,9 +381,20 @@ public class Autonomous {
 
 			case COASTMODE:
 				_controls.setCoastMode();
+				startNextStep();
 				break;
 
+			case LOW_SPEED:
+				_controls.setLowSpeed();
+				startNextStep();
+				break;
 
+			case HIGH_SPEED:
+				_controls.setHighSpeed();
+				startNextStep();
+				break;
+
+				
 			case WAIT:
 				wait(_currentAutoStep.stepTime);
 				break;

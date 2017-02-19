@@ -136,6 +136,11 @@ public class RobotControls {
 			System.out.println(e);
 			e.printStackTrace();
 		}
+		
+		// get the state of the shifter
+		_slowMode = (_dblSolShifter.get() == DoubleSolenoid.Value.kForward ? true : false);
+		setLowSpeed();
+		
 	}
 	
 	public void feederInit(){
@@ -149,6 +154,19 @@ public class RobotControls {
 	}
 	public Navx getNavx(){
 		return _navx;
+	}
+	public void setHighSpeed(){
+		if (!_slowMode)
+			return;
+		else
+			shiftTransmission();		
+	}
+	public void setLowSpeed(){
+		if (_slowMode)
+			return;
+		else
+			shiftTransmission();
+		
 	}
 
 	private void executeCommandAuto(){
@@ -278,10 +296,10 @@ public class RobotControls {
 			//button 1 is the "trigger" button
 			if (_leftJS.getRawButton(1)){
 				_visionData = _autoTarget.captureImage();
-				SmartDashboard.putBoolean("Vision Processing", _visionData.result);
-				SmartDashboard.putNumber("Vision FACING Angle", _visionData.facing_angle_in_deg);
-				SmartDashboard.putNumber("Vision ZONE", _visionData.zone);
-				SmartDashboard.putNumber("Vision DISTANCE", _visionData.distance_in_inches);
+				SmartDashboard.putBoolean("Vision Processing", _visionData.getResult());
+				SmartDashboard.putNumber("Vision FACING Angle", _visionData.getFacingAngleInDeg());
+				SmartDashboard.putNumber("Vision ZONE", _visionData.getZone());
+				SmartDashboard.putNumber("Vision DISTANCE", _visionData.getDistanceInInches());
 								
 			}
 		}else{
@@ -405,7 +423,7 @@ public class RobotControls {
 		
 //		SmartDashboard.putNumber("LeftSpeed", _drive.get(Enums.FRONT_LEFT));
 //		SmartDashboard.putNumber("Direction", directionLeft);
-		SmartDashboard.putBoolean("Shifter in HIGH Gear", _slowMode);		
+		SmartDashboard.putBoolean("Shifter in HIGH Gear", !_slowMode);		
 		
 		SmartDashboard.putBoolean("DriverLeftButton", _leftJS.getRawButton(3));
 		

@@ -99,6 +99,7 @@ public class Enums {
 	
 	//Autonomous uses the chooser object to select mode
 	public static final int AUTONOMOUS_TIME = 15;
+	public static final int AUTO_SWITCH_ANALOG = 0;
 	
 	
 	
