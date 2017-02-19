@@ -67,7 +67,6 @@ public class Robot extends IterativeRobot {
 	 */
     public void autonomousInit() {
     	try {
-    		System.out.println("calling autonomousInit");
         	_auto.init();    		
     	}
     	catch (Exception e){
@@ -78,7 +77,6 @@ public class Robot extends IterativeRobot {
     
     public void teleopInit() {
     	try {
-    		System.out.println("Teleop init");
         	_auto.disable();    
         	_teleop.init();
     	}
