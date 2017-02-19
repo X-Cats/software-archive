@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import org.opencv.core.Mat;
@@ -253,6 +254,39 @@ public class AutoTarget {
 		
 		_bProcessing = false;
 		return myVisiondata;
+	}
+	
+	public ArrayList<AutonomousStep> createAutoSteps(VisionData vd){
+		
+		//this is where we process our vision data and translate it into robot actions
+		ArrayList<AutonomousStep> steps = null;
+		
+		if (vd.getResult()){
+			
+			switch (vd.getZone()){
+			
+			case 1:
+				steps =  new ArrayList<AutonomousStep>();
+
+				
+				break;
+				
+			case 2:
+				break;
+				
+			case 3:
+				break;
+				
+			default:
+				break;
+			
+			}
+			
+		}
+				
+		//return the array of steps to the caller. Note this may be null at times, so the caller needs to 
+		//check that
+		return steps;
 	}
 	
 	public void updateStatus(){
