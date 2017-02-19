@@ -56,6 +56,8 @@ public class RobotControls {
 	private Navx _navx;
 	private boolean _driveStraight=false;
 	private float _initialYaw=0;
+	
+	private VisionData _visionData;
 
 	private Feeder _feeder;
 	private XCatsJSButton _feederLifter;
@@ -169,7 +171,13 @@ public class RobotControls {
 		if (_commandAuto != null)
 			return;
 		
+		SmartDashboard.putBoolean("Vision Processing", _visionData.result);
+		SmartDashboard.putNumber("Vision FACING Angle", _visionData.facing_angle_in_deg);
+		SmartDashboard.putNumber("Vision ZONE", _visionData.zone);
+		SmartDashboard.putNumber("Vision DISTANCE", _visionData.distance_in_inches);
+		
 		System.out.println("Prepping commands for vision system response!");
+		
 		
 		_autoMode = true;
 		ArrayList<AutonomousStep> steps;		
@@ -268,11 +276,16 @@ public class RobotControls {
 		if(Enums.TWO_JOYSTICKS){
 			//button 1 is the "trigger" button
 			if (_leftJS.getRawButton(1)){
-				_autoTarget.captureImage();
+				_visionData = _autoTarget.captureImage();
+				SmartDashboard.putBoolean("Vision Processing", _visionData.result);
+				SmartDashboard.putNumber("Vision FACING Angle", _visionData.facing_angle_in_deg);
+				SmartDashboard.putNumber("Vision ZONE", _visionData.zone);
+				SmartDashboard.putNumber("Vision DISTANCE", _visionData.distance_in_inches);
+								
 			}
 		}else{
 			if(_driveJS.getRawButton(7)){
-				_autoTarget.captureImage();
+				_visionData = _autoTarget.captureImage();
 			}
 		}
 
@@ -282,18 +295,18 @@ public class RobotControls {
 	{
 		float deltaYaw;
 
-		deltaYaw = _initialYaw - _navx.getYaw();
+		deltaYaw =  _navx.getYaw();
 		double offset=0;
 
 		SmartDashboard.putNumber("currentYaw", _initialYaw);
 		SmartDashboard.putNumber("deltaYaw", deltaYaw);
-		double  offsetLimit = 0.10;
+		double  offsetLimit = 0.05;
 		if (left == right){
 			offset = Math.abs(deltaYaw);
 			if(offset > offsetLimit){
 				offset = offsetLimit;
 			}
-			if(deltaYaw > 0){
+			if(deltaYaw < 0){
 				left = left * (1+offset);
 				right = right * (1-offset);
 			}else{

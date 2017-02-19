@@ -136,11 +136,13 @@ public class Navx {
 		ahrs.resetDisplacement();
 	}
 	public float getYaw(){
-		return ahrs.getYaw() - _startingYaw;
+//		return ahrs.getYaw() - _startingYaw;
+		return ahrs.getYaw();
 	}
 	public void zeroYaw(){
+		ahrs.reset();
 		ahrs.zeroYaw();
-		_startingYaw = ahrs.getYaw();
+//		_startingYaw = ahrs.getYaw();
 	}
 	public void rotate(double degrees){
 		

@@ -132,6 +132,7 @@ public class Autonomous {
 		}
 		
 		_navx = _controls.getNavx();
+		_navx.zeroYaw();
 		_initialYaw = _navx.getYaw();
 		_currentStep = 0;
 		_currentAutoStep = null;
@@ -155,7 +156,7 @@ public class Autonomous {
 
 		//we are going to construct the steps needed for our autonomous mode
 //		int choice=1;
-		double speedTest =1.0;
+		double speedTest =SmartDashboard.getNumber(_autoTestSpeed, 0.5);
 		String caseName;
 		_steps =  new ArrayList<AutonomousStep>();
 		
@@ -163,7 +164,7 @@ public class Autonomous {
 		case _auto2: 
 			caseName="Middle Gear";
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.BRAKEMODE,"Brake Mode",0,0,0,0)); //Set brake mode for drive train
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,89)); //assuming 99.64 inches
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,87)); //assuming 99.64 inches
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.WAIT,"Wait for gear to eject",0,0,0,Enums.GEAR_EJECT_TIME));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
@@ -173,9 +174,9 @@ public class Autonomous {
 		case _auto1: 
 			caseName="Left Gear";
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.BRAKEMODE,"Brake Mode",0,0,0,0)); //Set brake mode for drive train
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,72));
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn 60",0,0,0,60));
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,5));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,119-22));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn 60",0,0,0,58));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,37));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.COASTMODE,"Coast Mode",0,0,0,0)); //Set COAST mode for drive train
@@ -184,9 +185,9 @@ public class Autonomous {
 		case _auto3: 
 			caseName="Right Gear";
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.BRAKEMODE,"Brake Mode",0,0,0,0)); //Set brake mode for drive train
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,72));
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn 60",0,0,0,-60));
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,72));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,101.5-22));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn 60",0,0,0,-62));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,56));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.COASTMODE,"Coast Mode",0,0,0,0)); //Set COAST mode for drive train
@@ -195,7 +196,7 @@ public class Autonomous {
 		case _autoTestSpeed:
 			caseName="Speed Test";
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.BRAKEMODE,"Brake Mode",0,0,0,0)); //Set brake mode for drive train
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Drive Straight",5,speedTest,speedTest,0));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Drive",5,speedTest,speedTest,0));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.COASTMODE,"Coast Mode",0,0,0,0)); //Set COAST mode for drive train
 			break;
@@ -270,7 +271,7 @@ public class Autonomous {
 				else
 					cTime = _currentAutoStep.distance/(59*_currentAutoStep.leftSpeed - 2.5);
 
-				drive(cTime,_currentAutoStep.leftSpeed,_currentAutoStep.rightSpeed);
+				driveStraight(cTime,_currentAutoStep.leftSpeed,_currentAutoStep.rightSpeed);
 				break;
 			case ROTATE:
 				//float deltaYaw;
@@ -347,19 +348,36 @@ public class Autonomous {
 	}
 	public void drive (double time, double left, double right)
 	{
+	
+
+		if (_stepTimer.get() > time)
+		{
+			_controls.getDrive().set(0, 0, 0, 0);
+			startNextStep();
+		}
+		else
+		{
+			_controls.getDrive().set(-left, -left, -right, -right);
+		}
+	}
+
+	public void driveStraight (double time, double left, double right)
+	{
 		float deltaYaw;
 
-		deltaYaw = _initialYaw - _controls.getNavx().getYaw();
-		double offset;
+		//deltaYaw = _initialYaw - _controls.getNavx().getYaw();
+		deltaYaw = _navx.getYaw();
+		double offsetLimit = 0.05;
+		double offset=0;
 
 		SmartDashboard.putNumber("currentYaw", _initialYaw);
 		SmartDashboard.putNumber("deltaYaw", deltaYaw);
 		if (left == right){
 			offset = Math.abs(deltaYaw);
-			if(offset > .1){
-				offset = .1;
+			if(offset > offsetLimit){
+				offset = offsetLimit;
 			}
-			if(deltaYaw > 0){
+			if(deltaYaw < 0){
 				left = left * (1+offset);
 				right = right * (1-offset);
 			}else{
@@ -378,7 +396,7 @@ public class Autonomous {
 			_controls.getDrive().set(-left, -left, -right, -right);
 		}
 	}
-
+	
 	public void drive (double time, double leftX, double leftY, double rightX, double rightY)
 	{
 		if (_stepTimer.get() > time)

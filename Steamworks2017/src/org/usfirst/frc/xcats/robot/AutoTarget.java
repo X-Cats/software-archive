@@ -70,6 +70,8 @@ public class AutoTarget {
 	private Scalar _lineColor = new Scalar(0,255,255);
 	private Scalar _ejectColor = new Scalar(0,0,255);
 	private boolean _bProcessing =false;
+	private int _width = 320;
+	private int _height = 240;
 	
 	public AutoTarget(){
 		
@@ -78,15 +80,16 @@ public class AutoTarget {
 			_camera = CameraServer.getInstance().startAutomaticCapture();
 			//_camera = camera;
 			// Set the resolution
-			_camera.setResolution(640, 480);
+			_camera.setResolution(_width, _height);
 			_camera.setFPS(25);
+
 			//_camera.setFPS(5);
 
 			// Get a CvSink. This will capture Mats from the camera
 			_cvs = CameraServer.getInstance().getVideo();
 			
 			// Setup a CvSource. This will send images back to the Dashboard
-			_outputStream = CameraServer.getInstance().putVideo("XCATS", 640, 480);
+			_outputStream = CameraServer.getInstance().putVideo("XCATS", _width, _height);
 
 			// Mats are very memory expensive. Lets reuse this Mat.
 			_mat = new Mat();
@@ -100,18 +103,18 @@ public class AutoTarget {
 			if (Enums.IS_FINAL_ROBOT){
 				
 			} else{
-				inRangeDeltaX = 150;
-				outRangeDeltaX = 157;
-				P0x = 350;
-				P1y = 420;
-				P2y = 280;
-				P4y = 320;
+				inRangeDeltaX = (int) (0.234 * _width);
+				outRangeDeltaX = (int) (0.245 * _width);
+				P0x = (int) (_width / 2 + 0.1 * (_width / 2));
+				P1y = (int) (0.875 * _height);
+				P2y = (int) (0.6 * _height);
+				P4y = (int) (0.667 * _height);
 			}
 
 			_P0 	= new Point(P0x,0);
 			_P1 	= new Point(0,P1y);
 			_P2 	= new Point(P0x,P2y);
-			_P3 	= new Point(640,P1y);
+			_P3 	= new Point(_width,P1y);
 			
 			_P4 	= new Point(P0x-inRangeDeltaX,P4y);
 			_P4_0 = new Point(P0x-inRangeDeltaX,0);
@@ -184,19 +187,20 @@ public class AutoTarget {
 //		P2y = SmartDashboard.getNumber("P2y", 550);
 		
 		//Draw the center line, this is where we want the gear and the rope
-		Imgproc.line(_mat, _P0, _P2, _lineColor, 5 , 8, 0);
+	
+		Imgproc.line(_mat, _P0, _P2, _lineColor, 2 , 8, 0);
 
 		//Draw the P1 to P2 segment
-		Imgproc.line(_mat, _P1, _P2, _lineColor, 3 , 8, 0);
+		Imgproc.line(_mat, _P1, _P2, _lineColor, 1 , 8, 0);
 
 		//Draw the P2 to P3 segment
-		Imgproc.line(_mat, _P2, _P3, _lineColor, 3 , 8, 0);
+		Imgproc.line(_mat, _P2, _P3, _lineColor, 1 , 8, 0);
 		
 		//Draw the P4 segment (to top of screen)
-		Imgproc.line(_mat, _P4, _P4_0, _ejectColor, 3 , 8, 0);
+		Imgproc.line(_mat, _P4, _P4_0, _ejectColor, 1 , 8, 0);
 		
 		//Draw the P5 segment (to top of screen)
-		Imgproc.line(_mat, _P5, _P5_0, _ejectColor, 3 , 8, 0);
+		Imgproc.line(_mat, _P5, _P5_0, _ejectColor, 1 , 8, 0);
 
 //		//Draw the P4 segment (to top of screen)
 //		Imgproc.line(_mat, _P6, _P6_0, _ejectColor, 3 , 8, 0);
