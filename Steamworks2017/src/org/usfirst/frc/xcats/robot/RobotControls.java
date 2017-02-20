@@ -137,9 +137,12 @@ public class RobotControls {
 			e.printStackTrace();
 		}
 		
-		// get the state of the shifter
-		_slowMode = (_dblSolShifter.get() == DoubleSolenoid.Value.kForward ? true : false);
-		setLowSpeed();
+		// always initialize the robot in low gear
+		_dblSolShifter.set(DoubleSolenoid.Value.kReverse);
+		_slowMode = (_dblSolShifter.get() == DoubleSolenoid.Value.kReverse ? true : false);
+		System.out.println("State of shifter ="+ _dblSolShifter.get());
+		System.out.println("Slow mode" +_slowMode);
+//		setLowSpeed();
 		
 	}
 	
@@ -156,12 +159,14 @@ public class RobotControls {
 		return _navx;
 	}
 	public void setHighSpeed(){
+		
 		if (!_slowMode)
 			return;
 		else
 			shiftTransmission();		
 	}
 	public void setLowSpeed(){
+		
 		if (_slowMode)
 			return;
 		else
@@ -217,10 +222,13 @@ public class RobotControls {
 		_shiftTimer.start();
 		_shifting = true;
 		
+//		if (_dblSolShifter.get() == DoubleSolenoid.Value.kOff)
+//			_slowMode = true;
+		
 		if (_slowMode)
-			_dblSolShifter.set(DoubleSolenoid.Value.kForward);
+			_dblSolShifter.set(DoubleSolenoid.Value.kReverse);
 		 else 
-			_dblSolShifter.set(DoubleSolenoid.Value.kReverse);										
+			_dblSolShifter.set(DoubleSolenoid.Value.kForward);										
 		
 	}
 	public void drive ()
