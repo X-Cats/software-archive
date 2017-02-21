@@ -54,7 +54,7 @@ public class GearPlacementVision
         
         if (rectList.size() == 0)
         {
-            System.out.println("VISION: NOT ACCURATE - OPERATOR CONTROL NEEDED!!!");
+            System.out.println("VISION: NOT ACCURATE - OPERATOR CONTROL NEEDED!!!  Found 0 reflections!");
         	visionData.setResult(false);
         	return visionData;
         }
@@ -65,7 +65,7 @@ public class GearPlacementVision
   	    
         if ( (rectList.size() < 2) )
         {
-            System.out.println("VISION: NOT ACCURATE - OPERATOR CONTROL NEEDED!!!");
+            System.out.println("VISION: NOT ACCURATE - OPERATOR CONTROL NEEDED!!!  Found only 1 reflection!");
         	visionData.setResult(false);
         	return visionData;
         }
@@ -123,11 +123,22 @@ public class GearPlacementVision
         int center_of_left_tape = (left.x + (left.width / 2)); 
         int center_of_right_tape = (right.x + (right.width / 2));
         
-        // Calculate the distance based on the center point of the 2 rectangles        
-        int center_to_center_dist = (center_of_right_tape - center_of_left_tape); 
-        distance_in_inches = 5116 / center_to_center_dist;
+        // Calculate the distance based on the center point of the 2 rectangles
+        int center_to_center_dist = (center_of_right_tape - center_of_left_tape);
+        
+        if (center_to_center_dist <= 10)
+        {
+            System.out.println("ERROR: Center to Center distance of reflective tape is less than 10 pixels.");       	
+        	visionData.setResult(false);
+        	return visionData;
+        }
+        
+        distance_in_inches = ( (int) ((360 * 8.5 * pixels_per_degree_X) / (center_to_center_dist * 2 * 3.14)) );
+        // Subtract fixed distance from Tape to tip of Pin
         distance_in_inches = (int)(distance_in_inches - Enums.PEG_LENGTH 
         		- Enums.PEG_CHANNEL_DEPTH - Enums.CAMERA_DIST_FROM_FRONT);
+        
+        visionData.setDistanceInInches((int) distance_in_inches);
         
         // Calculate the Facing Angle based on center pixel of tape compared to center of image captured by camera
         int center_pixel_between_tape = (center_of_left_tape + (center_to_center_dist / 2));
