@@ -56,7 +56,7 @@ import org.opencv.imgcodecs.Imgcodecs;
  */
 
 public class AutoTarget {
-	private UsbCamera _camera; 
+	private static UsbCamera _camera; 
 	private CvSink _cvs;
 	private CvSource _outputStream;
 	private Mat _mat;
@@ -77,12 +77,17 @@ public class AutoTarget {
 	public AutoTarget(){
 		
 		try{
+			int brightness = 50;
+//			SmartDashboard.putNumber("Camera Brightness", brightness);
+			
 			System.out.print("Constructing camera from Robot Init");			
 			_camera = CameraServer.getInstance().startAutomaticCapture();
 			//_camera = camera;
 			// Set the resolution
 			_camera.setResolution(_width, _height);
 			_camera.setFPS(25);
+//			_camera.setBrightness(50);
+//			_camera.setWhiteBalanceManual(6000);
 
 			//_camera.setFPS(5);
 
@@ -291,5 +296,7 @@ public class AutoTarget {
 	
 	public void updateStatus(){
 		//update status here
+//		int brightness = (int) SmartDashboard.getNumber("Camera Brightness", 50);
+//		_camera.setBrightness(brightness);
 	}
 }

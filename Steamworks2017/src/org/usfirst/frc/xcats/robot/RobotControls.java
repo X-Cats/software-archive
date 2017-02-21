@@ -195,10 +195,13 @@ public class RobotControls {
 		if (_commandAuto != null)
 			return;
 		
-		SmartDashboard.putBoolean("Vision Processing", _visionData.result);
-		SmartDashboard.putNumber("Vision FACING Angle", _visionData.facing_angle_in_deg);
-		SmartDashboard.putNumber("Vision ZONE", _visionData.zone);
-		SmartDashboard.putNumber("Vision DISTANCE", _visionData.distance_in_inches);
+		if (_visionData != null){
+			SmartDashboard.putBoolean("Vision Processing", _visionData.result);
+			SmartDashboard.putNumber("Vision FACING Angle", _visionData.facing_angle_in_deg);
+			SmartDashboard.putNumber("Vision ZONE", _visionData.zone);
+			SmartDashboard.putNumber("Vision DISTANCE", _visionData.distance_in_inches);			
+		}
+		
 		
 		System.out.println("Prepping commands for vision system response!");
 		
@@ -258,7 +261,7 @@ public class RobotControls {
 			if (Enums.TWO_JOYSTICKS){
 				if (_rightJS.getRawButton(11)){
 					if (_driveStraight){
-						driveStraight(0.3,0.3);
+						driveStraight(0.4,0.4);
 						
 					}else{
 						_navx.zeroYaw();
@@ -439,6 +442,8 @@ public class RobotControls {
 		_gear.updateStatus();
 		_feeder.updateStatus();
 		_climber.updateStatus();
+		_autoTarget.updateStatus();
+		
 		if (_commandAuto != null)
 			_commandAuto.updateStatus();
 		
