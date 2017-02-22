@@ -173,23 +173,24 @@ public class Autonomous {
 			//use the switch on the robot to identify autonomous
 			
 			AnalogInput autoSelector = new AnalogInput(Enums.AUTO_SWITCH_ANALOG);
+			SmartDashboard.putNumber("Auto Selector Value", autoSelector.getValue()/100);
 			
-			if (autoSelector.getValue() < 0.5)
+			if (autoSelector.getValue()/100 < 0.5)
 				_autoSelected = _defaultAuto;
-			else if (autoSelector.getValue() < 1.5 && autoSelector.getValue() > 0.5)
+			else if (autoSelector.getValue()/100 < 1.5 && autoSelector.getValue()/100 > 0.5)
 				_autoSelected = _auto1;  //left
-			else if (autoSelector.getValue() < 2.5 && autoSelector.getValue() > 1.5)
+			else if (autoSelector.getValue()/100 < 2.5 && autoSelector.getValue()/100 > 1.5)
 				_autoSelected = _auto2;  //center
-			else if (autoSelector.getValue() < 3.5 && autoSelector.getValue() > 2.5)
+			else if (autoSelector.getValue()/100 < 3.5 && autoSelector.getValue()/100 > 2.5)
 				_autoSelected = _auto3;  //right
-			else if (autoSelector.getValue() < 4.5 && autoSelector.getValue() > 3.5)
+			else if (autoSelector.getValue()/100 < 4.5 && autoSelector.getValue()/100 > 3.5)
 				//read from the sendable chooser
 				System.out.println("Using Sendable Chooser Autonomous mode" + _autoSelected);
 			else
 				_autoSelected = _defaultAuto;
 		}
-		
-					
+		SmartDashboard.putString("AutoSelected", _autoSelected);
+			_autoSelected= _autoTestSpeed;		
 		switch (_autoSelected) {
 		case _auto2: 
 			caseName="Middle Gear";
@@ -320,7 +321,7 @@ public class Autonomous {
 			case DRIVE_DISTANCE:
 
 				if (Enums.IS_FINAL_ROBOT)					
-					cTime = _currentAutoStep.distance/(4.92*_currentAutoStep.leftSpeed + 0.01);
+					cTime = _currentAutoStep.distance/(59*_currentAutoStep.leftSpeed - 2.5);
 				else
 					cTime = _currentAutoStep.distance/(59*_currentAutoStep.leftSpeed - 2.5);
 
