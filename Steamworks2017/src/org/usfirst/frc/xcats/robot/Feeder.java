@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Feeder {
 	private XCatsSpeedController _topFeeder;
-	private XCatsSpeedController _bottomFeeder;
+//	private XCatsSpeedController _bottomFeeder;
 	private DoubleSolenoid _lifter;
 	private Timer _initTimer = new Timer();
 	private boolean _init = false;
@@ -17,8 +17,12 @@ public class Feeder {
 	public Feeder(){
 		
 		_topFeeder =  new XCatsSpeedController("Top Feeder",Enums.FEEDER_TOP_CAN,true,SCType.TALON,null,null);
-		_bottomFeeder =  new XCatsSpeedController("Bottom Feeder",Enums.FEEDER_BOTTOM_CAN,true,SCType.TALON,null,null);
-		_lifter = new DoubleSolenoid(Enums.PCM_CAN_ID,Enums.FEEDER_LIFT_PCM_FORWARD,Enums.FEEDER_LIFT_PCM_BACKWARD);
+//		_bottomFeeder =  new XCatsSpeedController("Bottom Feeder",Enums.FEEDER_BOTTOM_CAN,true,SCType.TALON,null,null);
+		if(Enums.IS_FINAL_ROBOT){
+			_lifter = new DoubleSolenoid(Enums.PCM_CAN_ID,Enums.PCM_SHIFTER_REVERSE,Enums.PCM_SHIFTER_FORWARD);
+		}else{
+			_lifter = new DoubleSolenoid(Enums.PCM_CAN_ID,Enums.FEEDER_LIFT_PCM_FORWARD,Enums.FEEDER_LIFT_PCM_BACKWARD);
+		}
 		dropBar();
 		
 	}
@@ -39,19 +43,19 @@ public class Feeder {
 	public void intake(){
 		//These should be opposite directions
 		_topFeeder.set(Enums.FEEDER_INTAKE_SPEED);
-		_bottomFeeder.set( - Enums.FEEDER_INTAKE_SPEED);
+//		_bottomFeeder.set( - Enums.FEEDER_INTAKE_SPEED);
 	}
 	public void lowGoal(){
 		
 		//these should be set to the SAME value
 		_topFeeder.set(Enums.FEEDER_FEED_SPEED);
-		_bottomFeeder.set(Enums.FEEDER_FEED_SPEED);
+//		_bottomFeeder.set(Enums.FEEDER_FEED_SPEED);
 		
 	}
 	public void feed(){
 		
 		_topFeeder.set(- Enums.FEEDER_FEED_SPEED);
-		_bottomFeeder.set(0);
+//		_bottomFeeder.set(0);
 	}
 	public void dropBar(){
 		if(_init){
@@ -63,7 +67,7 @@ public class Feeder {
 	}
 	public void stop(){
 		_topFeeder.set(0);
-		_bottomFeeder.set(0);
+//		_bottomFeeder.set(0);
 	}
 	
 	public void updateStatus(){

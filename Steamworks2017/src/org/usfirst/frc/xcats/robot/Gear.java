@@ -37,14 +37,22 @@ public class Gear {
 		_xcDrive = drive;
 		
 		// constructor
-		_sol = new DoubleSolenoid(Enums.PCM_CAN_ID,Enums.GEAR_PCM_FORWARD,Enums.GEAR_PCM_REVERSE);
+		if (Enums.IS_FINAL_ROBOT){
+			_sol = new DoubleSolenoid(Enums.PCM_CAN_ID,Enums.FEEDER_LIFT_PCM_FORWARD,Enums.FEEDER_LIFT_PCM_BACKWARD);
+			
+		} else
+		{
+			_sol = new DoubleSolenoid(Enums.PCM_CAN_ID,Enums.GEAR_PCM_FORWARD,Enums.GEAR_PCM_REVERSE);
+		}
 		_RS= new DigitalInput(Enums.GEAR_LS_CHANNEL);
 		_LS= new DigitalInput(Enums.GEAR_RS_CHANNEL);
 		_optoRotate = new DigitalInput(Enums.GEAR_POSITIONED_OPT);
 		
 //		_optoOnBoard = new DigitalInput(Enums.GEAR_ONBOARD_OPT);
 		_gearRotator =  new XCatsSpeedController("Gear Rotator",Enums.GEAR_ROTATOR_PWM_ID,true,SCType.TALON,null,null);
-				
+		if (Enums.IS_FINAL_ROBOT){
+			_gearRotator.setInverted(true);
+		}
 
 	}
 	
