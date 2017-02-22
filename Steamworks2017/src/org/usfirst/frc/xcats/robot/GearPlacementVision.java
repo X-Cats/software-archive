@@ -24,7 +24,7 @@ public class GearPlacementVision
         int facing_angle_in_deg = 0;
         int res_x = 640;  // default value of image resolution, horizontally (e.g. 640x480)
         res_x = _mat.width();
-    	int pixels_per_degree_X = res_x / Enums.CAMERA_FOV_HORIZONTAL;  // Horizontal field of view for MSoft Lifecam
+    	double pixels_per_degree_X = res_x / Enums.CAMERA_FOV_HORIZONTAL;  // Horizontal field of view for MSoft Lifecam
         System.out.println("Horizontal resolution: " + res_x + 
         		"  Horizontal pixels per degree = " + pixels_per_degree_X);
        	VisionData visionData = new VisionData();
@@ -126,7 +126,7 @@ public class GearPlacementVision
         // Calculate the distance based on the center point of the 2 rectangles
         int center_to_center_dist = (center_of_right_tape - center_of_left_tape);
         
-        if (center_to_center_dist <= 10)
+        if (center_to_center_dist <= (0.03 * res_x)) {  // if dist is farther than, say, ~250"
         {
             System.out.println("ERROR: Center to Center distance of reflective tape is less than 10 pixels.");       	
         	visionData.setResult(false);
@@ -135,8 +135,9 @@ public class GearPlacementVision
         
         distance_in_inches = ( (int) ((360 * 8.5 * pixels_per_degree_X) / (center_to_center_dist * 2 * 3.14)) );
         // Subtract fixed distance from Tape to tip of Pin
-        distance_in_inches = (int)(distance_in_inches - Enums.PEG_LENGTH 
-        		- Enums.PEG_CHANNEL_DEPTH - Enums.CAMERA_DIST_FROM_FRONT);
+//        distance_in_inches = (int)(distance_in_inches - Enums.PEG_LENGTH 
+//        		- Enums.PEG_CHANNEL_DEPTH - Enums.CAMERA_DIST_FROM_FRONT);
+        distance_in_inches = (int)(distance_in_inches - Enums.PEG_LENGTH - Enums.PEG_CHANNEL_DEPTH);  // better results
         
         visionData.setDistanceInInches((int) distance_in_inches);
         
@@ -166,7 +167,7 @@ public class GearPlacementVision
 		double rw = right.width; double lw = left.width;
 		double widthRatio = (rw > lw) ? lw / rw : rw / lw;
 
-		widthRatio = (rw > lw) ? widthRatio : - widthRatio;
+		widthRatio = (rw > lw) ? widthRatio : -widthRatio;
 		System.out.println("\nLEFT width = " + left.width + ", RIGHT width = " + right.width + 
 				", Width ratio = " + widthRatio);
 		
@@ -195,7 +196,7 @@ public class GearPlacementVision
 		
 		// if right area larger than left area, then left rectangle is occluded
 		// or barely smaller by parallax so right of center and positive zone
-		zone = (ra > la) ? zone : - zone;
+		zone = (ra > la) ? zone : -zone;
 
 		visionData.setZone(zone);
 
