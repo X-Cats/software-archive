@@ -5,7 +5,7 @@ public class VisionData
     boolean result = false;
     int distance_in_inches = 0;
     int zone = 0;
-    int facing_angle_in_deg = 0;
+    double facing_angle_in_deg = 0;
     
     public VisionData()
     {}
@@ -25,7 +25,7 @@ public class VisionData
     	zone = z;
     }
     
-    public void setFacingAngleInDeg(int facing_angle)
+    public void setFacingAngleInDeg(double facing_angle)
     {
     	facing_angle_in_deg = facing_angle;
     }
@@ -47,6 +47,6 @@ public class VisionData
     
     public int getFacingAngleInDeg()
     {
-    	return facing_angle_in_deg;
+    	return (int) facing_angle_in_deg;
     }
 }
