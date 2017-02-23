@@ -98,8 +98,11 @@ public class RobotControls {
 		if (Enums.USE_COMPRESSOR){
 			_compressor = new Compressor(Enums.PCM_CAN_ID);
 			_compressor.start();
-			
-			_dblSolShifter = new DoubleSolenoid(Enums.PCM_CAN_ID,Enums.PCM_SHIFTER_FORWARD,Enums.PCM_SHIFTER_REVERSE);			
+			if(Enums.IS_FINAL_ROBOT){
+				_dblSolShifter = new DoubleSolenoid(Enums.PCM_CAN_ID,Enums.GEAR_PCM_REVERSE,Enums.GEAR_PCM_FORWARD);
+			}else{
+			_dblSolShifter = new DoubleSolenoid(Enums.PCM_CAN_ID,Enums.PCM_SHIFTER_FORWARD,Enums.PCM_SHIFTER_REVERSE);
+			}
 		}
 	
 	    //the NAVX board is our gyro subsystem	
