@@ -106,16 +106,12 @@ public class AutoTarget {
 			int P1y;
 			int P2y;
 			int P4y;
-			if (Enums.IS_FINAL_ROBOT){
-				
-			} else{
 				inRangeDeltaX = (int) (0.234 * _width);
 				outRangeDeltaX = (int) (0.245 * _width);
 				P0x = (int) (_width / 2 + 0.1 * (_width / 2));
 				P1y = (int) (0.875 * _height);
 				P2y = (int) (0.6 * _height);
 				P4y = (int) (0.667 * _height);
-			}
 
 			_P0 	= new Point(P0x,0);
 			_P1 	= new Point(0,P1y);
