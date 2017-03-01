@@ -169,6 +169,8 @@ public class Autonomous {
 			blueAlliance = true;
 		}
 		
+		SmartDashboard.putBoolean("Alliance Color", blueAlliance);
+		
 		if (Enums.IS_FINAL_ROBOT){
 			//use the switch on the robot to identify autonomous
 			
