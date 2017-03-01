@@ -27,7 +27,7 @@ public class Enums {
 	*/
 	public static final double SPEED_CALIBRATION = 0.0;  
 	
-	public static final boolean IS_FINAL_ROBOT = true;
+	public static final boolean IS_FINAL_ROBOT = false;
 	public static final String  DRIVE_CONTROLLER_TYPE = "Talon"; // choices are "Jaguar" or "Talon"
 	public static final boolean HAS_MECHANUM_WHEELS = false;
 	public static final boolean USE_PID = false;    	// This is if the drive train is using PID control
@@ -81,8 +81,8 @@ public class Enums {
 	public static final int GEAR_PCM_REVERSE = 6; // PCM id for the gear ejector
 	public static final double GEAR_EJECT_TIME = 1; // time in seconds before retracting ejector piston
 	public static final double GEAR_EJECT_REVERSE_START_TIME = 0.5; // Start reversing this long after the piston deploys
-	public static final double GEAR_EJECT_REVERSE_TIME = 2; // time to reverse
-	public static final double GEAR_EJECT_REVERSE_SPEED = 0.4; //speed to reverse with when ejecting
+	public static final double GEAR_EJECT_REVERSE_TIME = .5; // time to reverse
+	public static final double GEAR_EJECT_REVERSE_SPEED = 0.6; //speed to reverse with when ejecting
 	public static final int GEAR_POSITIONED_OPT = 2; //optical sensor that detects if gear is position(rotated) correctly
 	public static final int GEAR_ONBOARD_OPT = 2;    //optical sensor that detects if the gear is positioned far enough in the robot to eject
 	public static final double GEAR_ROTATOR_SPEED = 0.25;
