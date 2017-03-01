@@ -190,12 +190,12 @@ public class Autonomous {
 				_autoSelected = _defaultAuto;
 		}
 		SmartDashboard.putString("AutoSelected", _autoSelected);
-			_autoSelected= _autoTestSpeed;		
+			_autoSelected= _auto2;		
 		switch (_autoSelected) {
 		case _auto2: 
 			caseName="Middle Gear";
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.BRAKEMODE,"Brake Mode",0,0,0,0)); //Set brake mode for drive train
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,87)); //assuming 99.64 inches
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,91)); //assuming 99.64 inches
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.WAIT,"Wait for gear to eject",0,0,0,Enums.GEAR_EJECT_TIME));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
@@ -255,7 +255,7 @@ public class Autonomous {
 			rotationAngle = (isBlueAlliance ? 58 : -62);
 			distanceLeg1 = (isBlueAlliance ? boilerSideLeg1 : feederSideLeg1 );
 			distanceLeg2 = (isBlueAlliance ? boilerSideLeg2 : feederSideLeg2);			
-		} else if (_autoSelected == _auto2){
+		} else if (_autoSelected == _auto3){
 			//right
 			rotationAngle = (isBlueAlliance ? -62 : 58);
 			distanceLeg1 = (isBlueAlliance ? feederSideLeg1 : boilerSideLeg1);
