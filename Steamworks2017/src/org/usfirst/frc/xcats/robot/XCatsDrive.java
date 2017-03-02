@@ -123,6 +123,14 @@ public class XCatsDrive {
 			_motors[i].setBrakeMode();
 		}
 	}
+
+	public void setRampingRate(double voltsPerSec){
+		
+		for (int i = 0; i < Enums.DRIVE_MOTOR_NUMBERS.length; i ++){
+			_motors[i].setRampingRate(voltsPerSec);
+		}
+	}
+	
 	
 	public void setReductionFactor (double reductionFactor)
 	{
