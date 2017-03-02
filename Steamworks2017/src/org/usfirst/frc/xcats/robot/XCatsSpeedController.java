@@ -244,7 +244,7 @@ public class XCatsSpeedController{
 				((CANTalon) _CANmotor).enableBrakeMode(true);				
 				break;
 			default:
-				System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
+				System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled in setBrakeMode!");
 			}			
 		}		
 	}
@@ -257,9 +257,22 @@ public class XCatsSpeedController{
 				((CANTalon) _CANmotor).enableBrakeMode(false);		
 				break;
 			default:
-				System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
+				System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled in setCoastMode!");
 			}			
 		}		
+	}
+	public void setRampingRate(double voltsPerSec){
+		if (_CANmotor != null){
+			
+			switch ( _sctype){
+			case TALON:
+				((CANTalon) _CANmotor).setVoltageRampRate(voltsPerSec);		
+				break;
+			default:
+				System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled in setRampingRate!");
+			}			
+		}		
+		
 	}
 	
 	public void stop ()
