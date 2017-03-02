@@ -192,7 +192,7 @@ public class Autonomous {
 				_autoSelected = _defaultAuto;
 		}
 		SmartDashboard.putString("AutoSelected", _autoSelected);
-			_autoSelected= _auto2;		
+//			_autoSelected= _auto2;		
 		switch (_autoSelected) {
 		case _auto2: 
 			caseName="Middle Gear";
@@ -267,9 +267,9 @@ public class Autonomous {
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.BRAKEMODE,"Brake Mode",0,0,0,0)); //Set brake mode for drive train
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LOW_SPEED,"Low speed transmission",0,0,0,0)); //make sure we are in low speed
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,distanceLeg1));
-		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn 60",0,0,0,58));
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn 60",0,0,0,rotationAngle));
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,distanceLeg2));
-		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,rotationAngle));
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.COASTMODE,"Coast Mode",0,0,0,0)); //Set COAST mode for drive train		
 		
@@ -506,6 +506,7 @@ public class Autonomous {
 
 	public void startNextStep ()
 	{
+		System.out.println("Step "+_currentStep + _currentAutoStep.name  + " is completed");
 		_navx.zeroYaw();
 		SmartDashboard.putNumber("Starting Yaw", _controls.getNavx().getYaw() );
 		_currentStep++;
