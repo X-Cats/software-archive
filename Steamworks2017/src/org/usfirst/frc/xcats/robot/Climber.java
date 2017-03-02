@@ -15,7 +15,10 @@ public class Climber {
 		//constructor
 		_winch = new XCatsSpeedController("Winch",Enums.WINCH_CAN_ID,true,SCType.TALON,null,null);
 		_lsWinch = new DigitalInput (Enums.WINCH_LIMIT_SWITCH);
-		//_winch.setInverted(true);
+		
+		//Set this inverted on 2017-03-01 because the gear box has changed and we want to keep the wires on the 
+		//speed controller green-to-black.
+		_winch.setInverted(true);
 		}
 	
 	
