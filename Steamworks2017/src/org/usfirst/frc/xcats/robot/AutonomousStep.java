@@ -4,7 +4,8 @@ import org.usfirst.frc.xcats.robot.AutonomousStep.stepTypes;
 
 public class AutonomousStep {
 	public enum stepTypes {DRIVE, DRIVESTRAIGHT, SHOOT, GRAB, UNGRAB, LIFT, LOWER, LIFT_TO_LOW, WAIT, 
-		                   STOP, RELEASE, DRIVE_DISTANCE,ROTATE,GEAR,BRAKEMODE,COASTMODE,HIGH_SPEED,LOW_SPEED};
+		                   STOP, RELEASE, DRIVE_DISTANCE,ROTATE,GEAR,BRAKEMODE,COASTMODE,
+		                   HIGH_SPEED,LOW_SPEED,CALCANGLE,FEED};
 				
 		public String name= "";
 		public double stepTime=0;
@@ -35,6 +36,9 @@ public class AutonomousStep {
 		 * LIFT, LOWER
 		 * time is the amount of time to wait for the operation to continue
 		 * leftSpeed,rightSpeed,distance is ignored		
+		 * 
+		 * CALCANGLE
+		 * distance = desired angle from heading obtained in Autonomous.init
 		*/
 		
 		

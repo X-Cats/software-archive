@@ -393,6 +393,9 @@ public class RobotControls {
 		
 	}
 
+	public Feeder getFeeder(){
+		return _feeder;
+	}
 
 	public XCatsDrive getDrive()
 	{

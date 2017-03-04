@@ -11,6 +11,7 @@ public class Teleop {
 	}
 	public void init(){
 		_controls.feederInit();
+		_controls.setCoastMode();
 	}
 
 	public void execute ()

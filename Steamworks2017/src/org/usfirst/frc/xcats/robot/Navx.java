@@ -144,6 +144,9 @@ public class Navx {
 		ahrs.zeroYaw();
 //		_startingYaw = ahrs.getYaw();
 	}
+	public float getCompassHeading(){
+		return ahrs.getCompassHeading();
+	}
 	public void rotate(double degrees){
 		
 		if(!navxMode.equals("")){
