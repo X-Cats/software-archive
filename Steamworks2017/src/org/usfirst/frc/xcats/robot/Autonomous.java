@@ -21,7 +21,11 @@ public class Autonomous {
 	private ArrayList<AutonomousStep> _steps;
 
 	private int _currentStep=0;
-	private float _initialYaw;
+	private float _initialYaw = 0;
+	private float _initCompassHeading=0;
+	private boolean _angleHasBeenCalculated = false;
+	private double _calculatedAngle = 0;
+
 	private double _totalAutoTime = Enums.AUTONOMOUS_TIME;
 	private AutonomousStep _currentAutoStep;
 	private Timer _stepTimer = new Timer();
@@ -41,6 +45,7 @@ public class Autonomous {
 	final String _autoReadFile = "TextFile read";
 	final String _autoTestSpeed = "Run 3 sec at input speed";
 	final String _autoInTeleop = "TeleopCommands";
+	final String _autoRotator = "Test Rotations";
 	private Navx _navx;
 	
 	String _autoSelected;
@@ -61,6 +66,7 @@ public class Autonomous {
 		_defensePosition.addObject(_auto3, _auto3);
 		_defensePosition.addObject(_autoReadFile,_autoReadFile);
 		_defensePosition.addObject(_autoTestSpeed, _autoTestSpeed);
+		_defensePosition.addObject(_autoRotator, _autoRotator);
 		SmartDashboard.putData("Auto choices", _defensePosition);			
 		
 		/**
@@ -136,8 +142,10 @@ public class Autonomous {
 		
 		_navx = _controls.getNavx();
 		_navx.zeroYaw();
+		_initCompassHeading = _navx.getCompassHeading();
 		_initialYaw = _navx.getYaw();
 		_currentStep = 0;
+		_angleHasBeenCalculated =false;
 		_currentAutoStep = null;
 		_autoTimer.start();
 		_stepTimer.start();
@@ -201,6 +209,8 @@ public class Autonomous {
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.WAIT,"Wait for gear to eject",0,0,0,Enums.GEAR_EJECT_TIME));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
+			
+			//note we set coastmode in teleop init, but setting it here is a good practice
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.COASTMODE,"Coast Mode",0,0,0,0)); //Set COAST mode for drive train
 		
 			break;
@@ -216,6 +226,17 @@ public class Autonomous {
 			
 			break;
 
+		case _autoRotator:
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.BRAKEMODE,"Brake Mode",0,0,0,0)); //Set brake mode for drive train
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LOW_SPEED,"Low speed transmission",0,0,0,0)); //make sure we are in low speed
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward1",0,.5,.5,30));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn 60",0,0,0,60));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward2",0,.5,.5,30));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn 60",0,0,0,-60));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward3",0,.5,.5,30));
+			
+			break;
+			
 		case _autoTestSpeed:
 			caseName="Speed Test";
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.BRAKEMODE,"Brake Mode",0,0,0,0)); //Set brake mode for drive train
@@ -242,36 +263,63 @@ public class Autonomous {
 
 
 	private void addSideSteps(boolean isBlueAlliance){
+		boolean isBoilerSide = false;
+		
+		double boilerAngle = 0;
 		double rotationAngle = 0;
 		double distanceLeg1 = 0;
 		double distanceLeg2 = 0;
+		double leftSpeed = 0;
+		double rightSpeed = 0;
 		
-		double boilerSideLeg1 = 119-22;
-		double feederSideLeg1 = 101.5-22;
-		double boilerSideLeg2 = 37;
-		double feederSideLeg2 = 56;
+		double boilerSideLeg1 = 118 - 22;
+		double boilerSideLeg2 = 33;
+		double feederSideLeg1 = 100.5 - 22; //22 is half the robot length
+		double feederSideLeg2 = 64;
 		
+		if ((isBlueAlliance && _autoSelected == _auto1) || (!isBlueAlliance && _autoSelected == _auto3)){
+			isBoilerSide = true;
+		}
 		
-		if (_autoSelected == _auto2){
+				
+		if (_autoSelected == _auto1){
 			//left 
-			rotationAngle = (isBlueAlliance ? 58 : -62);
+			rotationAngle = 59; //(isBlueAlliance ? 58 : -62);
 			distanceLeg1 = (isBlueAlliance ? boilerSideLeg1 : feederSideLeg1 );
 			distanceLeg2 = (isBlueAlliance ? boilerSideLeg2 : feederSideLeg2);			
 		} else if (_autoSelected == _auto3){
 			//right
-			rotationAngle = (isBlueAlliance ? -62 : 58);
+			rotationAngle = -61 ; //(isBlueAlliance ? 58 : -62);
 			distanceLeg1 = (isBlueAlliance ? feederSideLeg1 : boilerSideLeg1);
 			distanceLeg2 = (isBlueAlliance ? feederSideLeg2 : boilerSideLeg2);			
 		}
 					
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.BRAKEMODE,"Brake Mode",0,0,0,0)); //Set brake mode for drive train
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LOW_SPEED,"Low speed transmission",0,0,0,0)); //make sure we are in low speed
-		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,distanceLeg1));
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward 1",0,.7,.7,distanceLeg1));
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn 60",0,0,0,rotationAngle));
-		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,distanceLeg2));
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward 2",0,.7,.7,distanceLeg2));
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
+		
+		//If we are isBoilerSide then add the steps for the ball handling
+		SmartDashboard.putBoolean("is Boiler Side", isBoilerSide);
+		if (isBoilerSide){			
+			boilerAngle = (isBlueAlliance ? -32   : 32   );
+			leftSpeed   = (isBlueAlliance ? -0.79 : -0.93);
+			rightSpeed  = (isBlueAlliance ? -0.94 : -0.78);
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn to boiler1",0,0,0,boilerAngle));			
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.COASTMODE,"Coast Mode",0,0,0,0)); //Set COAST mode for drive train
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive to Boiler1",0,leftSpeed,rightSpeed,126)); //drive forward about 20 inch
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LIFT,"Lift Bottom",0,0,0,0)); 
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.FEED,"Feed Balls",10,0,0,0)); 
+		}
+		
+		//finish the autonomous
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
-		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.COASTMODE,"Coast Mode",0,0,0,0)); //Set COAST mode for drive train		
+		
+//note we set coastmode in teleop init, but setting it here is a good practice
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.COASTMODE,"Coast Mode",0,0,0,0)); //Set COAST mode for drive train
+		
 		
 	}
 
@@ -300,7 +348,6 @@ public class Autonomous {
 		}
 
 		double cTime=0;
-		int direction=1;
 
 
 		if (_autoTimer.get() > _totalAutoTime || _currentStep >= _steps.size() || _cancelExecution){
@@ -323,36 +370,46 @@ public class Autonomous {
 			case DRIVE_DISTANCE:
 
 				if (Enums.IS_FINAL_ROBOT)					
-					cTime = _currentAutoStep.distance/(59*_currentAutoStep.leftSpeed - 2.5);
+					cTime = Math.abs(_currentAutoStep.distance/(59*_currentAutoStep.leftSpeed - 2.5));
 				else
-					cTime = _currentAutoStep.distance/(59*_currentAutoStep.leftSpeed - 2.5);
+					cTime = Math.abs(_currentAutoStep.distance/(59*_currentAutoStep.leftSpeed - 2.5));
 
 				driveStraight(cTime,_currentAutoStep.leftSpeed,_currentAutoStep.rightSpeed);
 				break;
-			case ROTATE:
-				//float deltaYaw;
-				double  speed =0.25;
-				double tolerance=0.5;
-
-				//deltaYaw = _initialYaw + _controls.getNavx().getYaw();
-				//SmartDashboard.putNumber("deltaYaw", deltaYaw);
-				// 
-				direction = (_currentAutoStep.distance > 0 ? -1 : 1);
-				speed = direction * speed;	
-				_controls.getDrive().set(speed, speed, -speed, -speed);
-
-
-				if(Math.abs(_controls.getNavx().getYaw()) > Math.abs(_currentAutoStep.distance)){
-					SmartDashboard.putNumber("Auto Yaw", _controls.getNavx().getYaw());
-					speed=-speed/1.5;
-					_controls.getDrive().set(speed, speed, -speed, -speed);
-					if(Math.abs(_controls.getNavx().getYaw())-Math.abs(_currentAutoStep.distance)<tolerance){
-						startNextStep();
+				
+			case CALCANGLE:
+				if (!_angleHasBeenCalculated){
+					
+					if (DriverStation.getInstance().getAlliance() == DriverStation.Alliance.Blue){
+						//this is where we calculate the rotation angle
+						//initial heading + 225 - current heading should be pretty close
+						_calculatedAngle = 180 - 30;//_initCompassHeading + 225 - _navx.getCompassHeading();
+					}	else{
+						_calculatedAngle = 180 + 30; //_initCompassHeading + 135.0 - _navx.getCompassHeading();
+						
 					}
+					
+					_angleHasBeenCalculated = true;
 				}
+				SmartDashboard.putNumber("Init Compass Heading", _initCompassHeading);
+				SmartDashboard.putNumber("CalcAngle", _calculatedAngle);
+				//now just rotate the calculated distance
+				rotate(_calculatedAngle);
+				break;
+				
+			case LIFT:
+				raise();
+				break;
+				
+			case ROTATE:
+				rotate(_currentAutoStep.distance);
 
 				break;
 
+			case FEED:
+				feedBalls(_currentAutoStep.stepTime);
+				
+				break;
 			case GEAR: 
 				//if we have not requested an ejection, do so now
 				if (!_isEjecting){
@@ -405,6 +462,43 @@ public class Autonomous {
 		_controls.updateStatus();
 	}
 
+	private void rotate( double distance){
+		//float deltaYaw;
+		double  speed =0.25;
+		double tolerance=0.5;
+		int direction=1;
+
+
+		//deltaYaw = _initialYaw + _controls.getNavx().getYaw();
+		//SmartDashboard.putNumber("deltaYaw", deltaYaw);
+		// 
+		direction = (distance > 0 ? -1 : 1);
+		speed = direction * speed;	
+		_controls.getDrive().set(speed, speed, -speed, -speed);
+
+
+		if(Math.abs(_controls.getNavx().getYaw()) > Math.abs(distance)){
+			SmartDashboard.putNumber("Auto Yaw", _controls.getNavx().getYaw());
+			speed=-speed/1.5;
+			_controls.getDrive().set(speed, speed, -speed, -speed);
+			if(Math.abs(_controls.getNavx().getYaw())-Math.abs(distance)<=tolerance){
+				startNextStep();
+			}
+		}
+	}
+	
+	private void raise(){
+		_controls.getFeeder().lower();
+		startNextStep();
+	}
+	
+	private void feedBalls(double time){
+		if (_stepTimer.get() <= time){
+			_controls.getFeeder().feed();			
+		} else
+			startNextStep();
+		
+	}
 	public void updateStatus(){
 
 		if (_steps != null && _currentAutoStep != null){
@@ -511,6 +605,7 @@ public class Autonomous {
 		SmartDashboard.putNumber("Starting Yaw", _controls.getNavx().getYaw() );
 		_currentStep++;
 		_stepTimer.reset();
+		_angleHasBeenCalculated=false;
 	}	
 
 	private void ReadAutoFile(){

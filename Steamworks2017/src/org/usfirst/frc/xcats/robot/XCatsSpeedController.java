@@ -45,6 +45,8 @@ public class XCatsSpeedController{
 	private PowerDistributionPanel _pdp;
 	private double _pdpVoltageThreshold;
 	private double _pdpVoltageReductionFactor = 0; // setpoint = setpoint - _pdpVoltageReductionFactor* setpoint;
+	private double _rpmPerInch=0; //this is the number of RPMS to travel 1 inch
+	private int _totalizedRPM = 0;
 	
 
 	//this constructor is used with a controller that has a digital input that acts as a switch
@@ -261,6 +263,18 @@ public class XCatsSpeedController{
 			}			
 		}		
 	}
+	
+	//to set this, you need to determine it from the wheel diameter and other factors related to friction
+	public void setRPMPerInch(double rpmPerInch){
+		_rpmPerInch = rpmPerInch;
+	}
+	
+//	public double getTotalizedInches(){
+//		return _totalizedRPMS * _rpmPerInch;
+//	}
+//	public void zeroTotalizedInches(){
+//		_totalizedDistance = 0;
+//	}
 	public void setRampingRate(double voltsPerSec){
 		if (_CANmotor != null){
 			
@@ -529,6 +543,7 @@ public class XCatsSpeedController{
 		}		
 	}
 
+	
 	public void reverseSensor (boolean invert)
 	{
 		//note: you may need to use this if the RPMs are negative and you have an encoder

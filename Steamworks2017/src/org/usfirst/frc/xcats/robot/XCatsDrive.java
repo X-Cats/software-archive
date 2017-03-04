@@ -1,6 +1,8 @@
 package org.usfirst.frc.xcats.robot;
 
 
+import com.ctre.CANTalon.FeedbackDevice;
+
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 
@@ -18,20 +20,20 @@ public class XCatsDrive {
 	private PowerDistributionPanel _pdp;
 	private double _pdpVoltageThreshold;
 	private double _pdpVoltageReductionFactor = 0; // setpoint = setpoint - _pdpVoltageReductionFactor* setpoint;
+	private int _channels[];
 
 	
 	public XCatsDrive (boolean useCAN, boolean isTalon)
 	{
-		int channels[];
 		XCatsSpeedController.SCType sctype;
 		sctype = XCatsSpeedController.SCType.TALON;
 		
-		channels = new int[Enums.DRIVE_MOTOR_NUMBERS.length];
+		_channels = new int[Enums.DRIVE_MOTOR_NUMBERS.length];
 		if (useCAN){
-			channels = Enums.CAN_DRIVE_MOTOR_NUMBERS;
+			_channels = Enums.CAN_DRIVE_MOTOR_NUMBERS;
 		}
 		else{
-			channels =Enums.DRIVE_MOTOR_NUMBERS;		
+			_channels =Enums.DRIVE_MOTOR_NUMBERS;		
 		}
 		
 		
@@ -39,13 +41,13 @@ public class XCatsDrive {
 		
 		this._motors = new XCatsSpeedController[Enums.DRIVE_MOTOR_NUMBERS.length];
 
-		this._motors[Enums.FRONT_LEFT] = new XCatsSpeedController("motor"+Enums.FRONT_LEFT, channels[Enums.FRONT_LEFT], useCAN, sctype, null,null);
-		this._motors[Enums.FRONT_RIGHT] = new XCatsSpeedController("motor"+Enums.FRONT_RIGHT,channels[Enums.FRONT_RIGHT], useCAN, sctype, null,null);
+		this._motors[Enums.FRONT_LEFT] = new XCatsSpeedController("motor"+Enums.FRONT_LEFT, _channels[Enums.FRONT_LEFT], useCAN, sctype, null,null);
+		this._motors[Enums.FRONT_RIGHT] = new XCatsSpeedController("motor"+Enums.FRONT_RIGHT,_channels[Enums.FRONT_RIGHT], useCAN, sctype, null,null);
 		_motors[Enums.FRONT_LEFT].setInverted(true);
 		
 		if (Enums.DRIVE_MOTOR_NUMBERS.length > 2){
-			this._motors[Enums.REAR_LEFT] = new XCatsSpeedController("motor"+Enums.REAR_LEFT,channels[Enums.REAR_LEFT], useCAN, sctype, null,null);
-			this._motors[Enums.REAR_RIGHT] = new XCatsSpeedController("motor"+Enums.REAR_RIGHT,channels[Enums.REAR_RIGHT], useCAN, sctype, null,null);			
+			this._motors[Enums.REAR_LEFT] = new XCatsSpeedController("motor"+Enums.REAR_LEFT,_channels[Enums.REAR_LEFT], useCAN, sctype, null,null);
+			this._motors[Enums.REAR_RIGHT] = new XCatsSpeedController("motor"+Enums.REAR_RIGHT,_channels[Enums.REAR_RIGHT], useCAN, sctype, null,null);			
 			_motors[Enums.REAR_LEFT].setInverted(true);
 			
 			if (Enums.USE_2SC_TANK){
@@ -55,8 +57,8 @@ public class XCatsDrive {
 		}		
 		
 		if (Enums.DRIVE_MOTOR_NUMBERS.length > 4){
-			this._motors[Enums.AUX_LEFT] = new XCatsSpeedController("motor"+Enums.AUX_LEFT,channels[Enums.AUX_LEFT], useCAN, sctype, null,null);
-			this._motors[Enums.AUX_RIGHT] = new XCatsSpeedController("motor"+Enums.AUX_RIGHT,channels[Enums.AUX_RIGHT], useCAN, sctype, null,null);
+			this._motors[Enums.AUX_LEFT] = new XCatsSpeedController("motor"+Enums.AUX_LEFT,_channels[Enums.AUX_LEFT], useCAN, sctype, null,null);
+			this._motors[Enums.AUX_RIGHT] = new XCatsSpeedController("motor"+Enums.AUX_RIGHT,_channels[Enums.AUX_RIGHT], useCAN, sctype, null,null);
 			_motors[Enums.AUX_LEFT].setInverted(true);
 
 			if (Enums.USE_2SC_TANK){			
@@ -66,9 +68,10 @@ public class XCatsDrive {
 		}				
 	}
 	
-
+	
 	public XCatsDrive (int channels[], boolean speedMode, boolean isTalon, int codesPerRev, double p, double i, double d)
 	{
+		_channels = channels;
 		XCatsSpeedController.SCType sctype;
 		
 		sctype = XCatsSpeedController.SCType.TALON;
@@ -85,6 +88,14 @@ public class XCatsDrive {
 			_motors[Enums.REAR_LEFT].setInverted(true);
 		}
 	}
+	
+	public void setFeedbackDevice(int motorEnum,FeedbackDevice device){
+		this._motors[motorEnum].setFeedbackDevice(device);
+	}
+	
+//	public float getDistance(int motorEnum){
+//		return this._motors [motorEnum].
+//	}
 	
 	public void setPDP(PowerDistributionPanel pdp, double voltageThreshold, double reductionFactor){
 		_pdp = pdp;
