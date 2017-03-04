@@ -272,7 +272,7 @@ public class Autonomous {
 		double leftSpeed = 0;
 		double rightSpeed = 0;
 		
-		double boilerSideLeg1 = 118 - 22;
+		double boilerSideLeg1 = 120 - 22;
 		double boilerSideLeg2 = 33;
 		double feederSideLeg1 = 100.5 - 22; //22 is half the robot length
 		double feederSideLeg2 = 64;
@@ -305,11 +305,11 @@ public class Autonomous {
 		SmartDashboard.putBoolean("is Boiler Side", isBoilerSide);
 		if (isBoilerSide){			
 			boilerAngle = (isBlueAlliance ? -32   : 32   );
-			leftSpeed   = (isBlueAlliance ? -0.79 : -0.93);
-			rightSpeed  = (isBlueAlliance ? -0.94 : -0.78);
+			leftSpeed   = (isBlueAlliance ? -0.78 : -0.92);
+			rightSpeed  = (isBlueAlliance ? -0.93 : -0.77);
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn to boiler1",0,0,0,boilerAngle));			
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.COASTMODE,"Coast Mode",0,0,0,0)); //Set COAST mode for drive train
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive to Boiler1",0,leftSpeed,rightSpeed,126)); //drive forward about 20 inch
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive to Boiler1",0,leftSpeed,rightSpeed,129)); //drive forward about 20 inch
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LIFT,"Lift Bottom",0,0,0,0)); 
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.FEED,"Feed Balls",10,0,0,0)); 
 		}
