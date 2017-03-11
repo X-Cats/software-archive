@@ -3,6 +3,8 @@ package org.usfirst.frc.xcats.robot;
 
 import java.util.ArrayList;
 
+import com.ctre.CANTalon;
+
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
@@ -83,6 +85,7 @@ public class RobotControls {
 		_drive.setDashboardIO(false, false);
 		_drive.setInverted();
 		_drive.setCoastMode();
+		_drive.setMagneticEncoders(true);
 	
 		_feeder = new Feeder();
 		_climber = new Climber();
@@ -235,6 +238,8 @@ public class RobotControls {
 			_dblSolShifter.set(DoubleSolenoid.Value.kReverse);
 		 else 
 			_dblSolShifter.set(DoubleSolenoid.Value.kForward);										
+		
+		_drive.zeroEncoder();
 		
 	}
 	public void drive ()

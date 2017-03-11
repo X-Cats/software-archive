@@ -47,6 +47,7 @@ public class XCatsSpeedController{
 	private double _pdpVoltageReductionFactor = 0; // setpoint = setpoint - _pdpVoltageReductionFactor* setpoint;
 	private double _rpmPerInch=0; //this is the number of RPMS to travel 1 inch
 	private int _totalizedRPM = 0;
+	private boolean _hasFeedbackDevice = false;
 	
 
 	//this constructor is used with a controller that has a digital input that acts as a switch
@@ -300,6 +301,7 @@ public class XCatsSpeedController{
 		switch ( _sctype){
 		case TALON:
 			((CANTalon) _CANmotor).setFeedbackDevice(device);
+			_hasFeedbackDevice = true;
 			break;
 		default:
 			System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
@@ -469,6 +471,9 @@ public class XCatsSpeedController{
 			switch (_sctype){
 			case TALON:
 				((CANTalon) _CANmotor).setPosition(0);			
+				if (_hasFeedbackDevice){
+					((CANTalon) _CANmotor).setEncPosition(0); //note: i do not know what this will do to a PID loop
+				}
 				break;
 			default:
 				System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
@@ -571,6 +576,7 @@ public class XCatsSpeedController{
 		}
 
 		
+		
 		//SmartDashboard.putBoolean(_name+"_I/O output", _dashboardOutput);
 		
 		/*
@@ -607,7 +613,8 @@ public class XCatsSpeedController{
 
 				SmartDashboard.putNumber(_name + "_current", _CANmotor.getOutputCurrent());
 				SmartDashboard.putNumber(_name + "_speed", _CANmotor.getSpeed());
-				
+				SmartDashboard.putNumber(_name + "_EncPosition", ((CANTalon) _CANmotor).getEncPosition());
+				SmartDashboard.putNumber(_name + "_EncVelocity", ((CANTalon) _CANmotor).getEncVelocity());
 				SmartDashboard.putNumber(_name + "_position", ((CANTalon) _CANmotor).getPosition() / _invert / _scale);					
 				//				SmartDashboard.putNumber(_name + "_encoder", ((CANJaguar) motor).);
 			}
