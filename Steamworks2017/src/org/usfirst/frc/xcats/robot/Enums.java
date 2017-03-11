@@ -58,7 +58,10 @@ public class Enums {
 	public static final int  REAR_LEFT = 0,  FRONT_LEFT = 1, AUX_LEFT = 2, REAR_RIGHT = 3, FRONT_RIGHT = 4,  AUX_RIGHT = 5 ;
 //	public static final int DRIVE_MOTOR_NUMBERS[] = {FRONT_LEFT, FRONT_RIGHT}; //if we do not use CAN bus, the motors are created in this sequence
 	public static final int     DRIVE_MOTOR_NUMBERS[] = { REAR_LEFT, FRONT_LEFT, AUX_LEFT,  REAR_RIGHT, FRONT_RIGHT, AUX_RIGHT}; //if we do not use CAN bus, the motors are created in this sequence
-	public static final int     CAN_DRIVE_MOTOR_NUMBERS[] = {1, 2, 3, 4, 5, 6}; //these are the CAN bus ids of the motors
+
+	//before we put the encoders on drive because the cable was not long enough to reach the "Front" motor
+	//public static final int     CAN_DRIVE_MOTOR_NUMBERS[] = {1, 2, 3, 4, 5, 6}; //these are the CAN bus ids of the motors
+	public static final int     CAN_DRIVE_MOTOR_NUMBERS[] = {1, 3, 2, 4, 6, 5}; //these are the CAN bus ids of the motors
 		
 	//This is for the use of the compressor
 	public static final int     PCM_SHIFTER_FORWARD = 4, PCM_SHIFTER_REVERSE=5;  //this is used to shift the gear ration on the drive train from low to high (SHIFTER)
@@ -76,7 +79,10 @@ public class Enums {
 	public static final int WINCH_LIMIT_SWITCH = 3;// limit switch for the winch
 	
 	//Gear Ejector
-	public static final boolean GEAR_AUTO_ROTATE = true; // whether to monitor for the gear obstructing the eye
+	//note turn this off because the reflective tape on the target interferes with the sensor detection, and the
+	//gear rotates as it gets close to it.
+	public static final boolean GEAR_AUTO_ROTATE = false; // whether to monitor for the gear obstructing the eye
+	
 	public static final int GEAR_ROTATOR_PWM_ID = 7;
 	public static final int GEAR_PCM_FORWARD = 7; // PCM id for the gear ejector
 	public static final int GEAR_PCM_REVERSE = 6; // PCM id for the gear ejector

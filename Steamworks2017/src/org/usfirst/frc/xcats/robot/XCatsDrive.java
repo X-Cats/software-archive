@@ -1,10 +1,12 @@
 package org.usfirst.frc.xcats.robot;
 
 
+import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class XCatsDrive {
 	//we need to keep an array of the motors required for the drive. This will work for a 2 or 4 drive system
@@ -89,14 +91,29 @@ public class XCatsDrive {
 		}
 	}
 	
-	public void setFeedbackDevice(int motorEnum,FeedbackDevice device){
+	public void setMagneticEncoders(boolean outputIO){
+		//this function assumes that the front_left and front_right are the "drive motor master" controllers
+		this.setFeedbackDevice(Enums.FRONT_LEFT, CANTalon.FeedbackDevice.CtreMagEncoder_Absolute, outputIO);
+		this.setFeedbackDevice(Enums.FRONT_RIGHT, CANTalon.FeedbackDevice.CtreMagEncoder_Absolute, outputIO);
+	}
+	
+	public void setFeedbackDevice(int motorEnum,FeedbackDevice device,boolean outputIO){
 		this._motors[motorEnum].setFeedbackDevice(device);
+		this._motors[motorEnum].setDashboardIO(false, outputIO);
 	}
 	
 //	public float getDistance(int motorEnum){
 //		return this._motors [motorEnum].
 //	}
 	
+	public void zeroEncoder(){
+		for (int i=0; i<_motors.length; i++){
+			this._motors[i].zeroEncoder();			
+		}					
+	}
+	public double getAbsAvgEncoderValue(){
+		return (Math.abs(this._motors[Enums.FRONT_LEFT].getEncPosition()) + Math.abs(this._motors[Enums.FRONT_LEFT].getEncPosition())) / 2.0;
+	}
 	public void setPDP(PowerDistributionPanel pdp, double voltageThreshold, double reductionFactor){
 		_pdp = pdp;
 		this._pdpVoltageThreshold = voltageThreshold;
@@ -228,5 +245,6 @@ public class XCatsDrive {
 			_motors[i].updateStatus();
 			
 		}						
+		SmartDashboard.putNumber("Average Enc Position", this.getAbsAvgEncoderValue());
 	}
 }
