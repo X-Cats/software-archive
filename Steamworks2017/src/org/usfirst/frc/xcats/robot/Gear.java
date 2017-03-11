@@ -109,6 +109,12 @@ public class Gear {
 		SmartDashboard.putBoolean("Gear Positioner", _optoRotate.get());
 		SmartDashboard.putBoolean("Gear Aquiring", _acquiring);
 		
+		//if this is true, then check the optical for the gear rotator and if so, acquireGear
+		if (Enums.GEAR_AUTO_ROTATE){
+			if (!_optoRotate.get())
+				this.acquireGear();			
+		}
+		
 		//this checks to see if we are in the ejection mode
 		if (_ejecting){
 			

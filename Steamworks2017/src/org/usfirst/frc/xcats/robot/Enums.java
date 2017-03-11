@@ -76,6 +76,7 @@ public class Enums {
 	public static final int WINCH_LIMIT_SWITCH = 3;// limit switch for the winch
 	
 	//Gear Ejector
+	public static final boolean GEAR_AUTO_ROTATE = true; // whether to monitor for the gear obstructing the eye
 	public static final int GEAR_ROTATOR_PWM_ID = 7;
 	public static final int GEAR_PCM_FORWARD = 7; // PCM id for the gear ejector
 	public static final int GEAR_PCM_REVERSE = 6; // PCM id for the gear ejector
