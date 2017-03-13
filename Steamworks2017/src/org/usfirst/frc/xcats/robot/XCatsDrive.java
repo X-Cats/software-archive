@@ -23,6 +23,8 @@ public class XCatsDrive {
 	private double _pdpVoltageThreshold;
 	private double _pdpVoltageReductionFactor = 0; // setpoint = setpoint - _pdpVoltageReductionFactor* setpoint;
 	private int _channels[];
+	private double _leftEncZero=0;
+	private double _rightEncZero=0;
 
 	
 	public XCatsDrive (boolean useCAN, boolean isTalon)
@@ -109,10 +111,14 @@ public class XCatsDrive {
 	public void zeroEncoder(){
 		for (int i=0; i<_motors.length; i++){
 			this._motors[i].zeroEncoder();			
-		}					
+		}
+		//I don't know why but sometime the zero does not work!
+		_leftEncZero = this._motors[Enums.FRONT_LEFT].getEncPosition();
+		_rightEncZero = this._motors[Enums.FRONT_RIGHT].getEncPosition();		
+		System.out.println("                                                                Zero Encoders! "+ getAbsAvgEncoderValue());
 	}
 	public double getAbsAvgEncoderValue(){
-		return (Math.abs(this._motors[Enums.FRONT_LEFT].getEncPosition()) + Math.abs(this._motors[Enums.FRONT_LEFT].getEncPosition())) / 2.0;
+		return (Math.abs(this._motors[Enums.FRONT_LEFT].getEncPosition() - _leftEncZero ) + Math.abs(this._motors[Enums.FRONT_RIGHT].getEncPosition() - _rightEncZero)) / 2.0;
 	}
 	public void setPDP(PowerDistributionPanel pdp, double voltageThreshold, double reductionFactor){
 		_pdp = pdp;

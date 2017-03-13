@@ -43,7 +43,9 @@ public class Enums {
 	
 	public static final double  ROBOT_LENGTH_COMPACT = 30.0; //length of robot with shooter in home position
 	public static final double  ROBOT_LENGTH_EXTENDED = 40; // length of robot with shooter down
+
 	//vision constants
+	public static final boolean VISION_SYSTEM_ENABLED = false;
 	public static final int CAMERA_FOV_HORIZONTAL = 61;  // Horizontal field of view for MSoft Lifecam
 //	public static final int PIXEL_PER_DEGREE = 14;   // commented out to allow for various resolutions
 //	public static final int CAMERA_X_PIXELS_TOTAL = 640;  // commented out to allow for various resolutions
