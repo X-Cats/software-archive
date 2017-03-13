@@ -286,7 +286,7 @@ public class Autonomous {
 		
 		double boilerSideLeg1 = 117.4 - 14 - 9 + 2 +2;
 		double boilerSideLeg2 = 44 - 14 + 18 + 3 - 12;
-		double feederSideLeg1 = 104 - 14 - 9 + 2; //14 is half the robot length but need to subtract the 15.5/tan(60)
+		double feederSideLeg1 = 104 - 14 - 9 + 4; //14 is half the robot length but need to subtract the 15.5/tan(60)
 		double feederSideLeg2 = 52 - 14 + 18 + 3; // 19 = 15.5/sin(60) which is the left bumber membership
 		
 		if ((isBlueAlliance && _autoSelected == _auto1) || (!isBlueAlliance && _autoSelected == _auto3)){
@@ -308,9 +308,9 @@ public class Autonomous {
 					
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.BRAKEMODE,"Brake Mode",0,0,0,0)); //Set brake mode for drive train
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LOW_SPEED,"Low speed transmission",0,0,0,0)); //make sure we are in low speed
-		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DEADRECON,"Drive Forward 1",0,.7,.7,distanceLeg1));
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward 1",0,.7,.7,distanceLeg1));
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn 60",0,0,0,rotationAngle));
-		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DEADRECON,"Drive Forward 2",0,.7,.7,distanceLeg2));
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward 2",0,.7,.7,distanceLeg2));
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
 		
 		//If we are isBoilerSide then add the steps for the ball handling
