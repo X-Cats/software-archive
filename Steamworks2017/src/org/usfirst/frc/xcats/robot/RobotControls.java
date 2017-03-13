@@ -86,6 +86,7 @@ public class RobotControls {
 		_drive.setInverted();
 		_drive.setCoastMode();
 		_drive.setMagneticEncoders(true);
+		_drive.zeroEncoder();
 	
 		_feeder = new Feeder();
 		_climber = new Climber();
@@ -311,19 +312,21 @@ public class RobotControls {
 		}
 		
 		//image capture
-		if(Enums.TWO_JOYSTICKS){
-			//button 1 is the "trigger" button
-			if (_leftJS.getRawButton(1)){
-				_visionData = _autoTarget.captureImage();
-				SmartDashboard.putBoolean("Vision Processing", _visionData.getResult());
-				SmartDashboard.putNumber("Vision FACING Angle", _visionData.getFacingAngleInDeg());
-				SmartDashboard.putNumber("Vision ZONE", _visionData.getZone());
-				SmartDashboard.putNumber("Vision DISTANCE", _visionData.getDistanceInInches());
-								
-			}
-		}else{
-			if(_driveJS.getRawButton(7)){
-				_visionData = _autoTarget.captureImage();
+		if (Enums.VISION_SYSTEM_ENABLED){
+			if(Enums.TWO_JOYSTICKS){
+				//button 1 is the "trigger" button
+				if (_leftJS.getRawButton(1)){
+					_visionData = _autoTarget.captureImage();
+					SmartDashboard.putBoolean("Vision Processing", _visionData.getResult());
+					SmartDashboard.putNumber("Vision FACING Angle", _visionData.getFacingAngleInDeg());
+					SmartDashboard.putNumber("Vision ZONE", _visionData.getZone());
+					SmartDashboard.putNumber("Vision DISTANCE", _visionData.getDistanceInInches());
+									
+				}
+			}else{
+				if(_driveJS.getRawButton(7)){
+					_visionData = _autoTarget.captureImage();
+				}
 			}
 		}
 

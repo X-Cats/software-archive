@@ -133,13 +133,13 @@ public class Gear {
 					if (_reversing){
 						//if the reverse time has timed out, we are done.
 						if (_ejectReverseTimer.get() >= Enums.GEAR_EJECT_REVERSE_TIME){
-							System.out.print("Reverse Timer met, stopping");
+							//System.out.print("Reverse Timer met, stopping");
 							_ejectReverseTimer.stop();
 							_ejectTimer.stop();
 							_reversing = false;
 							_ejecting = false;
 							
-							System.out.println("Trying to home platen");
+							//System.out.println("Trying to home platen");
 							this.goHome();							
 						} else{
 							_xcDrive.set(Enums.GEAR_EJECT_REVERSE_SPEED, Enums.GEAR_EJECT_REVERSE_SPEED);
