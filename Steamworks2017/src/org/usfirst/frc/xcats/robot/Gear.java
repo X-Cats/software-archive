@@ -3,6 +3,7 @@ package org.usfirst.frc.xcats.robot;
 import org.usfirst.frc.xcats.robot.XCatsSpeedController.SCType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.Timer;
@@ -29,6 +30,7 @@ public class Gear {
     private boolean _homing = false;
     private double _homingLimit = 0.45;
     private Timer _sanityTimer = new Timer();
+    private DigitalOutput _gearLights;
     
 	
 	public Gear(XCatsDrive drive){
@@ -46,6 +48,7 @@ public class Gear {
 		}
 		_RS= new DigitalInput(Enums.GEAR_LS_CHANNEL);
 		_LS= new DigitalInput(Enums.GEAR_RS_CHANNEL);
+		_gearLights = new DigitalOutput(Enums.GEAR_LIGHTS_CHANNEL);
 		_optoRotate = new DigitalInput(Enums.GEAR_POSITIONED_OPT);
 		
 //		_optoOnBoard = new DigitalInput(Enums.GEAR_ONBOARD_OPT);
@@ -156,8 +159,10 @@ public class Gear {
 				}
 			
 			}
+			_gearLights.set(true);
 			
-		}
+		}else
+			_gearLights.set(false);
 		
 		if (_acquiring){
 			if((_LS.get() && _gearDirection == _movingLeft) || ( _RS.get() && _gearDirection == _movingRight) ){

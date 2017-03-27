@@ -78,7 +78,8 @@ public class Enums {
 	//Winch
 	public static final int WINCH_CAN_ID =11; //CAN ID of the winch
 	public static final double WINCH_CLIMB_SPEED = 1.0; // speed to climb
-	public static final int WINCH_LIMIT_SWITCH = 3;// limit switch for the winch
+	//public static final int WINCH_LIMIT_SWITCH = 3;// limit switch for the winch
+	
 	
 	//Gear Ejector
 	//note turn this off because the reflective tape on the target interferes with the sensor detection, and the
@@ -97,6 +98,7 @@ public class Enums {
 	public static final double GEAR_ROTATOR_SPEED = 0.25;
 	public static final int GEAR_LS_CHANNEL=0; //Left limit switch
     public static final int GEAR_RS_CHANNEL=1; //Right limit switch
+    
 	
 	//Feeder
 	public static final int FEEDER_TOP_CAN = 9;
@@ -110,6 +112,9 @@ public class Enums {
 	public static final int AUTONOMOUS_TIME = 15;
 	public static final int AUTO_SWITCH_ANALOG = 0;
 	
-	
+	//Lights
+	public static final int GEAR_LIGHTS_CHANNEL = 5;//output for controlling the lights while ejecting the gear
+	public static final int WINCH_LIGHTS_CHANNEL = 4;//output for controlling lights while climbing
+	public static final int LIGHTS_ALLIANCE_COLOR = 3;//output for controlling lights to match alliance color
 	
 }
