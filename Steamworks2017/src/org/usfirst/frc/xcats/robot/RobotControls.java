@@ -409,7 +409,9 @@ public class RobotControls {
 	{
 		return _drive;
 	}
-	
+	public AutoTarget getAutoTarget(){
+		return _autoTarget;
+	}
 	public Gear getGear(){
 		return _gear;
 	}

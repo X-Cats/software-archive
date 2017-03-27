@@ -26,6 +26,7 @@ public class Autonomous {
 	private float _initCompassHeading=0;
 	private boolean _angleHasBeenCalculated = false;
 	private double _calculatedAngle = 0;
+	private VisionData _visionData ;
 
 	private double _totalAutoTime = Enums.AUTONOMOUS_TIME;
 	private AutonomousStep _currentAutoStep;
@@ -318,6 +319,14 @@ public class Autonomous {
 //		double feederSideLeg2 = 52 - 14 + 18 + 3; // these were Jame's settings at last penfied practice
 		double feederSideLeg2 = 52 - 14 + 18 + 6; // 19 = 15.5/sin(60) which is the left bumber membership
 		
+		
+		//from Carl's latest drawing
+		feederSideLeg1 = 95.181 - 14.0; // 14 = half the length of the robot.
+		feederSideLeg2 = 69.036 - 14.0;
+		boilerSideLeg1 = 108.8 - 14.0;
+		boilerSideLeg2 = 41.799 - 14.0;
+		
+		
 		if ((isBlueAlliance && _autoSelected == _auto1) || (!isBlueAlliance && _autoSelected == _auto3)){
 			isBoilerSide = true;
 			legSpeed = 0.7;
@@ -346,6 +355,8 @@ public class Autonomous {
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Drive Forward an inch",0.2,0.3,0.3,0)); //drive an inch at low speed to make sure encoders are zeroing
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward 1",0,leg1Speed,leg1Speed,distanceLeg1));
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn 60",0,0,0,rotationAngle));
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GET_ANGLE_CORRECTION,"Get Angle Correction",0.25,0,0,0));
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Correct Angle",0,0,0,0));
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward 2",0,legSpeed,legSpeed,distanceLeg2));
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
 		
@@ -419,6 +430,8 @@ public class Autonomous {
 			case DRIVE_DISTANCE:
 				double encPos = 0;
 				if (Enums.IS_FINAL_ROBOT)					
+					//the final robot wheels are 5.375 in diameter (according to Pete, we should measure
+					// this makes each wheel revolution cover 7.5% more ground
 					encPos = Math.abs((_currentAutoStep.distance - 7.1002) /0.0045 );
 				else
 					encPos = Math.abs((_currentAutoStep.distance - 7.1002) /0.0045 );
@@ -457,6 +470,10 @@ public class Autonomous {
 				rotate(_calculatedAngle);
 				break;
 				
+			case GET_ANGLE_CORRECTION:
+				getVisionCorrection(_currentAutoStep.stepTime);
+				break;
+
 			case LIFT:
 				raise();
 				break;
@@ -521,6 +538,27 @@ public class Autonomous {
 
 		this.updateStatus();
 		_controls.updateStatus();
+	}
+	
+	private void getVisionCorrection(double time){
+		_visionData = _controls.getAutoTarget().captureImage();
+		if (_stepTimer.get() < time && _visionData != null && _visionData.getResult())
+		{
+			_controls.getDrive().set(0, 0, 0, 0);
+			
+			AutonomousStep nextStep= _steps.get(_currentStep + 1);
+			SmartDashboard.putNumber("Facing Angle", _visionData.getFacingAngleInDeg());
+			if(Math.abs(_visionData.getFacingAngleInDeg()) < 10 && Math.abs(_visionData.getFacingAngleInDeg()) > 3)
+				nextStep.distance = _visionData.getFacingAngleInDeg();
+			startNextStep();
+		}
+		else
+		{
+			// do something to get the angle
+			_visionData = _controls.getAutoTarget().captureImage();
+		}		
+		
+		
 	}
 
 	private void rotate( double distance){
