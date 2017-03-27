@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -34,6 +35,8 @@ public class Autonomous {
 	private boolean _isExecuting = false;
 	private boolean _cancelExecution = false;
 	private boolean _isEjecting = false;
+	
+	private DigitalOutput _lightsColor = new DigitalOutput(Enums.LIGHTS_ALLIANCE_COLOR);//digial output for controlling color of lights
 
 	private static final double FIRST_LEG_DISTANCE = 73.0;	// this is the distance from the auto line to the lip of the defenses	
 
@@ -180,37 +183,39 @@ public class Autonomous {
 		
 		if (DriverStation.getInstance().getAlliance() == DriverStation.Alliance.Blue){
 			blueAlliance = true;
-		}
+			_lightsColor.set(false);//sets lights to match alliance color
+		}else
+			_lightsColor.set(true);//sets lights to match alliance color
 		
 		SmartDashboard.putBoolean("Alliance Color", blueAlliance);
 		
-		if (Enums.IS_FINAL_ROBOT){
-			//use the switch on the robot to identify autonomous
-			
-			AnalogInput autoSelector = new AnalogInput(Enums.AUTO_SWITCH_ANALOG);
-			SmartDashboard.putNumber("Auto Selector Value", autoSelector.getValue()/100);
-			
-			if (autoSelector.getValue()/100 < 0.5)
-				_autoSelected = _defaultAuto;
-			else if (autoSelector.getValue()/100 < 1.5 && autoSelector.getValue()/100 > 0.5)
-				_autoSelected = _auto1;  //left
-			else if (autoSelector.getValue()/100 < 2.5 && autoSelector.getValue()/100 > 1.5)
-				_autoSelected = _auto2;  //center
-			else if (autoSelector.getValue()/100 < 3.5 && autoSelector.getValue()/100 > 2.5)
-				_autoSelected = _auto3;  //right
-			else if (autoSelector.getValue()/100 < 4.5 && autoSelector.getValue()/100 > 3.5)
-				//read from the sendable chooser
-				System.out.println("Using Sendable Chooser Autonomous mode" + _autoSelected);
-			else
-				_autoSelected = _defaultAuto;
-		}
+//		if (Enums.IS_FINAL_ROBOT){
+//			//use the switch on the robot to identify autonomous
+//			
+//			AnalogInput autoSelector = new AnalogInput(Enums.AUTO_SWITCH_ANALOG);
+//			SmartDashboard.putNumber("Auto Selector Value", autoSelector.getValue()/100);
+//			
+//			if (autoSelector.getValue()/100 < 0.5)
+//				_autoSelected = _defaultAuto;
+//			else if (autoSelector.getValue()/100 < 1.5 && autoSelector.getValue()/100 > 0.5)
+//				_autoSelected = _auto1;  //left
+//			else if (autoSelector.getValue()/100 < 2.5 && autoSelector.getValue()/100 > 1.5)
+//				_autoSelected = _auto2;  //center
+//			else if (autoSelector.getValue()/100 < 3.5 && autoSelector.getValue()/100 > 2.5)
+//				_autoSelected = _auto3;  //right
+//			else if (autoSelector.getValue()/100 < 4.5 && autoSelector.getValue()/100 > 3.5)
+//				//read from the sendable chooser
+//				System.out.println("Using Sendable Chooser Autonomous mode" + _autoSelected);
+//			else
+//				_autoSelected = _defaultAuto;
+//		}
 		SmartDashboard.putString("AutoSelected", _autoSelected);
 //			_autoSelected= _auto2;		
 		switch (_autoSelected) {
 		case _auto2: 
 			caseName="Middle Gear";
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.BRAKEMODE,"Brake Mode",0,0,0,0)); //Set brake mode for drive train
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward 1",0,.3,.3,1)); //drive an inch at low speed to make sure encoders are zeroing
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Drive Forward an inch",0.2,0.3,0.3,0)); //drive an inch at low speed to make sure encoders are zeroing
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,84)); //70 inches
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.WAIT,"Wait for gear to eject",0,0,0,Enums.GEAR_EJECT_TIME));
@@ -305,11 +310,11 @@ public class Autonomous {
 		double rightSpeed = 0;
 		
 //		double boilerSideLeg1 = 117.4 - 14 - 9 + 2 +2; // these were james at the last penfield practice
-		double boilerSideLeg1 = 117.4 - 14 - 9 + 2 -3;
+		double boilerSideLeg1 = 117.4 - 14 - 9 + 2 +2;
 //		double boilerSideLeg2 = 44 - 14 + 18 + 3 - 12; // these were james at the last penfield practice
 		double boilerSideLeg2 = 44 - 14 + 18 + 3 - 18;
 //		double feederSideLeg1 = 104 - 14 - 9 + 4; //these were James's settings at last penfield practice
-		double feederSideLeg1 = 104 - 14 - 9 - 10; //14 is half the robot length but need to subtract the 15.5/tan(60)
+		double feederSideLeg1 = 104 - 14 - 9 - 5; //14 is half the robot length but need to subtract the 15.5/tan(60)
 //		double feederSideLeg2 = 52 - 14 + 18 + 3; // these were Jame's settings at last penfied practice
 		double feederSideLeg2 = 52 - 14 + 18 + 6; // 19 = 15.5/sin(60) which is the left bumber membership
 		
@@ -325,13 +330,13 @@ public class Autonomous {
 		
 				
 		if (!isBoilerSide){
-			//left 
-			rotationAngle = 59; //(isBlueAlliance ? 58 : -62);
+			
+			rotationAngle = (isBlueAlliance ? -61 : 59);
 			distanceLeg1 = (isBlueAlliance ? boilerSideLeg1 : feederSideLeg1 );
 			distanceLeg2 = (isBlueAlliance ? boilerSideLeg2 : feederSideLeg2);			
 		} else {
-			//right
-			rotationAngle = -61 ; //(isBlueAlliance ? 58 : -62);
+			
+			rotationAngle = (isBlueAlliance ? 59 : -61);
 			distanceLeg1 = (isBlueAlliance ? feederSideLeg1 : boilerSideLeg1);
 			distanceLeg2 = (isBlueAlliance ? feederSideLeg2 : boilerSideLeg2);			
 		}
