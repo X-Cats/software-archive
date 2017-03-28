@@ -548,6 +548,7 @@ public class Autonomous {
 			
 			AutonomousStep nextStep= _steps.get(_currentStep + 1);
 			SmartDashboard.putNumber("Facing Angle", _visionData.getFacingAngleInDeg());
+			System.out.println("Facing angle: " + _visionData.getFacingAngleInDeg());
 			if(Math.abs(_visionData.getFacingAngleInDeg()) < 10 && Math.abs(_visionData.getFacingAngleInDeg()) > 3)
 				nextStep.distance = _visionData.getFacingAngleInDeg();
 			startNextStep();
