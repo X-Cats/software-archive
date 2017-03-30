@@ -48,7 +48,7 @@ public class Climber {
 		_climberLights.set(false);
 	}
 	public void updateStatus(){
-		SmartDashboard.putBoolean("Winch Limit Switch", _lsWinch.get());
+		//SmartDashboard.putBoolean("Winch Limit Switch", _lsWinch.get());
 		
 	}
 }
