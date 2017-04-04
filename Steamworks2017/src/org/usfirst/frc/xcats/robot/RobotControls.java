@@ -393,9 +393,12 @@ public class RobotControls {
 	
 		
 		if(_operatorJS.getRawButton(7))
+		{
 			_climber.climb();
 //		else if (_operatorJS.getRawButton(5))
 //			_climber.release();
+			_feeder.lift();
+		}
 		else
 			_climber.stop();
 		

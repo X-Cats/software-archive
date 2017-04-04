@@ -118,7 +118,19 @@ public class XCatsDrive {
 		System.out.println("                                                                Zero Encoders! "+ getAbsAvgEncoderValue());
 	}
 	public double getAbsAvgEncoderValue(){
-		return (Math.abs(this._motors[Enums.FRONT_LEFT].getEncPosition() - _leftEncZero ) + Math.abs(this._motors[Enums.FRONT_RIGHT].getEncPosition() - _rightEncZero)) / 2.0;
+		if ((Math.abs(this._motors[Enums.FRONT_LEFT].getEncPosition() - _leftEncZero ) * Math.abs(this._motors[Enums.FRONT_RIGHT].getEncPosition() - _rightEncZero)) != 0)
+			return (Math.abs(this._motors[Enums.FRONT_LEFT].getEncPosition() - _leftEncZero ) + Math.abs(this._motors[Enums.FRONT_RIGHT].getEncPosition() - _rightEncZero)) / 2.0;
+		else if(Math.abs(this._motors[Enums.FRONT_LEFT].getEncPosition() - _leftEncZero ) != 0)
+		{
+			//System.out.println("Right Drive encoder is 0 !");
+			return Math.abs(this._motors[Enums.FRONT_LEFT].getEncPosition() - _leftEncZero );
+		}
+		else
+		{
+			//System.out.println("Left Drive encoder is 0 !");
+			return Math.abs(this._motors[Enums.FRONT_RIGHT].getEncPosition() - _rightEncZero);
+		}
+			
 	}
 	public void setPDP(PowerDistributionPanel pdp, double voltageThreshold, double reductionFactor){
 		_pdp = pdp;
@@ -252,5 +264,6 @@ public class XCatsDrive {
 			
 		}						
 		SmartDashboard.putNumber("Average Enc Position", this.getAbsAvgEncoderValue());
+		//System.out.println("Left: " + Math.abs(this._motors[Enums.FRONT_LEFT].getEncPosition() - _leftEncZero ) +"  Right:" + Math.abs(this._motors[Enums.FRONT_RIGHT].getEncPosition() - _rightEncZero) );
 	}
 }

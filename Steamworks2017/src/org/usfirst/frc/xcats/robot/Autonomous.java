@@ -27,6 +27,7 @@ public class Autonomous {
 	private boolean _angleHasBeenCalculated = false;
 	private double _calculatedAngle = 0;
 	private VisionData _visionData ;
+	private boolean _hasCaptured=false;
 
 	private double _totalAutoTime = Enums.AUTONOMOUS_TIME;
 	private AutonomousStep _currentAutoStep;
@@ -160,6 +161,7 @@ public class Autonomous {
 		_stepTimer.start();
 		_isExecuting = false;
 		_cancelExecution = false;
+		_hasCaptured=false;
 		this.updateStatus();
 
 
@@ -321,18 +323,18 @@ public class Autonomous {
 		
 		
 		//from Carl's latest drawing
-		feederSideLeg1 = 95.181 - 14.0; // 14 = half the length of the robot.
-		feederSideLeg2 = 69.036 - 14.0;
+		feederSideLeg1 = 95.181 - 14.0 - 10.0 + 10; // 14 = half the length of the robot.
+		feederSideLeg2 = 69.036 - 14.0 + 15.0 - 3.0;
 		boilerSideLeg1 = 108.8 - 14.0;
 		boilerSideLeg2 = 41.799 - 14.0;
 		
 		
 		if ((isBlueAlliance && _autoSelected == _auto1) || (!isBlueAlliance && _autoSelected == _auto3)){
 			isBoilerSide = true;
-			legSpeed = 0.7;
+			legSpeed = 0.5;
 		} else if ((isBlueAlliance && _autoSelected == _autoFeederRun) ){
 			isBoilerSide = false;
-			legSpeed = 0.7;
+			legSpeed = 0.5;
 		}
 
 		
@@ -355,6 +357,7 @@ public class Autonomous {
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Drive Forward an inch",0.2,0.3,0.3,0)); //drive an inch at low speed to make sure encoders are zeroing
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward 1",0,leg1Speed,leg1Speed,distanceLeg1));
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn 60",0,0,0,rotationAngle));
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.WAIT,"wait to settle",0.5,0,0,0));
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GET_ANGLE_CORRECTION,"Get Angle Correction",0.25,0,0,0));
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Correct Angle",0,0,0,0));
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward 2",0,legSpeed,legSpeed,distanceLeg2));
@@ -541,24 +544,34 @@ public class Autonomous {
 	}
 	
 	private void getVisionCorrection(double time){
-		_visionData = _controls.getAutoTarget().captureImage();
-		if (_stepTimer.get() < time && _visionData != null && _visionData.getResult())
-		{
-			_controls.getDrive().set(0, 0, 0, 0);
+		if (! _hasCaptured){
+			_hasCaptured = true;
+			_visionData = _controls.getAutoTarget().captureImage();			
+		}
 			
-			AutonomousStep nextStep= _steps.get(_currentStep + 1);
-			SmartDashboard.putNumber("Facing Angle", _visionData.getFacingAngleInDeg());
-			System.out.println("Facing angle: " + _visionData.getFacingAngleInDeg());
-			if(Math.abs(_visionData.getFacingAngleInDeg()) < 10 && Math.abs(_visionData.getFacingAngleInDeg()) > 3)
-				nextStep.distance = _visionData.getFacingAngleInDeg();
+	
+		if (!Enums.VISION_CORRECTION_IN_AUTO){
+			startNextStep();
+			return;
+		}
+			
+			
+		if ( _visionData != null)
+		{
+			if (_visionData.getResult()){
+				_controls.getDrive().set(0, 0, 0, 0);
+				
+				AutonomousStep nextStep= _steps.get(_currentStep + 1);
+				SmartDashboard.putNumber("Facing Angle", _visionData.getFacingAngleInDeg());
+				System.out.println("Facing angle: " + _visionData.getFacingAngleInDeg());
+				if(Math.abs(_visionData.getFacingAngleInDeg()) < 10 && Math.abs(_visionData.getFacingAngleInDeg()) > 3)
+					nextStep.distance = _visionData.getFacingAngleInDeg();				
+			}
 			startNextStep();
 		}
-		else
-		{
-			// do something to get the angle
-			_visionData = _controls.getAutoTarget().captureImage();
-		}		
-		
+		else if (_stepTimer.get() > time)
+			startNextStep();
+
 		
 	}
 
@@ -568,7 +581,10 @@ public class Autonomous {
 		double tolerance=0.5;
 		int direction=1;
 
-
+		if (distance == 0){
+			startNextStep();			
+		}
+		
 		//deltaYaw = _initialYaw + _controls.getNavx().getYaw();
 		//SmartDashboard.putNumber("deltaYaw", deltaYaw);
 		// 
@@ -582,6 +598,7 @@ public class Autonomous {
 			speed=-speed/1.5;
 			_controls.getDrive().set(speed, speed, -speed, -speed);
 			if(Math.abs(_controls.getNavx().getYaw())-Math.abs(distance)<=tolerance){
+				_controls.getDrive().set(0, 0, 0, 0);
 				startNextStep();
 			}
 		}
