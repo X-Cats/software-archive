@@ -10,6 +10,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -241,7 +244,7 @@ public class AutoTarget {
 		}
 		if (Enums.CAMERA_SAVE_IMAGES){
 			Date date = new Date();
-			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
 			filename = "/home/lvuser/"+dateFormat.format(date)+".jpg";			
 		}
 		Imgcodecs.imwrite(filename, _mat);
@@ -254,6 +257,7 @@ public class AutoTarget {
 		}
 		
 		_bProcessing = false;
+		addToLog(filename,myVisiondata);
 		return myVisiondata;
 	}
 	
@@ -288,6 +292,24 @@ public class AutoTarget {
 		//return the array of steps to the caller. Note this may be null at times, so the caller needs to 
 		//check that
 		return steps;
+	}
+	
+	private void addToLog(String filename, VisionData vd ){
+
+		try{
+			Logger logger = Logger.getLogger(AutoTarget.class.getName());
+			FileHandler fileLog = new FileHandler("/home/lvuser/AutoTargetLog.log",true);
+			fileLog.setFormatter(new java.util.logging.SimpleFormatter());
+			logger.addHandler(fileLog);
+
+			logger.log(Level.INFO, filename+", "+ vd.getResult() +", "+vd.getZone() +", "+vd.getFacingAngleInDeg() +vd.getDistanceInInches()+"\n" );
+			fileLog.flush();
+			fileLog.close();
+		}
+		catch (Exception ex){
+			
+		}
+		
 	}
 	
 	public void updateStatus(){
