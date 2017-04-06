@@ -309,6 +309,7 @@ public class Autonomous {
 		double rotationAngle = 0;
 		double distanceLeg1 = 0;
 		double distanceLeg2 = 0;
+		double distanceLeg3 = 0;
 		double leftSpeed = 0;
 		double rightSpeed = 0;
 		
@@ -321,12 +322,17 @@ public class Autonomous {
 //		double feederSideLeg2 = 52 - 14 + 18 + 3; // these were Jame's settings at last penfied practice
 		double feederSideLeg2 = 52 - 14 + 18 + 6; // 19 = 15.5/sin(60) which is the left bumber membership
 		
+		double feederSideLeg3 = 0;
+		double boilerSideLeg3 = 0;
+		
 		
 		//from Carl's latest drawing
 		feederSideLeg1 = 95.181 - 14.0 - 10.0 + 10; // 14 = half the length of the robot.
-		feederSideLeg2 = 69.036 - 14.0 + 15.0 - 3.0;
+		feederSideLeg3 = 30;  //stop 30 inches from the pin to take a picture 
+		feederSideLeg2 = 69.036 - 14.0 + 15.0 - 3.0 - feederSideLeg3;
 		boilerSideLeg1 = 108.8 - 14.0;
-		boilerSideLeg2 = 41.799 - 14.0;
+		boilerSideLeg3 = 30;
+		boilerSideLeg2 = 41.799 - 14.0 - boilerSideLeg3;
 		
 		
 		if ((isBlueAlliance && _autoSelected == _auto1) || (!isBlueAlliance && _autoSelected == _auto3)){
@@ -342,14 +348,16 @@ public class Autonomous {
 				
 		if (!isBoilerSide){
 			
-			rotationAngle = (isBlueAlliance ? -61 : 59);
+			rotationAngle = (isBlueAlliance ? -60 : 60);
 			distanceLeg1 = (isBlueAlliance ? boilerSideLeg1 : feederSideLeg1 );
-			distanceLeg2 = (isBlueAlliance ? boilerSideLeg2 : feederSideLeg2);			
+			distanceLeg2 = (isBlueAlliance ? boilerSideLeg2 : feederSideLeg2);
+			distanceLeg3 = (isBlueAlliance ? boilerSideLeg3 : feederSideLeg3);
 		} else {
 			
-			rotationAngle = (isBlueAlliance ? 59 : -61);
+			rotationAngle = (isBlueAlliance ? 60 : -60);
 			distanceLeg1 = (isBlueAlliance ? feederSideLeg1 : boilerSideLeg1);
 			distanceLeg2 = (isBlueAlliance ? feederSideLeg2 : boilerSideLeg2);			
+			distanceLeg3 = (isBlueAlliance ? feederSideLeg3 : boilerSideLeg3);			
 		}
 					
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.BRAKEMODE,"Brake Mode",0,0,0,0)); //Set brake mode for drive train
@@ -357,24 +365,25 @@ public class Autonomous {
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Drive Forward an inch",0.2,0.3,0.3,0)); //drive an inch at low speed to make sure encoders are zeroing
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward 1",0,leg1Speed,leg1Speed,distanceLeg1));
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn 60",0,0,0,rotationAngle));
-		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.WAIT,"wait to settle",0.5,0,0,0));
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward 2",0,legSpeed,legSpeed,distanceLeg2));
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.WAIT,"wait to settle",0.25,0,0,0));
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GET_ANGLE_CORRECTION,"Get Angle Correction",0.25,0,0,0));
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Correct Angle",0,0,0,0));
-		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward 2",0,legSpeed,legSpeed,distanceLeg2));
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward 3",0,legSpeed,legSpeed,distanceLeg3));
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
 		
 		//If we are isBoilerSide then add the steps for the ball handling
-		SmartDashboard.putBoolean("is Boiler Side", isBoilerSide);
-		if (isBoilerSide){			
-			boilerAngle = (isBlueAlliance ? -40   : 40   );
-			leftSpeed   = (isBlueAlliance ? -0.77 : -0.92);
-			rightSpeed  = (isBlueAlliance ? -0.92 : -0.77);
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn to boiler1",0,0,0,boilerAngle));			
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.COASTMODE,"Coast Mode",0,0,0,0)); //Set COAST mode for drive train
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DEADRECON,"Drive to Boiler1",0,leftSpeed,rightSpeed,134)); //drive forward about 20 inch
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LIFT,"Lift Bottom",0,0,0,0)); 
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.FEED,"Feed Balls",10,0,0,0)); 
-		}
+//		SmartDashboard.putBoolean("is Boiler Side", isBoilerSide);
+//		if (isBoilerSide){			
+//			boilerAngle = (isBlueAlliance ? -40   : 40   );
+//			leftSpeed   = (isBlueAlliance ? -0.77 : -0.92);
+//			rightSpeed  = (isBlueAlliance ? -0.92 : -0.77);
+//			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn to boiler1",0,0,0,boilerAngle));			
+//			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.COASTMODE,"Coast Mode",0,0,0,0)); //Set COAST mode for drive train
+//			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DEADRECON,"Drive to Boiler1",0,leftSpeed,rightSpeed,134)); //drive forward about 20 inch
+//			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LIFT,"Lift Bottom",0,0,0,0)); 
+//			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.FEED,"Feed Balls",10,0,0,0)); 
+//		}
 		
 		//finish the autonomous
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.STOP,"Stop",0,0,0,0));
@@ -564,8 +573,11 @@ public class Autonomous {
 				AutonomousStep nextStep= _steps.get(_currentStep + 1);
 				SmartDashboard.putNumber("Facing Angle", _visionData.getFacingAngleInDeg());
 				System.out.println("Facing angle: " + _visionData.getFacingAngleInDeg());
-				if(Math.abs(_visionData.getFacingAngleInDeg()) < 10 && Math.abs(_visionData.getFacingAngleInDeg()) > 3)
+				if(Math.abs(_visionData.getFacingAngleInDeg()) < 10 && Math.abs(_visionData.getFacingAngleInDeg()) > 3){
 					nextStep.distance = _visionData.getFacingAngleInDeg();				
+					}
+				else
+					System.out.println("Angle found but not in range for correction!");
 			}
 			startNextStep();
 		}
