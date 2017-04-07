@@ -234,6 +234,7 @@ public class AutoTarget {
 		_bProcessing = true;
 		
 		String filename="";
+		String fname = "";
 		
 		if (_cvs.grabFrame(_mat) == 0) {
 			// Send the output the error.
@@ -245,7 +246,8 @@ public class AutoTarget {
 		if (Enums.CAMERA_SAVE_IMAGES){
 			Date date = new Date();
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
-			filename = "/home/lvuser/"+dateFormat.format(date)+".jpg";			
+			fname = dateFormat.format(date)+".jpg";
+			filename = "/home/lvuser/"+fname;			
 		}
 		Imgcodecs.imwrite(filename, _mat);
 		try {
@@ -257,7 +259,7 @@ public class AutoTarget {
 		}
 		
 		_bProcessing = false;
-		addToLog(filename,myVisiondata);
+		addToLog(fname,myVisiondata);
 		return myVisiondata;
 	}
 	
@@ -297,12 +299,16 @@ public class AutoTarget {
 	private void addToLog(String filename, VisionData vd ){
 
 		try{
+			Date date = new Date();
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			
 			Logger logger = Logger.getLogger(AutoTarget.class.getName());
-			FileHandler fileLog = new FileHandler("/home/lvuser/AutoTargetLog.log",true);
-			fileLog.setFormatter(new java.util.logging.SimpleFormatter());
+			FileHandler fileLog = new FileHandler("/home/lvuser/AutoTargetLog"+dateFormat.format(date) +".log",true);
+			fileLog.setFormatter(new java.util.logging.SimpleFormatter());			
 			logger.addHandler(fileLog);
 
-			logger.log(Level.INFO, filename+", "+ vd.getResult() +", "+vd.getZone() +", "+vd.getFacingAngleInDeg() +vd.getDistanceInInches()+"\n" );
+			logger.log(Level.INFO, "Filename, Result, Zone, FacingAngleInDeg, DistanceInInches \n\r" );
+			logger.log(Level.INFO, filename+", "+ vd.getResult() +", "+vd.getZone() +", "+vd.getFacingAngleInDeg() +", "+vd.getDistanceInInches()+"\n\r\n\r" );
 			fileLog.flush();
 			fileLog.close();
 		}
