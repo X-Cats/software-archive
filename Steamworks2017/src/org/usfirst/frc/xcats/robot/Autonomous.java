@@ -44,9 +44,9 @@ public class Autonomous {
 
 	final String _defaultAuto = "Do Nothing";
 	final String _autoForwardOnly = "Go forward only and stop";
-	final String _auto1 = "Left Gear Peg";
+	final String _auto1 = "Feeder Side Peg";
 	final String _auto2 = "Center Gear Peg";
-	final String _auto3 = "Right Gear Peg";
+	final String _auto3 = "Boiler Side Peg";
 	final String _autoReadFile = "TextFile read";
 	final String _autoTestSpeed = "Run 3 sec at input speed";
 	final String _autoTestDistance = "Run 48 in at input speed";
@@ -229,14 +229,14 @@ public class Autonomous {
 		
 			break;
 		case _auto1: 
-			caseName="Left Gear";
-			addSideSteps(blueAlliance);
+			caseName="Feeder Gear";
+			addSideSteps(blueAlliance,false);
 	
 			break;
 			
 		case _auto3: 
-			caseName="Right Gear";
-			addSideSteps(blueAlliance);
+			caseName="Boiler Gear";
+			addSideSteps(blueAlliance,true);
 			
 			break;
 
@@ -246,7 +246,7 @@ public class Autonomous {
 			double rotateAngle = -60;
 			rotateAngle = (blueAlliance ? 60 : -60);
 
-			addSideSteps(blueAlliance);
+			addSideSteps(blueAlliance,false);
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"backup some more",0,-0.5,-0.5,12)); //back up some more
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn to feeder",0,0,0,rotateAngle));
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"start moving",0.5,0.5,0.5,0)); //move some
@@ -300,8 +300,8 @@ public class Autonomous {
 	//	}
 
 
-	private void addSideSteps(boolean isBlueAlliance){
-		boolean isBoilerSide = false;
+	private void addSideSteps(boolean isBlueAlliance, boolean isBoilerSide){
+		//boolean isBoilerSide = false;
 		double legSpeed = 0.5;
 		double leg1Speed = 0.5;
 		
@@ -327,46 +327,44 @@ public class Autonomous {
 		
 		
 		//from Carl's latest drawing
-		feederSideLeg1 = 95.181 - 14.0 - 10.0 + 10; // 14 = half the length of the robot.
-		feederSideLeg3 = 30;  //stop 30 inches from the pin to take a picture 
-		feederSideLeg2 = 69.036 - 14.0 + 15.0 - 3.0 - feederSideLeg3;
+		feederSideLeg1 = 95.181 - 14.0 - 10.0 + 10 -4.0; // 14 = half the length of the robot.
+		feederSideLeg3 = 35;  //stop 30 inches from the pin to take a picture 
+		feederSideLeg2 = 69.036 - 14.0 + 15.0 - 3.0 - 2.0 - feederSideLeg3;
+		
 		boilerSideLeg1 = 108.8 - 14.0;
-		boilerSideLeg3 = 30;
+		boilerSideLeg3 = 25;
 		boilerSideLeg2 = 41.799 - 14.0 - boilerSideLeg3;
 		
 		
-		if ((isBlueAlliance && _autoSelected == _auto1) || (!isBlueAlliance && _autoSelected == _auto3)){
-			isBoilerSide = true;
+		if (isBoilerSide){
 			legSpeed = 0.5;
-		} else if ((isBlueAlliance && _autoSelected == _autoFeederRun) ){
-			isBoilerSide = false;
+			System.out.println("BOILER SIDE Auto!!");
+		} else {
 			legSpeed = 0.5;
+			System.out.println("FEEDER SIDE Auto!!");
 		}
 
 		
-		
-				
-		if (!isBoilerSide){
-			
+
+		distanceLeg1 = (isBoilerSide ? boilerSideLeg1 : feederSideLeg1);
+		distanceLeg2 = (isBoilerSide ? boilerSideLeg2 : feederSideLeg2);
+		distanceLeg3 = (isBoilerSide ? boilerSideLeg3 : feederSideLeg3);
+
+		if (!isBoilerSide){	
 			rotationAngle = (isBlueAlliance ? -60 : 60);
-			distanceLeg1 = (isBlueAlliance ? boilerSideLeg1 : feederSideLeg1 );
-			distanceLeg2 = (isBlueAlliance ? boilerSideLeg2 : feederSideLeg2);
-			distanceLeg3 = (isBlueAlliance ? boilerSideLeg3 : feederSideLeg3);
-		} else {
-			
+		} else {			
 			rotationAngle = (isBlueAlliance ? 60 : -60);
-			distanceLeg1 = (isBlueAlliance ? feederSideLeg1 : boilerSideLeg1);
-			distanceLeg2 = (isBlueAlliance ? feederSideLeg2 : boilerSideLeg2);			
-			distanceLeg3 = (isBlueAlliance ? feederSideLeg3 : boilerSideLeg3);			
 		}
 					
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.BRAKEMODE,"Brake Mode",0,0,0,0)); //Set brake mode for drive train
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LOW_SPEED,"Low speed transmission",0,0,0,0)); //make sure we are in low speed
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Drive Forward an inch",0.2,0.3,0.3,0)); //drive an inch at low speed to make sure encoders are zeroing
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward 1",0,leg1Speed,leg1Speed,distanceLeg1));
+
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn 60",0,0,0,rotationAngle));
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.WAIT,"wait to settle 1",0.5,0,0,0));
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward 2",0,legSpeed,legSpeed,distanceLeg2));
-		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.WAIT,"wait to settle",0.25,0,0,0));
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.WAIT,"wait to settle",1.0,0,0,0));
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GET_ANGLE_CORRECTION,"Get Angle Correction",0.25,0,0,0));
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Correct Angle",0,0,0,0));
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward 3",0,legSpeed,legSpeed,distanceLeg3));
@@ -553,35 +551,38 @@ public class Autonomous {
 	}
 	
 	private void getVisionCorrection(double time){
-		if (! _hasCaptured){
-			_hasCaptured = true;
-			_visionData = _controls.getAutoTarget().captureImage();			
-		}
-			
-	
 		if (!Enums.VISION_CORRECTION_IN_AUTO){
 			startNextStep();
 			return;
 		}
 			
-			
-		if ( _visionData != null)
-		{
-			if (_visionData.getResult()){
-				_controls.getDrive().set(0, 0, 0, 0);
-				
-				AutonomousStep nextStep= _steps.get(_currentStep + 1);
-				SmartDashboard.putNumber("Facing Angle", _visionData.getFacingAngleInDeg());
-				System.out.println("Facing angle: " + _visionData.getFacingAngleInDeg());
-				if(Math.abs(_visionData.getFacingAngleInDeg()) < 10 && Math.abs(_visionData.getFacingAngleInDeg()) > 3){
-					nextStep.distance = _visionData.getFacingAngleInDeg();				
+		if (! _hasCaptured){
+			_hasCaptured = true;
+			_visionData = _controls.getAutoTarget().captureImage();			
+							
+			if ( _visionData != null)
+			{
+				if (_visionData.getResult()){
+					_controls.getDrive().set(0, 0, 0, 0);
+					double correctionOffset = 0.0;
+					
+					AutonomousStep nextStep= _steps.get(_currentStep + 1);
+					SmartDashboard.putNumber("Facing Angle", _visionData.getFacingAngleInDeg());
+					System.out.println("Facing angle: " + _visionData.getFacingAngleInDeg());
+					if(Math.abs(_visionData.getFacingAngleInDeg()) < 60 && Math.abs(_visionData.getFacingAngleInDeg()) > 5){
+						
+						correctionOffset = (_visionData.getFacingAngleInDeg() > 0 ? 2.0 : -2.0);
+						nextStep.distance = _visionData.getFacingAngleInDeg() - correctionOffset; // we seem to be off about 2 deg				
+						}
+					else{
+						System.out.println("Angle found but not in range for correction!");
+						startNextStep();
 					}
-				else
-					System.out.println("Angle found but not in range for correction!");
+				}
+				startNextStep();
 			}
-			startNextStep();
 		}
-		else if (_stepTimer.get() > time)
+		else 
 			startNextStep();
 
 		
@@ -594,7 +595,8 @@ public class Autonomous {
 		int direction=1;
 
 		if (distance == 0){
-			startNextStep();			
+			startNextStep();
+			return;
 		}
 		
 		//deltaYaw = _initialYaw + _controls.getNavx().getYaw();

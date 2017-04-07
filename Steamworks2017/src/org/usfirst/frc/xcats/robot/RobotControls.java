@@ -295,21 +295,21 @@ public class RobotControls {
 			shiftTransmission();							
 		}
 
-		if (_navx != null){
-			
-			if (Enums.TWO_JOYSTICKS){
-				boolean aToggle = _leftJS.getRawButton(3);
-				if (aToggle != _autoMode ){
-					System.out.println("PREP auto");
-					this.prepAuto();
-				}
-			}
-			else {
-				if(_driveJS.getRawButton(5)){
-					this.prepAuto();
-				}
-			}
-		}
+//		if (_navx != null){
+//			
+//			if (Enums.TWO_JOYSTICKS){
+//				boolean aToggle = _leftJS.getRawButton(3);
+//				if (aToggle != _autoMode ){
+//					System.out.println("PREP auto");
+//					this.prepAuto();
+//				}
+//			}
+//			else {
+//				if(_driveJS.getRawButton(5)){
+//					this.prepAuto();
+//				}
+//			}
+//		}
 		
 		//image capture
 		if (Enums.VISION_SYSTEM_ENABLED){
