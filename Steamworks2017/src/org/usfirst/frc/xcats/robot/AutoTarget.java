@@ -76,6 +76,7 @@ public class AutoTarget {
 	private boolean _bProcessing =false;
 	private int _width = 320;
 	private int _height = 240;
+	private int _defaultBrightness = 0;
 	
 	public AutoTarget(){
 		
@@ -89,6 +90,8 @@ public class AutoTarget {
 			// Set the resolution
 			_camera.setResolution(_width, _height);
 			_camera.setFPS(25);
+			_defaultBrightness = _camera.getBrightness();
+			System.out.println("Default Brightness: "+_defaultBrightness);
 //			_camera.setBrightness(50);
 //			_camera.setWhiteBalanceManual(6000);
 
@@ -317,6 +320,47 @@ public class AutoTarget {
 		}
 		
 	}
+	
+
+	public void setCameraDefaults() {
+		
+		try{
+			int brightness = 50;
+			
+			System.out.print("Setting Camera to default settings");			
+			_camera.setResolution(_width,_height);
+			_camera.setFPS(25);
+			_camera.setBrightness(_defaultBrightness);
+			_camera.setWhiteBalanceAuto();
+			_camera.setExposureAuto();
+	
+		}
+		catch (Exception e)
+		{
+			System.out.println(e);
+			e.printStackTrace();
+		}
+	}
+
+	public void setCameraForAuto() {
+		
+		try{
+			
+			System.out.print("Setting Camera to dark settings");			
+			_camera.setResolution(640, 480);
+			_camera.setFPS(25);
+			_camera.setBrightness(20);
+			_camera.setWhiteBalanceManual(6000);
+			_camera.setExposureManual(50);
+	
+		}
+		catch (Exception e)
+		{
+			System.out.println(e);
+			e.printStackTrace();
+		}
+	}
+
 	
 	public void updateStatus(){
 		//update status here

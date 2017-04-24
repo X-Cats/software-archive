@@ -28,6 +28,7 @@ public class Autonomous {
 	private double _calculatedAngle = 0;
 	private VisionData _visionData ;
 	private boolean _hasCaptured=false;
+	private boolean _skipGearEjection = false;
 
 	private double _totalAutoTime = Enums.AUTONOMOUS_TIME;
 	private AutonomousStep _currentAutoStep;
@@ -53,12 +54,18 @@ public class Autonomous {
 	final String _autoFeederRun = "Feeder side run field";
 	final String _autoInTeleop = "TeleopCommands";
 	final String _autoRotator = "Test Rotations";
+	
+	final String _autoGearEject = "Eject";
+	final String _autoGearNothing = "Do Nothing";
+	final String _autoGearRun = "Eject and run";
+	
 	private Navx _navx;
 	
 	String _autoSelected;
 	String _defenseSelected;
 	String _shooterModeSelected;
 	SendableChooser _defensePosition;
+	SendableChooser _gearProcessing;
 
 	public Autonomous (RobotControls controls)
 	{
@@ -71,12 +78,19 @@ public class Autonomous {
 		_defensePosition.addObject(_auto1, _auto1);
 		_defensePosition.addObject(_auto2, _auto2);
 		_defensePosition.addObject(_auto3, _auto3);
-		_defensePosition.addObject(_autoFeederRun, _autoFeederRun);
 		_defensePosition.addObject(_autoReadFile,_autoReadFile);
 		_defensePosition.addObject(_autoTestSpeed, _autoTestSpeed);
 		_defensePosition.addObject(_autoTestDistance,_autoTestDistance);
 		_defensePosition.addObject(_autoRotator, _autoRotator);
 		SmartDashboard.putData("Auto choices", _defensePosition);			
+		
+		_gearProcessing = new SendableChooser();
+		_gearProcessing.addDefault(_autoGearEject, _autoGearEject);
+		_gearProcessing.addObject(_autoGearNothing, _autoGearNothing);
+		_gearProcessing.addObject(_autoGearRun, _autoGearRun);
+		SmartDashboard.putData("Gear Ejection choices", _gearProcessing);			
+		
+		
 		
 		/**
 		 * This autonomous (along with the chooser code above) shows how to select between different autonomous modes
@@ -142,6 +156,7 @@ public class Autonomous {
 
 		if (_autoSelected != this._autoInTeleop){
 			_autoSelected = (String) _defensePosition.getSelected();
+			_shooterModeSelected = (String) _gearProcessing.getSelected();
 			System.out.println("Auto selected: " + _autoSelected);		
 	
 	
@@ -231,27 +246,16 @@ public class Autonomous {
 		case _auto1: 
 			caseName="Feeder Gear";
 			addSideSteps(blueAlliance,false);
+			if (_shooterModeSelected == _autoGearRun)
+				addSideRunSteps (blueAlliance,false);
 	
 			break;
 			
 		case _auto3: 
 			caseName="Boiler Gear";
 			addSideSteps(blueAlliance,true);
-			
-			break;
-
-		case _autoFeederRun: 
-			caseName="Feeder side field run";
-
-			double rotateAngle = -60;
-			rotateAngle = (blueAlliance ? 60 : -60);
-
-			addSideSteps(blueAlliance,false);
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"backup some more",0,-0.5,-0.5,12)); //back up some more
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn to feeder",0,0,0,rotateAngle));
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"start moving",0.5,0.5,0.5,0)); //move some
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.HIGH_SPEED,"HI speed transmission",0,0,0,0)); //swich tranny
-			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Drive Down Field",1.0,0.75,0.75,0)); //drive down the field
+			if (_shooterModeSelected == _autoGearRun)
+				addSideRunSteps (blueAlliance,true);
 			
 			break;
 
@@ -300,10 +304,28 @@ public class Autonomous {
 	//	}
 
 
+	private void addSideRunSteps(boolean isBlueAlliance,boolean isBoilerSide){
+		double rotationAngle = 60;
+		if (!isBoilerSide){	
+			rotationAngle = (isBlueAlliance ? 60 : -60);
+		} else {			
+			rotationAngle = (isBlueAlliance ? -60 : 60);
+		}
+
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"backup some more",0,-0.9,-0.9,20)); //back up some more
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn to feeder",0,0,0,rotationAngle));
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"start moving",0.5,0.5,0.5,0)); //move some
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.HIGH_SPEED,"HI speed transmission",0,0,0,0)); //swich tranny
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Drive Down Field",1.0,0.75,0.75,0)); //drive down the field
+		
+		
+	}
+	
 	private void addSideSteps(boolean isBlueAlliance, boolean isBoilerSide){
 		//boolean isBoilerSide = false;
-		double legSpeed = 0.5;
-		double leg1Speed = 0.5;
+		double leg1Speed = 0.7;
+		double leg2Speed = 0.7;
+		double leg3Speed = 0.5;
 		
 		double boilerAngle = 0;
 		double rotationAngle = 0;
@@ -312,11 +334,21 @@ public class Autonomous {
 		double distanceLeg3 = 0;
 		double leftSpeed = 0;
 		double rightSpeed = 0;
+
+		
+		if (isBoilerSide){
+			System.out.println("BOILER SIDE Auto!!");
+		} else {
+			System.out.println("FEEDER SIDE Auto!!");
+		}
+
+		
 		
 //		double boilerSideLeg1 = 117.4 - 14 - 9 + 2 +2; // these were james at the last penfield practice
 		double boilerSideLeg1 = 117.4 - 14 - 9 + 2 +2;
 //		double boilerSideLeg2 = 44 - 14 + 18 + 3 - 12; // these were james at the last penfield practice
-		double boilerSideLeg2 = 44 - 14 + 18 + 3 - 18;
+//		double boilerSideLeg2 = 44 - 14 + 18 + 3 - 18;
+		double boilerSideLeg2 = 44 - 14 + 18 + 3 - 18 +5;
 //		double feederSideLeg1 = 104 - 14 - 9 + 4; //these were James's settings at last penfield practice
 		double feederSideLeg1 = 104 - 14 - 9 - 5; //14 is half the robot length but need to subtract the 15.5/tan(60)
 //		double feederSideLeg2 = 52 - 14 + 18 + 3; // these were Jame's settings at last penfied practice
@@ -332,29 +364,31 @@ public class Autonomous {
 		feederSideLeg2 = 69.036 - 14.0 + 15.0 - 3.0 - 2.0 - feederSideLeg3;
 		
 		boilerSideLeg1 = 108.8 - 14.0;
-		boilerSideLeg3 = 25;
-		boilerSideLeg2 = 41.799 - 14.0 - boilerSideLeg3;
-		
-		
-		if (isBoilerSide){
-			legSpeed = 0.5;
-			System.out.println("BOILER SIDE Auto!!");
-		} else {
-			legSpeed = 0.5;
-			System.out.println("FEEDER SIDE Auto!!");
-		}
-
-		
-
-		distanceLeg1 = (isBoilerSide ? boilerSideLeg1 : feederSideLeg1);
-		distanceLeg2 = (isBoilerSide ? boilerSideLeg2 : feederSideLeg2);
-		distanceLeg3 = (isBoilerSide ? boilerSideLeg3 : feederSideLeg3);
+//		boilerSideLeg3 = 41.799 - 14.0 - 3.0;
+//		boilerSideLeg3 = 41.799 - 14.0 - 5.0;  // mpk - changed on 4/10 8:03pm
+		boilerSideLeg3 = 41.799 - 14.0 - 5.0 -5;  // mpk - changed on 4/10 8:20pm, to increase dist for camera shot
+		boilerSideLeg2 = 1;
 
 		if (!isBoilerSide){	
 			rotationAngle = (isBlueAlliance ? -60 : 60);
 		} else {			
 			rotationAngle = (isBlueAlliance ? 60 : -60);
 		}
+
+		
+		distanceLeg1 = (isBoilerSide ? boilerSideLeg1 : feederSideLeg1);
+		distanceLeg2 = (isBoilerSide ? boilerSideLeg2 : feederSideLeg2);
+		distanceLeg3 = (isBoilerSide ? boilerSideLeg3 : feederSideLeg3);
+		
+		
+		if (Enums.AUTO_FROM_CORNER){
+			distanceLeg1 = 73;
+			distanceLeg2 = 60;
+			distanceLeg3 = 25;						
+		}
+				
+		
+
 					
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.BRAKEMODE,"Brake Mode",0,0,0,0)); //Set brake mode for drive train
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LOW_SPEED,"Low speed transmission",0,0,0,0)); //make sure we are in low speed
@@ -363,12 +397,15 @@ public class Autonomous {
 
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Turn 60",0,0,0,rotationAngle));
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.WAIT,"wait to settle 1",0.5,0,0,0));
-		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward 2",0,legSpeed,legSpeed,distanceLeg2));
-		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.WAIT,"wait to settle",1.0,0,0,0));
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward 2",0,leg2Speed,leg2Speed,distanceLeg2));
+		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.WAIT,"wait to settle",0.5,0,0,0));
 		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GET_ANGLE_CORRECTION,"Get Angle Correction",0.25,0,0,0));
-		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Correct Angle",0,0,0,0));
-		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward 3",0,legSpeed,legSpeed,distanceLeg3));
-		_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
+		
+		if (_shooterModeSelected != _autoGearNothing){
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.ROTATE,"Correct Angle",0,0,0,0));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward 3",0,leg3Speed,leg3Speed,distanceLeg3));
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
+		}
 		
 		//If we are isBoilerSide then add the steps for the ball handling
 //		SmartDashboard.putBoolean("is Boiler Side", isBoilerSide);
@@ -571,7 +608,9 @@ public class Autonomous {
 					System.out.println("Facing angle: " + _visionData.getFacingAngleInDeg());
 					if(Math.abs(_visionData.getFacingAngleInDeg()) < 60 && Math.abs(_visionData.getFacingAngleInDeg()) > 5){
 						
-						correctionOffset = (_visionData.getFacingAngleInDeg() > 0 ? 2.0 : -2.0);
+						if (!Enums.AUTO_FROM_CORNER){
+							correctionOffset = (_visionData.getFacingAngleInDeg() > 0 ? 2.0 : -2.0);							
+						}
 						nextStep.distance = _visionData.getFacingAngleInDeg() - correctionOffset; // we seem to be off about 2 deg				
 						}
 					else{

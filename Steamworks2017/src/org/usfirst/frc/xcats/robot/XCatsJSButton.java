@@ -17,6 +17,14 @@ public class XCatsJSButton {
 		_buttonNumber = buttonNumber;
 		
 	}
+	public void setState(boolean isTrue){
+		_mode = isTrue;
+		_toggle = !isTrue;
+	}
+	public boolean getState()
+	{
+		return _mode;
+	}
 
 	public XCatsJSButton(Joystick js, int axisNumber,boolean isAxis, boolean detectOnPositive){
 		_js = js;
