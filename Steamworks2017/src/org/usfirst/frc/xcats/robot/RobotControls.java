@@ -93,6 +93,8 @@ public class RobotControls {
 		_gear = new Gear(_drive);
 		_autoTarget = new AutoTarget(false);
 		
+		//_autoTarget.setCameraForAuto();
+		
 		_gearTimer = new Timer();
 		_gearTimer.reset();
 		
@@ -228,6 +230,9 @@ public class RobotControls {
 	private void shiftTransmission(){
 
 		_slowMode = !_slowMode;
+		if (_speedToggleButton.getState() != _slowMode){
+			_speedToggleButton.setState(_slowMode);}
+
 		_shiftTimer.reset();
 		_shiftTimer.start();
 		_shifting = true;
@@ -321,6 +326,7 @@ public class RobotControls {
 					SmartDashboard.putNumber("Vision FACING Angle", _visionData.getFacingAngleInDeg());
 					SmartDashboard.putNumber("Vision ZONE", _visionData.getZone());
 					SmartDashboard.putNumber("Vision DISTANCE", _visionData.getDistanceInInches());
+//					_autoTarget.setCameraDefaults();
 									
 				}
 			}else{

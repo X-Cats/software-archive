@@ -112,6 +112,7 @@ public class Enums {
 	//Autonomous uses the chooser object to select mode
 	public static final int AUTONOMOUS_TIME = 15;
 	public static final int AUTO_SWITCH_ANALOG = 0;
+	public static final boolean AUTO_FROM_CORNER = false;
 	
 	//Lights
 	public static final int GEAR_LIGHTS_CHANNEL = 5;//output for controlling the lights while ejecting the gear
