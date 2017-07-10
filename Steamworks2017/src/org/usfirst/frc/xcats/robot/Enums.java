@@ -27,7 +27,7 @@ public class Enums {
 	*/
 	public static final double SPEED_CALIBRATION = 0.0;  
 	
-	public static final boolean IS_FINAL_ROBOT = false;
+	public static final boolean IS_FINAL_ROBOT = true;
 	public static final String  DRIVE_CONTROLLER_TYPE = "Talon"; // choices are "Jaguar" or "Talon"
 	public static final boolean HAS_MECHANUM_WHEELS = false;
 	public static final boolean USE_PID = false;    	// This is if the drive train is using PID control
@@ -47,6 +47,7 @@ public class Enums {
 	//vision constants
 	public static final boolean VISION_SYSTEM_ENABLED = true;
 	public static final int CAMERA_FOV_HORIZONTAL = 61;  // Horizontal field of view for MSoft Lifecam
+	public static final boolean CAMERA_USE_REDUCED_BRIGHTNESS = true; //reduces brightness during acquisition for vision processing
 //	public static final int PIXEL_PER_DEGREE = 14;   // commented out to allow for various resolutions
 //	public static final int CAMERA_X_PIXELS_TOTAL = 640;  // commented out to allow for various resolutions
 //	public static final int CAMERA_Y_PIXELS_TOTAL = 480;  // commented out to allow for various resolutions

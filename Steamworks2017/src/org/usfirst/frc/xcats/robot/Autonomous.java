@@ -345,10 +345,10 @@ public class Autonomous {
 		
 		
 //		double boilerSideLeg1 = 117.4 - 14 - 9 + 2 +2; // these were james at the last penfield practice
-		double boilerSideLeg1 = 117.4 - 14 - 9 + 2 +2;
+		double boilerSideLeg1 = 117.4 - 14 - 9 + 2 + 2 + 3;
 //		double boilerSideLeg2 = 44 - 14 + 18 + 3 - 12; // these were james at the last penfield practice
 //		double boilerSideLeg2 = 44 - 14 + 18 + 3 - 18;
-		double boilerSideLeg2 = 44 - 14 + 18 + 3 - 18 +5;
+		double boilerSideLeg2 = 44 - 14 + 18 + 3 - 18 +5 -3 ;
 //		double feederSideLeg1 = 104 - 14 - 9 + 4; //these were James's settings at last penfield practice
 		double feederSideLeg1 = 104 - 14 - 9 - 5; //14 is half the robot length but need to subtract the 15.5/tan(60)
 //		double feederSideLeg2 = 52 - 14 + 18 + 3; // these were Jame's settings at last penfied practice
@@ -479,7 +479,7 @@ public class Autonomous {
 				if (Enums.IS_FINAL_ROBOT)					
 					//the final robot wheels are 5.375 in diameter (according to Pete, we should measure
 					// this makes each wheel revolution cover 7.5% more ground
-					encPos = Math.abs((_currentAutoStep.distance - 7.1002) /0.0045 );
+					encPos = Math.abs((_currentAutoStep.distance - 7.1002) /0.0045 )* 0.96; // was 0.9375 and slightly short
 				else
 					encPos = Math.abs((_currentAutoStep.distance - 7.1002) /0.0045 );
 
@@ -595,7 +595,13 @@ public class Autonomous {
 			
 		if (! _hasCaptured){
 			_hasCaptured = true;
-			_visionData = _controls.getAutoTarget().captureImage();			
+			if (Enums.CAMERA_USE_REDUCED_BRIGHTNESS)
+				_controls.getAutoTarget().setCameraForAuto();
+			
+			_visionData = _controls.getAutoTarget().captureImage();	
+			
+			if (Enums.CAMERA_USE_REDUCED_BRIGHTNESS)
+				_controls.getAutoTarget().setCameraDefaults();			
 							
 			if ( _visionData != null)
 			{

@@ -46,12 +46,22 @@ public class GripPipeline {
 		blur(blurInput, blurType, blurRadius, blurOutput);
 
 		// Step HSL_Threshold0:
-		Mat hslThresholdInput = blurOutput;
-		double[] hslThresholdHue = {66.36690647482014, 90.92150170648466};
-		double[] hslThresholdSaturation = {77.96762589928058, 255.0};
-		double[] hslThresholdLuminance = {38.98381294964029, 200.60580204778157};
-		hslThreshold(hslThresholdInput, hslThresholdHue, hslThresholdSaturation, hslThresholdLuminance, hslThresholdOutput);
+		if (Enums.CAMERA_USE_REDUCED_BRIGHTNESS) {
+			Mat hslThresholdInput = source0;
+			double[] hslThresholdHue = {45.0, 100.0};
+			double[] hslThresholdSaturation = {154.0, 255.0};
+			double[] hslThresholdLuminance = {38.98381294964029, 200.60580204778157};
+			hslThreshold(hslThresholdInput, hslThresholdHue, hslThresholdSaturation, hslThresholdLuminance, hslThresholdOutput);
 
+		} else {
+			Mat hslThresholdInput = blurOutput;
+			double[] hslThresholdHue = {66.36690647482014, 90.92150170648466};
+			double[] hslThresholdSaturation = {77.96762589928058, 255.0};
+			double[] hslThresholdLuminance = {38.98381294964029, 200.60580204778157};
+			hslThreshold(hslThresholdInput, hslThresholdHue, hslThresholdSaturation, hslThresholdLuminance, hslThresholdOutput);
+		
+		}
+		
 		// Step Find_Contours0:
 		Mat findContoursInput = hslThresholdOutput;
 		boolean findContoursExternalOnly = false;
