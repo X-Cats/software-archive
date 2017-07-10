@@ -233,6 +233,7 @@ public class Autonomous {
 		case _auto2: 
 			caseName="Middle Gear";
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.BRAKEMODE,"Brake Mode",0,0,0,0)); //Set brake mode for drive train
+			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.LOW_SPEED,"Low speed transmission",0,0,0,0)); //make sure we are in low speed
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE,"Drive Forward an inch",0.2,0.3,0.3,0)); //drive an inch at low speed to make sure encoders are zeroing
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.DRIVE_DISTANCE,"Drive Forward",0,.5,.5,84)); //70 inches
 			_steps.add( new AutonomousStep(AutonomousStep.stepTypes.GEAR,"Place Gear",0,0,0,60));
