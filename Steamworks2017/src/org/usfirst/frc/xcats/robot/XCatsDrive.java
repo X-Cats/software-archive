@@ -263,7 +263,7 @@ public class XCatsDrive {
 			_motors[i].updateStatus();
 			
 		}						
-		SmartDashboard.putNumber("Average Enc Position", this.getAbsAvgEncoderValue());
+//		SmartDashboard.putNumber("Average Enc Position", this.getAbsAvgEncoderValue());
 		//System.out.println("Left: " + Math.abs(this._motors[Enums.FRONT_LEFT].getEncPosition() - _leftEncZero ) +"  Right:" + Math.abs(this._motors[Enums.FRONT_RIGHT].getEncPosition() - _rightEncZero) );
 	}
 }

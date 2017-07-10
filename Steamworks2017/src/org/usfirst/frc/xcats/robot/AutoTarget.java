@@ -89,7 +89,7 @@ public class AutoTarget {
 			//_camera = camera;
 			// Set the resolution
 			_camera.setResolution(_width, _height);
-			_camera.setFPS(25);
+			_camera.setFPS(20);
 			_defaultBrightness = _camera.getBrightness();
 			System.out.println("Default Brightness: "+_defaultBrightness);
 //			_camera.setBrightness(50);
@@ -114,7 +114,7 @@ public class AutoTarget {
 			int P4y;
 				inRangeDeltaX = (int) (0.234 * _width);
 				outRangeDeltaX = (int) (0.245 * _width);
-				P0x = (int) (_width / 2 + 0.1 * (_width / 2));
+				P0x = (int)  (_width / 2);  // (_width / 2 + 0.1 * (_width / 2));
 				P1y = (int) (0.875 * _height);
 				P2y = (int) (0.6 * _height);
 				P4y = (int) (0.667 * _height);
@@ -330,7 +330,7 @@ public class AutoTarget {
 			System.out.print("Setting Camera to default settings");			
 			_camera.setResolution(_width,_height);
 			_camera.setFPS(25);
-			_camera.setBrightness(_defaultBrightness);
+			_camera.setBrightness(50);
 			_camera.setWhiteBalanceAuto();
 			_camera.setExposureAuto();
 	
@@ -347,11 +347,11 @@ public class AutoTarget {
 		try{
 			
 			System.out.print("Setting Camera to dark settings");			
-			_camera.setResolution(640, 480);
-			_camera.setFPS(25);
-			_camera.setBrightness(20);
+			//_camera.setResolution(640, 480);
+			_camera.setFPS(20);
+			_camera.setBrightness(50);  //was 20
 			_camera.setWhiteBalanceManual(6000);
-			_camera.setExposureManual(50);
+			_camera.setExposureManual(40);  //was 50
 	
 		}
 		catch (Exception e)

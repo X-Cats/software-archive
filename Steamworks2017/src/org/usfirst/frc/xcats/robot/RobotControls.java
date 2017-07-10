@@ -85,7 +85,7 @@ public class RobotControls {
 		_drive.setDashboardIO(false, false);
 		_drive.setInverted();
 		_drive.setCoastMode();
-		_drive.setMagneticEncoders(true);
+		_drive.setMagneticEncoders(false);
 		_drive.zeroEncoder();
 	
 		_feeder = new Feeder();
@@ -251,9 +251,9 @@ public class RobotControls {
 	public void drive ()
 	{
 
-		SmartDashboard.putBoolean("isEjecting", _gear.isEjecting());
-		SmartDashboard.putBoolean("isShifting", _shifting);
-		
+//		SmartDashboard.putBoolean("isEjecting", _gear.isEjecting());
+//		SmartDashboard.putBoolean("isShifting", _shifting);
+//		
 		if (_gear.isEjecting())
 			return;
 		
@@ -321,12 +321,18 @@ public class RobotControls {
 			if(Enums.TWO_JOYSTICKS){
 				//button 1 is the "trigger" button
 				if (_leftJS.getRawButton(1)){
+					
+					if (Enums.CAMERA_USE_REDUCED_BRIGHTNESS)
+						_autoTarget.setCameraForAuto();
+					
 					_visionData = _autoTarget.captureImage();
 					SmartDashboard.putBoolean("Vision Processing", _visionData.getResult());
 					SmartDashboard.putNumber("Vision FACING Angle", _visionData.getFacingAngleInDeg());
 					SmartDashboard.putNumber("Vision ZONE", _visionData.getZone());
 					SmartDashboard.putNumber("Vision DISTANCE", _visionData.getDistanceInInches());
-//					_autoTarget.setCameraDefaults();
+					
+					if (Enums.CAMERA_USE_REDUCED_BRIGHTNESS)
+						_autoTarget.setCameraDefaults();
 									
 				}
 			}else{
@@ -345,8 +351,8 @@ public class RobotControls {
 		deltaYaw =  _navx.getYaw();
 		double offset=0;
 
-		SmartDashboard.putNumber("currentYaw", _initialYaw);
-		SmartDashboard.putNumber("deltaYaw", deltaYaw);
+//		SmartDashboard.putNumber("currentYaw", _initialYaw);
+//		SmartDashboard.putNumber("deltaYaw", deltaYaw);
 		double  offsetLimit = 0.05;
 		if (left == right){
 			offset = Math.abs(deltaYaw);
@@ -459,9 +465,9 @@ public class RobotControls {
 		
 //		SmartDashboard.putNumber("LeftSpeed", _drive.get(Enums.FRONT_LEFT));
 //		SmartDashboard.putNumber("Direction", directionLeft);
-		SmartDashboard.putBoolean("Shifter in HIGH Gear", !_slowMode);		
-		
-		SmartDashboard.putBoolean("DriverLeftButton", _leftJS.getRawButton(3));
+//		SmartDashboard.putBoolean("Shifter in HIGH Gear", !_slowMode);		
+//		
+//		SmartDashboard.putBoolean("DriverLeftButton", _leftJS.getRawButton(3));
 		
 		_drive.updateStatus();
 		_gear.updateStatus();

@@ -19,7 +19,8 @@ public class Feeder {
 		_topFeeder =  new XCatsSpeedController("Top Feeder",Enums.FEEDER_TOP_CAN,true,SCType.TALON,null,null);
 //		_bottomFeeder =  new XCatsSpeedController("Bottom Feeder",Enums.FEEDER_BOTTOM_CAN,true,SCType.TALON,null,null);
 		if(Enums.IS_FINAL_ROBOT){
-			_lifter = new DoubleSolenoid(Enums.PCM_CAN_ID,Enums.PCM_SHIFTER_REVERSE,Enums.PCM_SHIFTER_FORWARD);
+			//_lifter = new DoubleSolenoid(Enums.PCM_CAN_ID,Enums.PCM_SHIFTER_REVERSE,Enums.PCM_SHIFTER_FORWARD);
+			_lifter = new DoubleSolenoid(Enums.PCM_CAN_ID,Enums.PCM_SHIFTER_FORWARD,Enums.PCM_SHIFTER_REVERSE);
 		}else{
 			_lifter = new DoubleSolenoid(Enums.PCM_CAN_ID,Enums.FEEDER_LIFT_PCM_FORWARD,Enums.FEEDER_LIFT_PCM_BACKWARD);
 		}
