@@ -47,7 +47,7 @@ public class Enums {
 	//vision constants
 	public static final boolean VISION_SYSTEM_ENABLED = true;
 	public static final int CAMERA_FOV_HORIZONTAL = 61;  // Horizontal field of view for MSoft Lifecam
-	public static final boolean CAMERA_USE_REDUCED_BRIGHTNESS = true; //reduces brightness during acquisition for vision processing
+	public static final boolean CAMERA_USE_REDUCED_BRIGHTNESS = false; //reduces brightness during acquisition for vision processing
 //	public static final int PIXEL_PER_DEGREE = 14;   // commented out to allow for various resolutions
 //	public static final int CAMERA_X_PIXELS_TOTAL = 640;  // commented out to allow for various resolutions
 //	public static final int CAMERA_Y_PIXELS_TOTAL = 480;  // commented out to allow for various resolutions

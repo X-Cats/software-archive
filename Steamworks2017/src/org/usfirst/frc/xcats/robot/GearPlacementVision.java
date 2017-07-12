@@ -22,8 +22,11 @@ public class GearPlacementVision
 		int distance_in_inches = 0;
 		int zone = 0;
 		double facing_angle_in_deg = 0;
-		int res_x = 640;  // default value of image resolution, horizontally (e.g. 640x480)
+		int res_x = 640;  // default value of image resolution, horizontally (e.g. 640x480) 
+		int res_y = 320;  // default
 		res_x = _mat.width();
+		res_y = _mat.height();
+		
 		double pixels_per_degree_X = res_x / Enums.CAMERA_FOV_HORIZONTAL;  // Horizontal field of view for MSoft Lifecam
 		System.out.println("Horizontal resolution: " + res_x + 
 				"  Horizontal pixels per degree = " + pixels_per_degree_X);
@@ -42,14 +45,16 @@ public class GearPlacementVision
 		for (MatOfPoint mop : gp.filterContoursOutput())
 		{
 			Rect rect = Imgproc.boundingRect(mop);
-			rectList.add(rect);
-			System.out.println("Rectangle #" + rectNum
-					+ ": Height=" + rect.height
-					+ ", Width=" + rect.width
-					+ ", Area=" + rect.area()
-					+ ", X=" + rect.x
-					+ ", Y=" + rect.y);
-			rectNum++;
+			if ((rect.x > 5) && (rect.y > 0.25*res_y) && (rect.y < 0.75*res_y )) {
+				rectList.add(rect);
+				System.out.println("Rectangle #" + rectNum
+						+ ": Height=" + rect.height
+						+ ", Width=" + rect.width
+						+ ", Area=" + rect.area()
+						+ ", X=" + rect.x
+						+ ", Y=" + rect.y);
+				rectNum++;
+			}
 		}
 
 		if (rectList.size() == 0)
