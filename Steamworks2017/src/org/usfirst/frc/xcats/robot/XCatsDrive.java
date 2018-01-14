@@ -1,8 +1,8 @@
 package org.usfirst.frc.xcats.robot;
 
 
-import com.ctre.CANTalon;
-import com.ctre.CANTalon.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
@@ -72,7 +72,7 @@ public class XCatsDrive {
 		}				
 	}
 	
-	
+	/*
 	public XCatsDrive (int channels[], boolean speedMode, boolean isTalon, int codesPerRev, double p, double i, double d)
 	{
 		_channels = channels;
@@ -92,11 +92,12 @@ public class XCatsDrive {
 			_motors[Enums.REAR_LEFT].setInverted(true);
 		}
 	}
+	*/
 	
 	public void setMagneticEncoders(boolean outputIO){
 		//this function assumes that the front_left and front_right are the "drive motor master" controllers
-		this.setFeedbackDevice(Enums.FRONT_LEFT, CANTalon.FeedbackDevice.CtreMagEncoder_Absolute, outputIO);
-		this.setFeedbackDevice(Enums.FRONT_RIGHT, CANTalon.FeedbackDevice.CtreMagEncoder_Absolute, outputIO);
+		this.setFeedbackDevice(Enums.FRONT_LEFT, FeedbackDevice.CTRE_MagEncoder_Absolute, outputIO);
+		this.setFeedbackDevice(Enums.FRONT_RIGHT, FeedbackDevice.CTRE_MagEncoder_Absolute, outputIO);
 	}
 	
 	public void setFeedbackDevice(int motorEnum,FeedbackDevice device,boolean outputIO){
@@ -170,10 +171,10 @@ public class XCatsDrive {
 		}
 	}
 
-	public void setRampingRate(double voltsPerSec){
+	public void setRampingRateTime(double timeToFull){
 		
 		for (int i = 0; i < Enums.DRIVE_MOTOR_NUMBERS.length; i ++){
-			_motors[i].setRampingRate(voltsPerSec);
+			_motors[i].setRampingRate(timeToFull);
 		}
 	}
 	
