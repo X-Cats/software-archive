@@ -1,9 +1,14 @@
 package org.usfirst.frc.xcats.robot;
 
 
-import edu.wpi.first.wpilibj.CANSpeedController;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
+//import edu.wpi.first.wpilibj.CANSpeedController;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Talon;
@@ -15,7 +20,7 @@ public class XCatsSpeedController{
 
 	public enum SCType{TALON,VICTOR_SP};
 	private SpeedController motor;
-	private CANSpeedController _CANmotor;
+	 private SpeedController _CANmotor;
 	private SCType _sctype; 
 	/*
 	 * The _scale and the units depend on the mode the Jaguar is in.
@@ -62,13 +67,15 @@ public class XCatsSpeedController{
 			{
 				switch ( sctype){
 				case TALON :
-					this._CANmotor = new TalonSRX(channel);
+					this._CANmotor = new WPI_TalonSRX(channel);
 					this.motor = _CANmotor;			// all CANSpeedControllers are SpeedControllers
 					//this makes sure the talon operates between 0 and 12 volts, voltage > 12 is unpredictable
-					((TalonSRX) _CANmotor).configNominalOutputVoltage(0f, -0f);
-					((TalonSRX) _CANmotor).configPeakOutputVoltage(12.0f, -12.0f);
-					((TalonSRX) _CANmotor).changeControlMode(TalonSRX.TalonControlMode.PercentVbus);
-					((TalonSRX) _CANmotor).enableControl();
+					((WPI_TalonSRX) _CANmotor).configNominalOutputForward(0,+1);
+					((WPI_TalonSRX) _CANmotor).configNominalOutputReverse(0,+1);
+					((WPI_TalonSRX) _CANmotor).configPeakOutputForward(1, 0);
+					((WPI_TalonSRX) _CANmotor).configPeakOutputReverse(-1, 0);
+					((WPI_TalonSRX) _CANmotor).set(com.ctre.phoenix.motorcontrol.ControlMode.PercentOutput, 0);
+					//((WPI_TalonSRX) _CANmotor).enableControl();//this appears to no longer be required when changing control modes
 					break;
 				default:
 					System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
@@ -102,13 +109,14 @@ public class XCatsSpeedController{
 			e.printStackTrace();			
 			System.out.println("------------------------------------------------------");
 		}
+		
 
 
 	}
 
-	
+	/*
 	//this constructor is only used when we want to try using PID control
-	public XCatsSpeedController (String name, int channel, SCType sctype, boolean speedMode, int codesPerRev, int scale, double p, double i, double d,DigitalInput lowerLimit,DigitalInput upperLimit, com.ctre.TalonSRX.FeedbackDevice feedback)
+	public XCatsSpeedController (String name, int channel, SCType sctype, boolean speedMode, int codesPerRev, int scale, double p, double i, double d,DigitalInput lowerLimit,DigitalInput upperLimit, com.ctre.phoenix.motorcontrol.FeedbackDevice feedback)
 	{
 		this._codesPerRev = codesPerRev;
 		this._p = p;
@@ -175,18 +183,21 @@ public class XCatsSpeedController{
 			}								
 		}		
 	}
+	
+	*/
 
 	public void setPDP(PowerDistributionPanel pdp, double voltageThreshold, double reductionFactor){
 		_pdp = pdp;
 		this._pdpVoltageThreshold = voltageThreshold;
 		this._pdpVoltageReductionFactor=reductionFactor;
 	}
+	
 	public void set (double setPoint)
 	{
 		//i don't know why we are getting a stack dump at the beginning of the code, maybe it is an initialization thing
 		//		try
 		//		{
-		/*
+		
 			//check to see if we have a limit switch for this speed controller
 			//if you do not interrogate the limit switch before you set the speed controller value you can get "chatter" where the 
 			//speed controller tries to drive it past the limit.
@@ -200,7 +211,7 @@ public class XCatsSpeedController{
 			if (_upperLimit != null)
 				if (_upperLimit.get() && _cutOffDirection * setPoint > 0 )
 					return;
-		 */
+		 
 		
 		if (_pdp != null){
 
@@ -237,32 +248,35 @@ public class XCatsSpeedController{
 			//			if (setPoint ==0)
 			//				this.stop();
 	}
+	
 
 	public void setBrakeMode(){
 	if (_CANmotor != null){
 			
 			switch ( _sctype){
 			case TALON:
-				((TalonSRX) _CANmotor).enableBrakeMode(true);				
+				((WPI_TalonSRX) _CANmotor).setNeutralMode(NeutralMode.Brake);				
 				break;
 			default:
 				System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled in setBrakeMode!");
 			}			
 		}		
 	}
+	
 
 	public void setCoastMode(){
 	if (_CANmotor != null){
 			
 			switch ( _sctype){
 			case TALON:
-				((TalonSRX) _CANmotor).enableBrakeMode(false);		
+				((WPI_TalonSRX) _CANmotor).setNeutralMode(NeutralMode.Coast);		
 				break;
 			default:
 				System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled in setCoastMode!");
 			}			
 		}		
 	}
+	/*
 	
 	//to set this, you need to determine it from the wheel diameter and other factors related to friction
 	public void setRPMPerInch(double rpmPerInch){
@@ -275,12 +289,13 @@ public class XCatsSpeedController{
 //	public void zeroTotalizedInches(){
 //		_totalizedDistance = 0;
 //	}
-	public void setRampingRate(double voltsPerSec){
+ */
+	public void setRampingRate(double timeToFull){
 		if (_CANmotor != null){
 			
 			switch ( _sctype){
 			case TALON:
-				((TalonSRX) _CANmotor).setVoltageRampRate(voltsPerSec);		
+				((WPI_TalonSRX) _CANmotor).configOpenloopRamp(timeToFull, 0);		
 				break;
 			default:
 				System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled in setRampingRate!");
@@ -288,6 +303,7 @@ public class XCatsSpeedController{
 		}		
 		
 	}
+	/*
 	
 	public void stop ()
 	{
@@ -295,11 +311,12 @@ public class XCatsSpeedController{
 		this._stopping = true;
 		_stopTimer.start();
 	}
+	*/
 
-	public void setFeedbackDevice(TalonSRX.FeedbackDevice device){
+	public void setFeedbackDevice(com.ctre.phoenix.motorcontrol.FeedbackDevice device){
 		switch ( _sctype){
 		case TALON:
-			((TalonSRX) _CANmotor).setFeedbackDevice(device);
+			((WPI_TalonSRX) _CANmotor).configSelectedFeedbackSensor(device, 0, 0);
 			_hasFeedbackDevice = true;
 			break;
 		default:
@@ -307,15 +324,13 @@ public class XCatsSpeedController{
 		}					
 		
 	}
-	public void zeroSensorAndThrottle(TalonSRX.FeedbackDevice feedbackdevice,TalonSRX.TalonControlMode cmode,double zero){
+	/*
+	public void zeroSensorAndThrottle(int zero){
 		switch ( _sctype){
 		case TALON:
+			int arg1, arg2 =0;//todo
 			_setPoint = zero;
-			((TalonSRX) _CANmotor).setPosition(zero); /* start our position at zero, this example uses relative positions */
-//			((TalonSRX) _CANmotor).changeControlMode(cmode);
-//			setFeedbackDevice(feedbackdevice);
-//			((TalonSRX) _CANmotor).set(zero);
-//			 Thread.Sleep(100); 		
+			((TalonSRX) _CANmotor).setSelectedSensorPosition(zero, arg1, arg2); /* start our position at zero, this example uses relative positions 	
 			break;
 		default:
 			System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
@@ -362,6 +377,7 @@ public class XCatsSpeedController{
 		if (_dashboardOutput)
 			SmartDashboard.putBoolean(_name + "_raw_input", _useRawInput);
 	}
+	*/
 
 	public void setInverted(boolean invert)
 	{
@@ -391,15 +407,18 @@ public class XCatsSpeedController{
 			SmartDashboard.putBoolean(_name + "_raw_input", _useRawInput);
 
 			if (_CANmotor != null ){
-				if (_CANmotor.getControlMode() != TalonSRX.TalonControlMode.PercentVbus)
+				/*if (_CANmotor.get() != com.ctre.phoenix.motorcontrol.can.TalonSRX.)
 				{
 					SmartDashboard.putNumber(_name + "_p", _p);
 					SmartDashboard.putNumber(_name + "_i", _i);
 					SmartDashboard.putNumber(_name + "_d", _d);				
 				}
+				*/
 			}
 		}
+		
 	}
+	/*
 
 	//	public void setPercentMode ()
 	//	{
@@ -429,7 +448,9 @@ public class XCatsSpeedController{
 	//			((TalonSRX) motor).setPID(p, i, d);
 	//			((TalonSRX) motor).enableControl();
 	//		}
-	//	}
+	//	}*/
+
+/*
 
 	public boolean isTalon ()
 	{
@@ -450,13 +471,13 @@ public class XCatsSpeedController{
 			return null;
 		}
 	}
+	*/
 
 	public void setFollower(int masterChannel){
-		
 		switch (_sctype){
 		case TALON:
-			 ((TalonSRX) _CANmotor).changeControlMode(TalonControlMode.Follower);
-			 ((TalonSRX) _CANmotor).set(masterChannel);
+			 ((WPI_TalonSRX) _CANmotor).set(com.ctre.phoenix.motorcontrol.ControlMode.Follower, masterChannel);
+			 //((TalonSRX) _CANmotor).set(masterChannel);
 			 break;
 		default:
 			System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
@@ -469,9 +490,9 @@ public class XCatsSpeedController{
 		if (_CANmotor != null){		
 			switch (_sctype){
 			case TALON:
-				((TalonSRX) _CANmotor).setPosition(0);			
+				((WPI_TalonSRX) _CANmotor).setSelectedSensorPosition(0, 0, 0);			
 				if (_hasFeedbackDevice){
-					((TalonSRX) _CANmotor).setEncPosition(0); //note: i do not know what this will do to a PID loop
+					((WPI_TalonSRX) _CANmotor).getSensorCollection(). setQuadraturePosition(0, 0); //note: i do not know what this will do to a PID loop
 				}
 				break;
 			default:
@@ -479,11 +500,13 @@ public class XCatsSpeedController{
 			}
 		}
 	}
+	
 
 	public double getSetPoint ()
 	{
 		return _setPoint;
 	}
+	/*
 
 	public double getCurrent ()
 	{
@@ -515,11 +538,12 @@ public class XCatsSpeedController{
 		return motor.get();
 	}
 
-	public void setPosition(double position)
+	public void setPosition(int position)
 	{
 		switch (_sctype){
 		case TALON:
-			((TalonSRX)_CANmotor).setPosition(position) ;
+			int arg1, arg2 = 0;//todo
+			((TalonSRX)_CANmotor).setSelectedSensorPosition(position, arg1, arg2) ;
 			break;
 		default:
 			System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
@@ -535,17 +559,19 @@ public class XCatsSpeedController{
 		else
 			return _CANmotor.getPosition() / _invert / _scale;
 	}
+	*/
 
 	public double getEncPosition ()
 	{
 		switch (_sctype){
 		case TALON:
-			return ((TalonSRX) motor).getEncPosition();			
+			return ((WPI_TalonSRX) motor).getSensorCollection(). getQuadraturePosition();			
 		default:
 			System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
 			return 0;
 		}		
 	}
+	/*
 
 	
 	public void reverseSensor (boolean invert)
@@ -553,7 +579,7 @@ public class XCatsSpeedController{
 		//note: you may need to use this if the RPMs are negative and you have an encoder
 		switch (_sctype){
 		case TALON:
-			((TalonSRX) motor).reverseSensor(invert);
+			((TalonSRX) motor) com.ctre.phoenix.motorcontrol.can.basemotorcontroller.setInverted(invert);
 			break;
 		default:
 			System.out.println("DANGER DANGER DANGER -- speed controller type in XCatsSpeedController not handled!");
@@ -564,13 +590,14 @@ public class XCatsSpeedController{
 	{
 		//		((TalonSRX) motor).
 	}
+	*/
 
 	public void updateStatus()
 	{
 			
 		if (_CANmotor != null){
 			//don't do anything with following motors
-			if (_CANmotor.getControlMode() == TalonSRX.TalonControlMode.Follower)
+			if (((WPI_TalonSRX) _CANmotor).getControlMode() == com.ctre.phoenix.motorcontrol.ControlMode.Follower)
 				return;			
 		}
 
@@ -578,10 +605,10 @@ public class XCatsSpeedController{
 		
 		//SmartDashboard.putBoolean(_name+"_I/O output", _dashboardOutput);
 		
-		/*
+		
 		if (motor instanceof TalonSRX){
 			
-		}*/
+		}
 		
 		if (_stopping && _stopTimer.get() > Enums.MOTOR_STOP_TIME)
 		{
@@ -596,25 +623,25 @@ public class XCatsSpeedController{
 			//check the control mode, if it's not PercentVbus its going to be PID control
 			if (_dashboardInput )
 			{
-				if (_CANmotor.getControlMode() != TalonSRX.TalonControlMode.PercentVbus){
+				if (((WPI_TalonSRX) _CANmotor).getControlMode() != com.ctre.phoenix.motorcontrol.ControlMode.PercentOutput){
 					_p = SmartDashboard.getNumber(_name + "_p", 0);
 					_i = SmartDashboard.getNumber(_name + "_i",0);
 					_d = SmartDashboard.getNumber(_name + "_d",0);					
 				}
 
-				_CANmotor.setPID(_p, _i, _d);
+				//( (WPI_TalonSRX) _CANmotor).setPID(_p, _i, _d);
 			}
 
 			if (_dashboardOutput)
 			{
 				if (motor instanceof TalonSRX)
-					SmartDashboard.putBoolean(_name + " is RPM Mode", ((TalonSRX) motor).getControlMode() == TalonSRX.TalonControlMode.Speed ? true : false);
+					SmartDashboard.putBoolean(_name + " is RPM Mode", ((TalonSRX) motor).getControlMode() == com.ctre.phoenix.motorcontrol.ControlMode.Velocity ? true : false);
 
-				SmartDashboard.putNumber(_name + "_current", _CANmotor.getOutputCurrent());
-				SmartDashboard.putNumber(_name + "_speed", _CANmotor.getSpeed());
-				SmartDashboard.putNumber(_name + "_EncPosition", ((TalonSRX) _CANmotor).getEncPosition());
-				SmartDashboard.putNumber(_name + "_EncVelocity", ((TalonSRX) _CANmotor).getEncVelocity());
-				SmartDashboard.putNumber(_name + "_position", ((TalonSRX) _CANmotor).getPosition() / _invert / _scale);					
+				SmartDashboard.putNumber(_name + "_current", ((WPI_TalonSRX) _CANmotor).getOutputCurrent());
+				SmartDashboard.putNumber(_name + "_speed", ((PWM) _CANmotor).getSpeed());
+				SmartDashboard.putNumber(_name + "_EncPosition", ((TalonSRX) _CANmotor).getSensorCollection().getQuadraturePosition());
+				SmartDashboard.putNumber(_name + "_EncVelocity", ((TalonSRX) _CANmotor).getSensorCollection().getQuadratureVelocity());
+				SmartDashboard.putNumber(_name + "_position", ((TalonSRX) _CANmotor).getSelectedSensorPosition(0) / _invert / _scale);					
 				//				SmartDashboard.putNumber(_name + "_encoder", ((CANJaguar) motor).);
 			}
 		}
@@ -627,4 +654,5 @@ public class XCatsSpeedController{
 
 		set(_setPoint);
 	}
+	
 }
