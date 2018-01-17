@@ -48,9 +48,6 @@ public class RobotControls {
 	private boolean _liftMode = false;
 	private XCatsJSButton _speedToggleButton;
 	private XCatsJSButton _highSpeedButton;
-	
-	private Timer _gearTimer;  // use this so that the 
-	private Gear _gear;
 
 	private boolean _highSpeed = false;
 	private DoubleSolenoid _dblSolShifter;
@@ -59,11 +56,6 @@ public class RobotControls {
 	private float _initialYaw=0;
 	
 	private VisionData _visionData;
-
-	private Feeder _feeder;
-	private XCatsJSButton _feederLifter;
-
-	private Climber _climber;
 	
 	private Compressor _compressor;
 	private PowerDistributionPanel _pdp;
@@ -86,17 +78,11 @@ public class RobotControls {
 		_drive.setCoastMode();
 		_drive.setMagneticEncoders(false);
 		_drive.zeroEncoder();
-	
-		_feeder = new Feeder();
-		_climber = new Climber();
-		_gear = new Gear(_drive);
+		
 		_autoTarget = new AutoTarget(false);
 		
 		//_autoTarget.setCameraForAuto();
-		
-		_gearTimer = new Timer();
-		_gearTimer.reset();
-		
+
 		//_drive.setPDP(_pdp, Enums.BROWNOUT_VOLTAGE_THRESHOLD, Enums.BROWNOUT_VOLTAGE_REDUCTIONFACTOR);
 		
 		
@@ -132,7 +118,6 @@ public class RobotControls {
 		}
 
 		_operatorJS = new Joystick(Enums.OPERATOR_JS);
-		_feederLifter = new XCatsJSButton(_operatorJS,5);
 				
 		try
 		{
@@ -154,9 +139,6 @@ public class RobotControls {
 		
 	}
 	
-	public void feederInit(){
-		_feeder.dropBar();
-	}
 	public void setCoastMode(){
 		_drive.setCoastMode();
 	}
@@ -253,8 +235,6 @@ public class RobotControls {
 //		SmartDashboard.putBoolean("isEjecting", _gear.isEjecting());
 //		SmartDashboard.putBoolean("isShifting", _shifting);
 //		
-		if (_gear.isEjecting())
-			return;
 		
 		//if we are executing commands then execute it but exit response to driver.
 		//we will need to allow some escape sequence to cancel this, maybe respond to both triggers on the drivers joysticks
@@ -378,46 +358,16 @@ public class RobotControls {
 			return;
 		}
 		
-		if(_operatorJS.getRawButton(8))
-			_gear.eject();
-		
-		if (_operatorJS.getRawButton(6))
-			_gear.acquireGear();
 		
 		//these feeder buttons are mutually exclusive, but need to be on a 
 		//different thumb from the feeder raise and lower
-		if(_operatorJS.getRawButton(1))
-			_feeder.intake();
-		else if (_operatorJS.getRawButton(2))
-			_feeder.feed();
-		else if(_operatorJS.getRawButton(3))
-			_feeder.lowGoal();
-		else
-			_feeder.stop();
-
-		boolean liftToggle = _feederLifter.isPressed();
-		if (liftToggle != _liftMode ){
-			_liftMode = ! _liftMode;
-			_feeder.toggleLifter();
-		}
 		
 	
 		
-		if(_operatorJS.getRawButton(7))
-		{
-			_climber.climb();
-//		else if (_operatorJS.getRawButton(5))
-//			_climber.release();
-			_feeder.lift();
-		}
-		else
-			_climber.stop();
 		
 	}
 
-	public Feeder getFeeder(){
-		return _feeder;
-	}
+
 
 	public XCatsDrive getDrive()
 	{
@@ -426,9 +376,7 @@ public class RobotControls {
 	public AutoTarget getAutoTarget(){
 		return _autoTarget;
 	}
-	public Gear getGear(){
-		return _gear;
-	}
+
 	
 	public void updateStatus ()
 	{
@@ -469,9 +417,6 @@ public class RobotControls {
 //		SmartDashboard.putBoolean("DriverLeftButton", _leftJS.getRawButton(3));
 		
 		_drive.updateStatus();
-		_gear.updateStatus();
-		_feeder.updateStatus();
-		_climber.updateStatus();
 		_autoTarget.updateStatus();
 		
 		if (_commandAuto != null)
@@ -481,7 +426,6 @@ public class RobotControls {
 			_navx.updateStatus();
 			
 		}
-		if(_gear.isOnBoard())
-			_operatorJS.setRumble(RumbleType.kRightRumble, 1);
+		
 	}
 }

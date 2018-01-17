@@ -538,15 +538,11 @@ public class Autonomous {
 			case GEAR: 
 				//if we have not requested an ejection, do so now
 				if (!_isEjecting){
-					_isEjecting = true;
-					_controls.getGear().eject();					
+					_isEjecting = true;					
 				}					
 				
 				//wait until the gear is fully deployed, this will back up the robot too
-				if (! _controls.getGear().isEjecting()){
-					_isEjecting = false;
-					startNextStep();
-				} 
+				
 			
 				break;
 				
@@ -664,18 +660,9 @@ public class Autonomous {
 		}
 	}
 	
-	private void raise(){
-		_controls.getFeeder().lower();
-		startNextStep();
-	}
+
 	
-	private void feedBalls(double time){
-		if (_stepTimer.get() <= time){
-			_controls.getFeeder().feed();			
-		} else
-			startNextStep();
-		
-	}
+
 	public void updateStatus(){
 
 		if (_steps != null && _currentAutoStep != null){
