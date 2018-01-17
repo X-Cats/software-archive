@@ -10,7 +10,6 @@ public class Teleop {
 		this._controls = controls;
 	}
 	public void init(){
-		_controls.feederInit();
 		_controls.setCoastMode();
 	}
 
