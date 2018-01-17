@@ -522,19 +522,14 @@ public class Autonomous {
 				getVisionCorrection(_currentAutoStep.stepTime);
 				break;
 
-			case LIFT:
-				raise();
-				break;
 				
 			case ROTATE:
 				rotate(_currentAutoStep.distance);
 
 				break;
 
-			case FEED:
-				feedBalls(_currentAutoStep.stepTime);
 				
-				break;
+				
 			case GEAR: 
 				//if we have not requested an ejection, do so now
 				if (!_isEjecting){
