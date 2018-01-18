@@ -77,38 +77,12 @@ public class Enums {
 	public static final boolean TWO_JOYSTICKS = true;
 	public static final boolean DASHBOARD_INPUT = false, DASHBOARD_OUTPUT = false;
 	
-	//Winch
-	public static final int WINCH_CAN_ID =11; //CAN ID of the winch
-	public static final double WINCH_CLIMB_SPEED = 1.0; // speed to climb
-	//public static final int WINCH_LIMIT_SWITCH = 3;// limit switch for the winch
+	//Following enums need to be set for 2018 robot, current values are just placeholders
 	
-	
-	//Gear Ejector
-	//note turn this off because the reflective tape on the target interferes with the sensor detection, and the
-	//gear rotates as it gets close to it.
-	public static final boolean GEAR_AUTO_ROTATE = false; // whether to monitor for the gear obstructing the eye
-	
-	public static final int GEAR_ROTATOR_PWM_ID = 7;
-	public static final int GEAR_PCM_FORWARD = 7; // PCM id for the gear ejector
-	public static final int GEAR_PCM_REVERSE = 6; // PCM id for the gear ejector
-	public static final double GEAR_EJECT_TIME = 1; // time in seconds before retracting ejector piston
-	public static final double GEAR_EJECT_REVERSE_START_TIME = 0.5; // Start reversing this long after the piston deploys
-	public static final double GEAR_EJECT_REVERSE_TIME = .5; // time to reverse
-	public static final double GEAR_EJECT_REVERSE_SPEED = 0.6; //speed to reverse with when ejecting
-	public static final int GEAR_POSITIONED_OPT = 2; //optical sensor that detects if gear is position(rotated) correctly
-	public static final int GEAR_ONBOARD_OPT = 2;    //optical sensor that detects if the gear is positioned far enough in the robot to eject
-	public static final double GEAR_ROTATOR_SPEED = 0.25;
-	public static final int GEAR_LS_CHANNEL=0; //Left limit switch
-    public static final int GEAR_RS_CHANNEL=1; //Right limit switch
-    
-	
-	//Feeder
-	public static final int FEEDER_TOP_CAN = 9;
-	public static final int FEEDER_BOTTOM_CAN = 10;
-	public static final double FEEDER_INTAKE_SPEED = 0.5; //speed at which balls are sucked in
-	public static final double FEEDER_FEED_SPEED = 0.5;  //speed at which balls are spit out
-	public static final int FEEDER_LIFT_PCM_FORWARD = 2;
-	public static final int FEEDER_LIFT_PCM_BACKWARD = 3;
+	//Acquisition
+	public static final int LEFT_ACQUISITION_CAN_ID = 30;//can id for left acquisition motor
+	public static final int RIGHT_ACQUISITION_CAN_ID = 31;//can id for right acquisition motor
+	public static final double ACQUISITION_SPEED = 0.5;//speed of acquisition motors, is currently test value
 	
 	//Autonomous uses the chooser object to select mode
 	public static final int AUTONOMOUS_TIME = 15;
