@@ -84,6 +84,11 @@ public class Enums {
 	public static final int RIGHT_ACQUISITION_CAN_ID = 31;//can id for right acquisition motor
 	public static final double ACQUISITION_SPEED = 0.5;//speed of acquisition motors, is currently test value
 	
+	//Elevator
+	public static final int ELEVATOR_MASTER_CAN_ID = 32;//can id for elevatorMaster
+	public static final int ELEVATOR_FOLLOWER_CAN_ID = 32;//can id for elevatorFollower
+	public static final double ELEVATOR_SPEED = 0.5;//speed for elevator motor, currently test value
+	
 	//Autonomous uses the chooser object to select mode
 	public static final int AUTONOMOUS_TIME = 15;
 	public static final int AUTO_SWITCH_ANALOG = 0;
